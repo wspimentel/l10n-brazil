@@ -20,7 +20,9 @@ import re
 from openerp.osv import orm, fields
 from openerp.tools.translate import _
 from openerp.osv.osv import except_osv
-
+import urllib2
+import urllib 
+import libxml2 
 
 class l10n_br_data_zip(orm.Model):
     """ Este objeto persiste todos os códigos postais que podem ser
@@ -101,7 +103,6 @@ class l10n_br_data_zip(orm.Model):
                 'zip': zip,
             }
         return result
-            
                 
     def zip_search_multi(self, cr, uid, ids, context, country_id=False, state_id=False, l10n_br_city_id=False, district=False, street=False, zip=False):
         domain = self.set_domain(country_id = country_id, 
@@ -149,3 +150,32 @@ class l10n_br_data_zip(orm.Model):
                     'nodestroy': True,
                     }
         return result
+
+    def zip_search_online(self,cr, uid, ids, context, zip=False):
+        if zip != False:
+            zip = re.sub('[^0-9]', '', zip or '')
+            zip = '88040230'
+            data = {'cepEntrada': zip, 'tipoCep':'', 'cepTemp':'', 'metodo':'buscarCep'}
+            data = urllib.urlencode(data)
+            response = urllib2.urlopen("http://m.correios.com.br/movel/buscaCepConfirma.do", data)
+            html = response.read()
+            doc =  libxml2.htmlParseDoc(html, 'ISO-8859-1')
+            ctxt = doc.xpathEval('//*[@id="frmCep"]/div[1]/span')               
+            if len(ctxt) > 0 :
+                logradouro = ctxt[1].content
+                logradouro = logradouro.strip(' \t\n\r')
+                bairro = ctxt[3].content
+                bairro = bairro.strip(' \t\n\r')
+                cidade = ctxt[5].content.split('/')[0]
+                cidade = cidade.strip(' \t\n\r')
+                estado = ctxt[5].content.split('/')[1]
+                estado = estado.strip(' \t\n\r')
+                cep = ctxt[7].content
+                cep = cep.strip(' \t\n\r')
+                
+                #Buscar a cidade o estado e inserir no banco 
+                return self.set_result(cr, uid, ids, context, 1)                    
+            else:
+                return False         
+        else:
+            return False

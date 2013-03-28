@@ -18,6 +18,8 @@
 ###############################################################################
 
 from openerp.osv import orm
+from openerp.osv import osv
+from openerp.tools.translate import _
 
 
 class res_partner(orm.Model):
@@ -50,4 +52,9 @@ class res_partner(orm.Model):
                                         zip_ids = zip_ids
                                         )
                 else:
-                    return True
+                    result = obj_zip.zip_search_online(cr, uid, ids, context, zip=res_partner.zip)
+                    if result != False:
+                        self.write(cr, uid, res_partner.id, result, context)
+                        return True
+                    else:
+                        raise osv.except_osv(_('Not found!'), _('No address found with the provided zip code!'))

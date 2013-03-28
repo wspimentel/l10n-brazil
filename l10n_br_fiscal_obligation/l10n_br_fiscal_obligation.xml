@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="fiscal_obligation_form_view">
+            <field name="name">fiscal.obligation.form</field>
+            <field name="model">fiscal.obligation</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Obrigacoes fiscais">                
+                    <field name="code" colspan="2"/>
+                    <field name="description" placeholder="Descricao" />
+                    <field name="messages" placeholder="Mensagens" colspan="8"/>                 
+                </form>
+            </field>
+        </record>
+        
+        <record forcecreate='True' id='ir_cron_run_job_to_generate_obligations' model='ir.cron'>
+            <field name="name">Run Schedule to generate the fiscal files</field>
+            <field name="active" eval='True' />
+            <field name="user_id" ref='base.user_root'/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">1</field>
+            <field name="doall" eval='False' />
+            <field name="model" eval="'fiscal.obligation'" />
+            <field name="function" eval="'generate_obligation'" />
+            <field name="args" eval="'()'" />
+        </record>
+
+        <record model='ir.actions.act_window' id='action_id_view_fiscal_obligations'>
+            <field name="name">Criar nova Obrigacao Fiscal</field>
+            <field name="res_model">fiscal.obligation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="usage">menu</field>
+            <field name="target">current</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Clique aqui para configurar um novo documento fiscal.</p>                
+            </field>
+        </record>
+        
+        <menuitem id="menu_l10n_br_base_configuration" name="Configuração" parent="l10n_br_account.menu_l10n_br_account" />
+        <menuitem action="action_id_view_fiscal_obligations" name="Obrigações fiscais" parent="menu_l10n_br_base_configuration" id="fiscal_obligation_menu" />
+        
+    </data>
+</openerp>

@@ -37,7 +37,9 @@ class sale_order(osv.Model):
         result = super(sale_order, self)._prepare_invoice(
             cr, uid, order, lines, context)
 
-        result['carrier_id'] = order.carrier_id.id,
+        if order.carrier_id:
+            result['carrier_id'] = order.carrier_id.id
+        
         result['incoterm'] = order.incoterm and order.incoterm.id or False
         return result
 

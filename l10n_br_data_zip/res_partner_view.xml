@@ -7,11 +7,18 @@
       		<field name="model">res.partner</field>
 	   		<field name="inherit_id" ref="base.view_partner_form"/>
 	   		<field name="priority">33</field>
-	   		<field name="arch" type="xml">
-	   			<field name="zip" position="replace">
-					<field name="zip" placeholder="ZIP" on_change="onchange_mask_zip(zip)"/>
-					<button name="zip_search" string="Buscar Endereço" type="object"/>
-        		</field>
+	   		<field name="arch" type="xml">	   		    
+	   		    <data version="7.0">
+	   		        <field name="state_id" position="replace" />                    
+	   		        <field name="street2" position="after">
+	   		          <field name="state_id" class="oe_no_button" placeholder="State"  options='{"no_open": True}' on_change="onchange_state(state_id)"/>
+                    </field>
+                    <field name="zip" position="replace"/>
+                    <field name="street" position="before">
+                        <field name="zip" placeholder="ZIP" on_change="onchange_mask_zip(zip)" style="width: 40%%" />
+                        <button name="zip_search" string="Pesquisar CEP" type="object"/>
+                    </field>
+                </data> 
         	</field>
    		</record>
 		
