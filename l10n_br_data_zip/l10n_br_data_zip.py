@@ -154,7 +154,6 @@ class l10n_br_data_zip(orm.Model):
     def zip_search_online(self,cr, uid, ids, context, zip=False):
         if zip != False:
             zip = re.sub('[^0-9]', '', zip or '')
-            zip = '88040230'
             data = {'cepEntrada': zip, 'tipoCep':'', 'cepTemp':'', 'metodo':'buscarCep'}
             data = urllib.urlencode(data)
             response = urllib2.urlopen("http://m.correios.com.br/movel/buscaCepConfirma.do", data)
@@ -173,8 +172,26 @@ class l10n_br_data_zip(orm.Model):
                 cep = ctxt[7].content
                 cep = cep.strip(' \t\n\r')
                 
-                #Buscar a cidade o estado e inserir no banco 
-                return self.set_result(cr, uid, ids, context, 1)                    
+                obj_city = self.pool.get('l10n_br_base.city')
+                ids_city =  obj_city.search(cr, uid, [('name','ilike', cidade)],context=context)
+                id_created = 0
+                if len(ids_city) ==1:
+                    cities =  obj_city.browse(cr, uid, ids_city, context)
+                    for city in cities:
+                        new_data_zip = {'code':zip,'street_type':'Rua', 'street':logradouro,
+                                    'district':bairro, 
+                                    'l10n_br_city_id': city.id, 
+                                    'state_id': city.state_id.id,
+                                    'country_id':city.state_id.country_id.id }
+                                        
+                        id_created = self.create(cr, uid,new_data_zip , context)
+                                
+                    if id_created != 0:
+                        return self.set_result(cr, uid, ids, context, id_created)
+                    else:
+                        return False
+                else:
+                    return False    
             else:
                 return False         
         else:

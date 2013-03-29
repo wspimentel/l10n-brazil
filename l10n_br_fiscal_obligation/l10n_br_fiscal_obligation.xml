@@ -40,7 +40,7 @@
             </field>
         </record>
         
-        <menuitem id="menu_l10n_br_base_configuration" name="Configuração" parent="l10n_br_account.menu_l10n_br_account" />
+        <menuitem id="menu_l10n_br_base_configuration" name="SPED" parent="l10n_br_account.menu_l10n_br_account" />
         <menuitem action="action_id_view_fiscal_obligations" name="Obrigações fiscais" parent="menu_l10n_br_base_configuration" id="fiscal_obligation_menu" />
         
     </data>
