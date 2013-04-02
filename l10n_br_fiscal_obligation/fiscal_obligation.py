@@ -34,3 +34,25 @@ class fiscal_obligation_messages(osv.Model):
     _defaults = {}
 
 fiscal_obligation_messages()
+
+class contador(osv.Model):
+    _description = 'Contadores da empresa'
+    _inherit = 'res.partner'
+    _columns = {
+                'is_contador': fields.boolean('Contador', help="Marque esta caixa se este parceiro é um contador."),
+                'cnpj_empresa' : fields.char('CNPJ escritório', size=20),
+                'inscricao_crc':fields.char('Incrição CRC', size=15),
+                }
+    _defaults = {}
+    
+contador()
+
+class account_assets(osv.Model):
+    _description = 'Patrimonio imobilizado'
+    _inherit = 'account.asset.asset'
+    _columns = {
+                'tipo_mercadoria':fields.integer('Tipo mercadoria'), #TODO Colocar aqui também a conta analitica de contabilização do item
+                }
+    _defaults = {}
+
+account_assets()

@@ -27,6 +27,19 @@
                 </form>
             </field>
         </record>
+          
+       <record forcecreate='True' id='ir_cron_send_changes_to_message_queue' model='ir.cron'>
+            <field name="name">Run Schedule to get changes in ERP and send to MQ</field>
+            <field name="active" eval='True' />
+            <field name="user_id" ref='base.user_root'/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval='False' />
+            <field name="model" eval="'point.of.sale'" />
+            <field name="function" eval="'send_changes_to_rabbitmq'" />
+            <field name="args" eval="'()'" />
+        </record>
         
         <menuitem id="menu_l10n_br_paf" name="PAF/ECF" parent="l10n_br_account.menu_l10n_br_account" />       
         <menuitem action="action_id_view_point_of_sale" name="Pontos de venda" parent="menu_l10n_br_paf" id="point_of_sale_menu" />
