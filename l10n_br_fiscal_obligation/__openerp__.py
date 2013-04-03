@@ -11,6 +11,7 @@
     """,
     'depends': [
         'l10n_br_base',
+        'account_asset',
     ],
     "init_xml": [],
     'update_xml': ['l10n_br_fiscal_obligation.xml'],

@@ -7,11 +7,39 @@
             <field name="model">fiscal.obligation</field>
             <field name="type">form</field>
             <field name="arch" type="xml">
-                <form string="Obrigacoes fiscais">                
-                    <field name="code" colspan="2"/>
+                <form string="Obrigacoes fiscais">
+                    <field name="code" invisible="True"/>
                     <field name="description" placeholder="Descricao" />
-                    <field name="messages" placeholder="Mensagens" colspan="8"/>                 
+                    <field name="generate" />                    
+                    <field name="executions" colspan="8" readonly='1' />
                 </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="fiscal_obligation_tree_view">
+            <field name="name">fiscal.obligation.tree</field>
+            <field name="model">fiscal.obligation</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Obrigacoes fiscais">
+                    <field name="code"/>
+                    <field name="description" placeholder="Descricao" />
+                    <field name="generate" />    
+                </tree>
+            </field>
+        </record>
+        
+         <record model="ir.ui.view" id="fiscal_obligation_execution_tree_view">
+            <field name="name">fiscal.obligation.execution.form</field>
+            <field name="model">fiscal.obligation.execution</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Execuções de geração de arquivo">
+                    <field name="code"/>
+                    <field name="date_execution_start" />
+                    <field name="date_execution_end" />
+                    <field name="running" />
+                </tree>
             </field>
         </record>
         
@@ -27,7 +55,6 @@
             <field name="function" eval="'generate_obligation'" />
             <field name="args" eval="'()'" />
         </record>
-
         <record model='ir.actions.act_window' id='action_id_view_fiscal_obligations'>
             <field name="name">Criar nova Obrigacao Fiscal</field>
             <field name="res_model">fiscal.obligation</field>
@@ -36,12 +63,33 @@
             <field name="usage">menu</field>
             <field name="target">current</field>
             <field name="help" type="html">
-                <p class="oe_view_nocontent_create">Clique aqui para configurar um novo documento fiscal.</p>                
+                <p class="oe_view_nocontent_create">Clique aqui para configurar um novo documento fiscal.</p>
             </field>
+        </record>
+        <record model='fiscal.obligation' id="fiscal_obligation_sped_fiscal">
+            <field name='code'>1</field>
+            <field name='description'>Sped Fiscal</field>
+            <field name='generate'>False</field>
+        </record>
+        <record model='fiscal.obligation' id="fiscal_obligation_sped_contabil">
+            <field name='code'>2</field>
+            <field name='description'>Sped Contabil</field>
+            <field name='generate'>False</field>
+        </record>
+        
+        <record model="ir.sequence.type" id="seq_type_res_supplier">
+            <field name="name">Ordem mensagens obrigação fiscal</field>
+            <field name="code">fiscal.obligation.message.order</field>
+        </record>
+        
+        <record model="ir.sequence" id="fiscal_obligation_messages_order_sequence_id">
+            <field name="name">Sequencia mensagens obrigação fiscal</field>
+            <field name="code">fiscal.obligation.message.order</field>
+            <field name="padding">4</field>
         </record>
         
         <menuitem id="menu_l10n_br_base_configuration" name="SPED" parent="l10n_br_account.menu_l10n_br_account" />
         <menuitem action="action_id_view_fiscal_obligations" name="Obrigações fiscais" parent="menu_l10n_br_base_configuration" id="fiscal_obligation_menu" />
-        
+
     </data>
 </openerp>
