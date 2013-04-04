@@ -30,7 +30,7 @@
         </record>
         
          <record model="ir.ui.view" id="fiscal_obligation_execution_tree_view">
-            <field name="name">fiscal.obligation.execution.form</field>
+            <field name="name">fiscal.obligation.execution.tree</field>
             <field name="model">fiscal.obligation.execution</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
@@ -40,6 +40,21 @@
                     <field name="date_execution_end" />
                     <field name="running" />
                 </tree>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="fiscal_obligation_execution_form_view">
+            <field name="name">fiscal.obligation.execution.form</field>
+            <field name="model">fiscal.obligation.execution</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Execuções de geração de arquivo">
+                    <field name="code"/>
+                    <field name="date_execution_start" />
+                    <field name="date_execution_end" />
+                    <field name="running" />
+                    <field name="messages" colspan="8"/>
+                </form>
             </field>
         </record>
         

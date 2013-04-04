@@ -15,14 +15,14 @@ class generate_sped_contabil():
         pool_obligation = obligation.pool.get('fiscal.obligation')
         pool_obligation.write(cr, uid, ids, { 'generate':False, } , context)         
     
-    def _create_new_message(self,cr, uid, ids=None, context=None, obligation=None, execution=None, message=None):
+    def _create_new_message(self,cr, uid, ids=None, context=None, obligation=None, execution_id=None, message=None):
         pool_message = obligation.pool.get('fiscal.obligation.messages')
-        pool_message.create(cr, uid, { 'message':message, 'fiscal_obligation_execution_id': execution.id }, context)
+        pool_message.create(cr, uid, { 'message':message, 'fiscal_obligation_execution_id': execution_id }, context)
     
     def generate(self, cr, uid, ids=None, context=None, obligation=None):
-        execution = self._create_new_execution(cr, uid, ids, context, obligation)
-        self._create_new_message(cr, uid, ids, context, obligation, execution, "Iniciado a gerar o Sped Contabil")
+        execution_id = self._create_new_execution(cr, uid, ids, context, obligation)
+        self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Iniciado a gerar o Sped Contabil")
         
                 
         self._set_as_generated(cr, uid, ids, context, obligation)        
-        self._create_new_message(cr, uid, ids, context, obligation, execution, "Terminado de gerar o Sped Contabil")    
+        self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Terminado de gerar o Sped Contabil")    

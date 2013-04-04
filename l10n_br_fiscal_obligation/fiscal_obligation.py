@@ -31,6 +31,9 @@ class fiscal_obligation(osv.Model):
                 generator = generate_sped_contabil()
                 generator.generate(cr, uid, obligation.id, context, obligation)           
                 print 'Executou contabil'
+        
+        return True
+        
     
 fiscal_obligation()
 
