@@ -73,11 +73,13 @@ class contador(osv.Model):
     _description = 'Contadores da empresa'
     _inherit = 'res.partner'
     _columns = {
-                'is_contador': fields.boolean('Contador', help="Marque esta caixa se este parceiro é um contador."),
+                'is_accountant': fields.boolean('Contador', help="Marque esta caixa se este parceiro é um contador."),
                 'cnpj_empresa' : fields.char('CNPJ escritório', size=20),
                 'inscricao_crc':fields.char('Incrição CRC', size=15),
                 }
     _defaults = {}
+    
+    
     
 contador()
 

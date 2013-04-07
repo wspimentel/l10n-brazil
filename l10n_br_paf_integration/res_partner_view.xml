@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+		<record model="ir.ui.view" id="view_l10n_br_paf_integration_partner_form">
+			<field name="name">l10n_br_fiscal_obligation.partner.form</field>
+			<field name="model">res.partner</field>		
+			<field name="context">{'is_accountant':1, 'supplier':0 , 'employee':0, 'customer':0}</field>	
+			<field eval="100" name="priority"/>
+            <field name="arch" type="xml">
+                <form string="Accountant" version="7.0">
+                <sheet>
+                    <field name="image" widget='image' class="oe_left oe_avatar" options='{"preview_image": "image_medium", "size": [90, 90]}'/>
+                    <div class="oe_title">                        
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name" />
+                        </h1>                        
+                        <field name="cnpj_cpf" placeholder="CPF..."/>
+                        <field name="inscricao_crc"  placeholder="Incrição CRC..."/>
+                        <field name="cnpj_empresa"  placeholder="CNPJ Escritório..."/>                              
+                        <field name="category_id" widget="many2many_tags" placeholder="Tags..."/>
+                    </div>
+                    <div class="oe_right oe_button_box" name="buttons"> </div>
+                    <group>
+                        <group>
+                            <label for="street" string="Address"/>
+                            <div>
+                                <field name="street" placeholder="Street..."/>
+                                <field name="street2"/>
+                                <div class="address_format">
+                                    <field name="city" placeholder="City" style="width: 40%%"/>
+                                    <field name="state_id" class="oe_no_button" placeholder="State" style="width: 37%%" options='{"no_open": True}' on_change="onchange_state(state_id)"/>
+                                    <field name="zip" placeholder="ZIP" style="width: 20%%"/>
+                                </div>
+                                <field name="country_id" placeholder="Country" class="oe_no_button" options='{"no_open": True}'/>
+                            </div>
+                            <field name="website" widget="url" placeholder="e.g. www.openerp.com"/>
+                        </group>
+                        <group>
+                            <field name="function" placeholder="e.g. Sales Director" />
+                            <field name="phone" placeholder="e.g. +32.81.81.37.00"/>
+                            <field name="mobile"/>
+                            <field name="fax"/>
+                            <field name="email" widget="email"/>
+                            <field name="title" domain="[('domain', '=', 'contact')]"
+                                options='{"no_open": True}' />
+                        </group>
+                    </group>
+
+                    <notebook colspan="4">
+                        <page string="Contacts">
+                            <field name="child_ids" context="{'default_parent_id': active_id}" mode="kanban">
+                                <kanban>
+                                    <field name="color"/>
+                                    <field name="name"/>
+                                    <field name="title"/>
+                                    <field name="email"/>
+                                    <field name="parent_id"/>
+                                    <field name="is_company"/>
+                                    <field name="function"/>
+                                    <field name="phone"/>
+                                    <field name="street"/>
+                                    <field name="street2"/>
+                                    <field name="zip"/>
+                                    <field name="city"/>
+                                    <field name="country_id"/>
+                                    <field name="mobile"/>
+                                    <field name="fax"/>
+                                    <field name="state_id"/>
+                                    <field name="has_image"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <t t-set="color" t-value="kanban_color(record.color.raw_value)"/>
+                                            <div t-att-class="color + (record.title.raw_value == 1 ? ' oe_kanban_color_alert' : '')" style="position: relative">
+                                                <a t-if="! read_only_mode" type="delete" style="position: absolute; right: 0; padding: 4px; diplay: inline-block">X</a>
+                                                <div class="oe_module_vignette">
+                                                <a type="open">
+                                                    <t t-if="record.has_image.raw_value === true">
+                                                        <img t-att-src="kanban_image('res.partner', 'image', record.id.value, {'preview_image': 'image_small'})" class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                                    </t>
+                                                    <t t-if="record.image and record.image.raw_value !== false">
+                                                        <img t-att-src="'data:image/png;base64,'+record.image.raw_value" class="oe_avatar oe_kanban_avatar_smallbox"/>
+                                                    </t>
+                                                    <t t-if="record.has_image.raw_value === false and (!record.image or record.image.raw_value === false)">
+                                                        <t t-if="record.is_company.raw_value === true">
+                                                            <img t-att-src='_s + "/base/static/src/img/company_image.png"' class="oe_kanban_image oe_kanban_avatar_smallbox"/>
+                                                        </t>
+                                                        <t t-if="record.is_company.raw_value === false">
+                                                            <img t-att-src='_s + "/base/static/src/img/avatar.png"' class="oe_kanban_image oe_kanban_avatar_smallbox"/>
+                                                        </t>
+                                                    </t>
+                                                </a>
+                                                    <div class="oe_module_desc">
+                                                        <div class="oe_kanban_box_content oe_kanban_color_bglight oe_kanban_color_border">
+                                                            <table class="oe_kanban_table">
+                                                                <tr>
+                                                                    <td class="oe_kanban_title1" align="left" valign="middle">
+                                                                        <h4><a type="open"><field name="name"/></a></h4>
+                                                                        <i><div t-if="record.function.raw_value">
+                                                                            <field name="function"/></div></i>
+                                                                        <div><a t-if="record.email.raw_value" title="Mail" t-att-href="'mailto:'+record.email.value">
+                                                                            <field name="email"/>
+                                                                        </a></div>
+                                                                        <div t-if="record.phone.raw_value">Phone: <field name="phone"/></div>
+                                                                        <div t-if="record.mobile.raw_value">Mobile: <field name="mobile"/></div>
+                                                                        <div t-if="record.fax.raw_value">Fax: <field name="fax"/></div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                                <form string="Contact" version="7.0">
+                                    <field name="image" widget='image' class="oe_avatar oe_left" options='{"preview_image": "image_medium"}'/>
+                                    <div class="oe_title">
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="category_id" widget="many2many_tags" placeholder="Tags..."/>
+                                            <field name="function" placeholder="e.g. Sales Director"/>
+                                            <field name="email"/>
+                                            <field name="phone"/>
+                                            <field name="mobile"/>
+                                        </group>
+                                    </div>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Internal Notes">
+                            <field name="comment" placeholder="Put an internal note..."/>
+                        </page>                       
+                        <!-- The History page becomes visible as soon as there is something to display inside -->
+                        <page string="History" name="page_history" invisible="True">
+                        </page>
+                    </notebook>
+                </sheet>
+                </form>
+            </field>        
+        </record>
+
+		<record model='ir.actions.act_window' id='action_id_view_contador'>
+            <field name="name">Criar novo Contador</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">tree</field>
+            <field name="view_mode">tree,form</field>
+            <field name="usage">menu</field>
+            <field name="domain">[('is_accountant','=',1)]</field>
+            <field name="context">{'is_accountant':1, 'supplier':0 , 'employee':0, 'customer':0}</field>
+            <field name="target">current</field>
+            <field name="view_id" ref="view_l10n_br_paf_integration_partner_form"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Clique aqui para configurar um novo contador para sua empresa.</p>                
+            </field>
+        </record>
+
+	<menuitem action="action_id_view_contador" name="Contador" parent="menu_l10n_br_paf" id="contador_menu" />
+
+    </data>
+</openerp>

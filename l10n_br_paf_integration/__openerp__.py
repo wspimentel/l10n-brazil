@@ -10,9 +10,11 @@
     """,
     'depends': [
         'l10n_br_base',
+        'product',
+        'l10n_br_fiscal_obligation'
     ],
     "init_xml": [],
-    'update_xml': ['l10n_br_paf_integration.xml'],
+    'update_xml': ['l10n_br_paf_integration.xml','res_partner_view.xml'],
     'demo_xml': [],
     'installable': True,
     'active': False,

@@ -14,23 +14,37 @@
             </field>
         </record>
 
-
-        <record model="ir.ui.view" id="fiscal_obligation_form_view">
+        <record model="ir.ui.view" id="point_of_sale_form_view">
             <field name="name">point_of_sale_form</field>
             <field name="model">point.of.sale</field>
-            <field name="type">form</field>
+            <field name="type">form</field>            
             <field name="arch" type="xml">
                 <form string="Pontos de vendas">                
                     <field name="code" colspan="2" placeholder="Código"/>
                     <field name="description" placeholder="Descricao" />
-                    <field name="pdv_number" placeholder="Número PDV" />                 
+                    <field name="pdv_number" placeholder="Número PDV" />     
+                    <field name="execute_full_update" />            
                 </form>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="point_of_sale_tree_view">
+            <field name="name">point_of_sale_form</field>
+            <field name="model">point.of.sale</field>
+            <field name="type">tree</field>            
+            <field name="arch" type="xml">
+                <tree string="Pontos de vendas">                
+                    <field name="code" colspan="2" />
+                    <field name="description" />
+                    <field name="pdv_number" />     
+                    <field name="execute_full_update" />            
+                </tree>
             </field>
         </record>
           
        <record forcecreate='True' id='ir_cron_send_changes_to_message_queue' model='ir.cron'>
             <field name="name">Run Schedule to get changes in ERP and send to MQ</field>
-            <field name="active" eval='False' />
+            <field name="active" eval='True' />
             <field name="user_id" ref='base.user_root'/>
             <field name="interval_number">1</field>
             <field name="interval_type">minutes</field>
@@ -45,5 +59,8 @@
         <menuitem id="menu_l10n_br_paf" name="PAF/ECF" parent="l10n_br_account.menu_l10n_br_account" />       
         <menuitem action="action_id_view_point_of_sale" name="Pontos de venda" parent="menu_l10n_br_paf" id="point_of_sale_menu" />
 
+
+		   	        
+     
     </data>
 </openerp>
