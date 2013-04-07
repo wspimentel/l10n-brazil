@@ -234,7 +234,6 @@ class EFD:
             self._validate()
         except EFD.RequiredException, e:
             print(e.message)
-            return
 
         lines = []
 

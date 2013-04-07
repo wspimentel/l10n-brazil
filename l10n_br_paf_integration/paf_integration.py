@@ -27,13 +27,14 @@ class point_of_sale(osv.Model):
         #audit = self.pool.get('audittrail.log')
         ids = self.search(cr, uid, [], context)        
         
-        print datetime.now()
+        print str(datetime.now()) + ' - Starting full update.'
         
         pdv = self.browse(cr, uid, ids[0], context)
         if pdv.execute_full_update:
             self.send_all_tables_to_rabbitmq(cr, uid, ids, context, channel)               
         
-        print datetime.now()
+        self.write(cr, uid, pdv.id, {'execute_full_update': False}, context)        
+        print str(datetime.now()) + ' - Finished full update.'
 #        ids_log = audit.search(cr, uid, [('is_processed','=',False)])            
 #        full_logs = audit.browse(cr, uid, ids_log, context)
 #        for log in full_logs:     

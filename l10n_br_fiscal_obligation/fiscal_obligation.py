@@ -56,16 +56,13 @@ class fiscal_obligation_execution(osv.Model):
 class fiscal_obligation_messages(osv.Model):
     _name = 'fiscal.obligation.messages'
     _description = 'Mensagens ocorridas na geracao da obrigacao'
-    _order = 'code asc'
-    _columns = {
-        'order':fields.integer('Ordem'),
+    _order = 'id asc'
+    _columns = {        
         'message': fields.char('Mensagem', size=500),
         'fiscal_obligation_execution_id': fields.many2one('fiscal.obligation.execution', 'Execução obrigação fiscal',
                                     required=True),
     }
-    _defaults = {
-        'order': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'fiscal.obligation.messages.order.sequence'),
-                 }
+    _defaults = { }
 
 fiscal_obligation_messages()
 

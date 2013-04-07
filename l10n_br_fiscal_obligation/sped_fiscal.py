@@ -4,13 +4,14 @@ import pysped_efd
 
 class generate_sped_fiscal():
     def __init__(self):
-        pass
+        self.execution_id = 0
     
     def _create_new_execution(self, cr, uid, ids=None, context=None, obligation=None):
         pool_execution = obligation.pool.get('fiscal.obligation.execution')        
         new_obj = {'code':1,'date_execution_start': datetime.now(), 'date_execution_end':datetime.now(), 'running':True,
                    'fiscal_obligation_id':obligation.id }        
         id = pool_execution.create(cr, uid, new_obj,context)
+        self.execution_id = id
         return id        
         
     def _set_as_generated(self,cr, uid, ids=None, context=None, obligation=None, execution_id=None):
@@ -27,40 +28,46 @@ class generate_sped_fiscal():
         execution_id = self._create_new_execution(cr, uid, ids, context, obligation)
         self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Iniciado a gerar o Sped Fiscal")
        
-        efd = pysped_efd.EFD(
-            COD_FIN='',
-            DT_INI='',
-            DT_FIN='',
-            NOME='',
-            CNPJ='',
-            CPF='',
-            UF='',
-            IE='',
-            COD_MUN='',
-            IM='',
-            SUFRAMA='',
-            IND_PERFIL='',
-            IND_ATIV=''
-        )
+        companies = obligation.pool.get('res.company')
+        company_ids = companies.search(cr, uid, [], offset=0, limit=1, context=context)
+        if len(company_ids) > 0:
+            company =  companies.browse(cr, uid, company_ids[0],context)
+       
+            efd = pysped_efd.EFD(
+                COD_FIN='0',  #adicionar estes atributos ao objeto fiscal_obligation
+                DT_INI='01042013',
+                DT_FIN='30042013',
+                NOME=company.partner_id.legal_name,
+                CNPJ=company.partner_id.cnpj_cpf,
+                CPF='',
+                UF=company.partner_id.l10n_br_city_id.state_id.code,
+                IE=company.partner_id.inscr_est,
+                COD_MUN=company.partner_id.l10n_br_city_id.ibge_code,
+                IM=company.partner_id.inscr_mun,
+                SUFRAMA=company.partner_id.suframa,
+                IND_PERFIL='', #TODO Adicionar estes dois campos ao objeto company
+                IND_ATIV=''
+            )
         
         
-        self.bloco_0(cr, uid, ids, context, obligation, efd)                        
-        self.bloco_C(cr, uid, ids, context, obligation, efd)(cr, uid, ids, context, obligation, efd)                        
-        self.bloco_D(cr, uid, ids, context, obligation, efd)
-        self.bloco_E(cr, uid, ids, context, obligation, efd)
-        self.bloco_G(cr, uid, ids, context, obligation, efd)
-        self.bloco_H(cr, uid, ids, context, obligation, efd)
-        self.bloco_1(cr, uid, ids, context, obligation, efd)
-        self.bloco_9(cr, uid, ids, context, obligation, efd)
-        print efd.generate()
+            self.bloco_0(cr, uid, ids, context, obligation, efd, company)                        
+            self.bloco_C(cr, uid, ids, context, obligation, efd)                        
+            self.bloco_D(cr, uid, ids, context, obligation, efd)
+            self.bloco_E(cr, uid, ids, context, obligation, efd)
+            self.bloco_G(cr, uid, ids, context, obligation, efd)
+            self.bloco_H(cr, uid, ids, context, obligation, efd)
+            self.bloco_1(cr, uid, ids, context, obligation, efd)
+            self.bloco_9(cr, uid, ids, context, obligation, efd)
+            print efd.generate()        
+            #TODO Save the content in the database or file
         
-        #TODO Save the content in the database or file
-        
-        self._set_as_generated(cr, uid, ids, context, obligation)        
-        self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Terminado de gerar o Sped Fiscal")  
-        
+            self._set_as_generated(cr, uid, ids, context, obligation)        
+            self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Terminado de gerar o Sped Fiscal")  
+        else:
+            self._set_as_generated(cr, uid, ids, context, obligation)        
+            self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Não foi possível encontrar a empresa padrão.")
     
-    def bloco_0(self,cr, uid, ids, context, obligation, efd=None):   
+    def bloco_0(self,cr, uid, ids, context, obligation, efd=None, company=None):   
         # Abertura do Arquivo Digital e Identificação da entidade 0000 0 1
         # Abertura do Bloco 0 0001 1 1
         # Dados Complementares da entidade 0005 2 1
@@ -76,26 +83,62 @@ class generate_sped_fiscal():
         # Cadastro de bens ou componentes do Ativo Imobilizado 0300 2 V
         # Informação sobre a Utilização do Bem 0305 3 1:1
         # Tabela de Natureza da Operação / Prestação 0400 2 V
-        # Tabela de Informação Complementar do documento fisca l 0450 2 V
-        # Tabela de Observações do Lançamento Fisca l 0460 2 V
+        # Tabela de Informação Complementar do documento fiscal 0450 2 V
+        # Tabela de Observações do Lançamento Fiscal 0460 2 V
         # Plano de contas contábeis 0500 2 V
         # Centro de custos 0600 2 V
         # Encerramento do Bloco 0 0990
-               
-        reg = pysped_efd.r0005(
-            FANTASIA='Empresa Teste Ltda',
-            CEP='90900-000',
-            END='R. Um',
-            NUM='1',
-            COMPL='101',
-            BAIRRO='Único',
-            FONE='11 3011 1103',
-            FAX='',
-            EMAIL='responsavel@empresa.com.br',
-            )
         
+        # --------------- REG 0001 -----------------  
+        reg0001 = pysped_efd.r0001(IND_MOV='0')
+        efd.add(reg0001)
         
-        efd.add(reg)
+        #---------------- REG 0005 -----------------
+        reg0005 = pysped_efd.r0005(FANTASIA=company.name, CEP=company.partner_id.zip,
+            END=company.partner_id.street,NUM=company.partner_id.number, COMPL=company.partner_id.street2,
+            BAIRRO=company.partner_id.district,FONE=company.partner_id.phone,FAX=company.partner_id.fax,
+            EMAIL=company.partner_id.email,)       
+        
+        efd.add(reg0005)
+        
+        #---------------- REG 0015 -----------------
+        #TODO Precisa de um cadastro de incrição estadual substituto reg0015
+        
+        #---------------- REG 0100 -----------------
+        partner_pool = obligation.pool.get('res.partner')        
+        accountant_ids = partner_pool.search(cr, uid, ['&',('company_id.id','=',company.id),('is_accountant','=',True)], context, limit=1)
+        if len(accountant_ids)>0:
+            accountant = partner_pool.browse(cr, uid, accountant_ids, context)
+            
+            reg0100 = pysped_efd.r0100(NOME=accountant.name, CPF=accountant.cnpj_cpf, 
+                 CRC=accountant.inscricao_crc, CNPJ=accountant.cnpj_empresa, 
+                 CEP=accountant.zip, END=accountant.street, NUM=accountant.number, 
+                 COMPL=accountant.street2,BAIRRO=accountant.district, FONE=accountant.phone,
+                 FAX=accountant.fax, EMAIL=accountant.email, COD_MUN=accountant.l10n_br_city_id.ibge_code)
+            
+            efd.add(reg0100)
+        else:
+            self._create_new_message(cr, uid, ids, context, obligation, self.execution_id, "Informações sobre o contador não configuradas.")
+        
+        #--------------- REG 0150 ------------------
+        #TODO Talvez em vez de pesquisar antes todos os clientes, 
+        #conforme for gerando os registros de entrada e saida, ir adicionando os clientes automaticamente, ja que o componente ordena os registros. 
+        customer_pool = obligation.pool.get('res.partner')
+        customer_ids = customer_pool.search(cr, uid, [('customer','=',True)], context)
+        customers = customer_pool.browse(cr, uid, customer_ids, context)
+        for customer in customers:            
+            reg0150 = pysped_efd.r0150(COD_PART=customer.id, NOME=customer.name, COD_PAIS=customer.country_id.bc_code,
+                CNPJ=customer.cnpj_cpf, CPF=customer.cnpj_cpf, IE=customer.inscr_est, 
+                COD_MUN=customer.l10n_br_city_id.ibge_code, SUFRAMA=customer.suframa,
+                END=customer.street, NUM=customer.number, COMPL=customer.street2, BAIRRO=customer.district)
+            
+            efd.add(reg0150)
+        
+        #--------------- REG 0175 -------------------
+        #TODO
+        
+        #--------------- REG 0190 -------------------
+        
         
     def bloco_C(self,cr, uid, ids, context, obligation, efd=None): 
         # Abertura do Bloco C C001 1 1
@@ -260,7 +303,7 @@ class generate_sped_fiscal():
         # Ajustes da Apuração do IP I E530 4 1:N
         # Encerramento do Bloco E E990 1 1
 
-        regE100 = pysped_efd.rE100(DT_INI='01-03-2012', DT_FIM='31-03-2012')
+        regE100 = pysped_efd.rE100(DT_INI='01-03-2012', DT_FIN='31-03-2012')
         efd.add(regE100)
     
         
