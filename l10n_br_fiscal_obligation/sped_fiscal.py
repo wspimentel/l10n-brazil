@@ -1,6 +1,7 @@
 # coding=utf-8
 from datetime import datetime
 import pysped_efd
+import base64
 
 class generate_sped_fiscal():
     def __init__(self):
@@ -10,15 +11,21 @@ class generate_sped_fiscal():
         pool_execution = obligation.pool.get('fiscal.obligation.execution')        
         new_obj = {'code':1,'date_execution_start': datetime.now(), 'date_execution_end':datetime.now(), 'running':True,
                    'fiscal_obligation_id':obligation.id }        
-        id = pool_execution.create(cr, uid, new_obj,context)
-        self.execution_id = id
-        return id        
+        generated_id = pool_execution.create(cr, uid, new_obj,context)
+        self.execution_id = generated_id
+        return generated_id
         
-    def _set_as_generated(self,cr, uid, ids=None, context=None, obligation=None, execution_id=None):
+    def _set_as_generated(self,cr, uid, ids=None, context=None, obligation=None, content=None):
         pool_obligation = obligation.pool.get('fiscal.obligation')
         pool_execution = obligation.pool.get('fiscal.obligation.execution')
         pool_obligation.write(cr, uid, ids, { 'generate':False, } , context) 
-        pool_execution.write(cr, uid, execution_id, { 'date_execution_end':datetime.now(), 'running':False } , context) 
+                
+        if not content is None:
+            result = base64.b64encode(content)        
+            pool_execution.write(cr, uid, self.execution_id,
+                     { 'date_execution_end':datetime.now(), 'running':False, 'efd_fiscal_file':result } , context) 
+        else:
+            pool_execution.write(cr, uid, self.execution_id, { 'date_execution_end':datetime.now(), 'running':False } , context)
                     
     def _create_new_message(self,cr, uid, ids=None, context=None, obligation=None, execution_id=None, message=None):
         pool_message = obligation.pool.get('fiscal.obligation.messages')
@@ -58,10 +65,9 @@ class generate_sped_fiscal():
             self.bloco_H(cr, uid, ids, context, obligation, efd)
             self.bloco_1(cr, uid, ids, context, obligation, efd)
             self.bloco_9(cr, uid, ids, context, obligation, efd)
-            print efd.generate()        
-            #TODO Save the content in the database or file
+            content = efd.generate()
         
-            self._set_as_generated(cr, uid, ids, context, obligation)        
+            self._set_as_generated(cr, uid, ids, context, obligation, content)        
             self._create_new_message(cr, uid, ids, context, obligation, execution_id, "Terminado de gerar o Sped Fiscal")  
         else:
             self._set_as_generated(cr, uid, ids, context, obligation)        
@@ -89,11 +95,11 @@ class generate_sped_fiscal():
         # Centro de custos 0600 2 V
         # Encerramento do Bloco 0 0990
         
-        # --------------- REG 0001 -----------------  
+        # -------------- REG 0001 ---------------  
         reg0001 = pysped_efd.r0001(IND_MOV='0')
         efd.add(reg0001)
         
-        #---------------- REG 0005 -----------------
+        #--------------- REG 0005 ---------------
         reg0005 = pysped_efd.r0005(FANTASIA=company.name, CEP=company.partner_id.zip,
             END=company.partner_id.street,NUM=company.partner_id.number, COMPL=company.partner_id.street2,
             BAIRRO=company.partner_id.district,FONE=company.partner_id.phone,FAX=company.partner_id.fax,
@@ -101,10 +107,10 @@ class generate_sped_fiscal():
         
         efd.add(reg0005)
         
-        #---------------- REG 0015 -----------------
+        #---------------- REG 0015 --------------
         #TODO Precisa de um cadastro de incrição estadual substituto reg0015
         
-        #---------------- REG 0100 -----------------
+        #--------------- REG 0100 ---------------
         partner_pool = obligation.pool.get('res.partner')        
         accountant_ids = partner_pool.search(cr, uid, ['&',('company_id.id','=',company.id),('is_accountant','=',True)], context, limit=1)
         if len(accountant_ids)>0:
@@ -120,7 +126,7 @@ class generate_sped_fiscal():
         else:
             self._create_new_message(cr, uid, ids, context, obligation, self.execution_id, "Informações sobre o contador não configuradas.")
         
-        #--------------- REG 0150 ------------------
+        #--------------- REG 0150 ---------------
         #TODO Talvez em vez de pesquisar antes todos os clientes, 
         #conforme for gerando os registros de entrada e saida, ir adicionando os clientes automaticamente, ja que o componente ordena os registros. 
         customer_pool = obligation.pool.get('res.partner')
@@ -134,11 +140,84 @@ class generate_sped_fiscal():
             
             efd.add(reg0150)
         
-        #--------------- REG 0175 -------------------
-        #TODO
+        #--------------- REG 0175 ---------------
+        #TODO Usar o audittrail.log para buscar as modificações.
         
-        #--------------- REG 0190 -------------------
+        #--------------- REG 0190 ---------------
+        uom_pool = obligation.pool.get('product.uom')
+        ids = uom_pool.search(cr, uid, [], context)        
+        units = uom_pool.browse(cr, uid, ids, context)
+        for unit in units:
+            reg0190 = pysped_efd.r0190(UNID=unit.id, DESCR=unit.name)
+            efd.add(reg0190)
+            
+        #--------------- REG 0200 ---------------
+        product_pool = obligation.pool.get('product.product')
+        ids = product_pool.search(cr, uid, [], context)
+        products = product_pool.browse(cr, uid, ids, context)
+        #TODO TIPO_ITEM, ou criar um enumerador no cadastro, ou inferir o tipo dependendo de onde for usado
+        #TODO NCM seria a classificação fiscal, porém não entendi como é o relacionamento
+        #TODO Quando for serviço ainda falta o Tipo de serviço no cadastro
+        #TODO Como pegar a aliquota default de icms para o item?
+        for product in products:
+            reg0200 = pysped_efd.r0200(COD_ITEM=product.default_code, DESCR_ITEM=product.name_template, 
+                COD_BARRA=product.ean13, COD_ANT_ITEM='', UNID_INV=product.product_tmpl_id.uom_id.id, 
+                TIPO_ITEM='0', COD_NCM='',EX_IPI='', COD_GEN='?',
+                COD_LST='', ALIQ_ICMS='?' )
+            efd.add(reg0200)
+            
+        #--------------- REG 0205 ---------------
+        #TODO Usar o audittrail.log para buscar as modificações.
         
+        #--------------- REG 0206 ---------------
+        #Registro correspondente aos combustiveis. Talvez seria necessário outro módulo
+        
+        #--------------- REG 0220 ---------------
+        #Registro de conversão de unidade de medida. Acho que não se aplica
+        
+        #--------------- REG 0300 ---------------
+        asset_pool = obligation.pool.get('account.asset.asset')
+        asset_ids = asset_pool.search(cr, uid, [], context)
+        assets = asset_pool.browse(cr, uid, asset_ids, context)
+        for asset in assets:
+            reg0300 = pysped_efd.r0300(COD_IND_BEM=asset.code, IDENT_MERC=asset.tipo_mercadoria, 
+                DESCR_ITEM=asset.name, COD_PRNC=asset.parent_id.id, 
+                COD_CTA=asset.category_id.id, NR_PARC=asset.method_number)
+            efd.add(reg0300)
+        
+        #--------------- REG 0305 ---------------
+        #TODO modificar o asset para quando for tipo 1, acrescentar os campos desse registro no cadastro
+        
+        #--------------- REG 0400 ---------------
+        #TODO Usar categoria fiscal ou posição fiscal? Natureza da operação
+        
+        #--------------- REG 0450 ---------------
+        #Necessita cadastro de informações adicionais, que posteriormente deve ser vinculado as faturas
+        # e aparecer na nota de saida e entrada.
+        
+        #--------------- REG 0460 ---------------
+        #mesmo caso do registro anterior.
+        
+        #--------------- REG 0500 ---------------
+        account_pool = obligation.pool.get('account.account')
+        account_ids = account_pool.search(cr, uid, [('company_id','=',company.id)], context)
+        accounts =account_pool.browse(cr, uid, account_ids, context)
+        #TODO Falta a natureza e o tipo da conta.
+        for account in accounts:
+            reg0500 = pysped_efd.r0500(DT_ALT='', COD_NAT_CC='',
+                IND_CTA='',NIVEL=account.level, COD_CTA=account.code, 
+                NOME_CTA=account.name)
+            efd.add(reg0500)
+        
+        #--------------- REG 0600 ---------------
+        account_analytic_pool = obligation.pool.get('account.analytic.account')
+        analytic_ids = account_analytic_pool.search(cr, uid, [('company_id', '=', company.id)], context)
+        analytic_accounts = account_analytic_pool.browse(cr, uid, analytic_ids, context)
+        for analytic in analytic_accounts:
+            reg0600 = pysped_efd.r0600(DT_ALT='', COD_CCUS=analytic.code, CCUS=analytic.name)
+            efd.add(reg0600)
+        
+        #--------------- REG 0990 ---------------
         
     def bloco_C(self,cr, uid, ids, context, obligation, efd=None): 
         # Abertura do Bloco C C001 1 1
@@ -148,11 +227,11 @@ class generate_sped_fiscal():
         # Complemento de Documento - Processo referenciado C111 4 1:N
         # Complemento de Documento - Documento de Arrecadação Referenciado C112 4 1:N
         # Complemento de Documento - Documento Fisca l Referenciado C113 4 1:N
-        # Complemento de Documento - Cupom Fisca l Referenciado C114 4 1:N
-        # Loca l de coleta e/ou entrega (CÓDIGOS 01 , 1B e 04) C115 4 1:N
-        # Cupom Fisca l Eletrônico - CF-e referenciado C116 4 1:N
+        # Complemento de Documento - Cupom Fiscal Referenciado C114 4 1:N
+        # Local de coleta e/ou entrega (CÓDIGOS 01 , 1B e 04) C115 4 1:N
+        # Cupom Fiscal Eletrônico - CF-e referenciado C116 4 1:N
         # Complemento de Documento - Operações de Importação (código 01) C120 3 1:N
-        # Complemento de Documento - ISSQN , IRRF e Previdência Socia l C130 3 1:1
+        # Complemento de Documento - ISSQN , IRRF e Previdência Social C130 3 1:1
         # Complemento de Documento - Fatura (código 01) C140 3 1:1
         # Complemento de Documento - Vencimento da Fatura (código 01) C141 4 1:N
         # Complemento de Documento - Volumes Transportados (código 01 e 04) Exceto Combustíveis C160 3 1:1

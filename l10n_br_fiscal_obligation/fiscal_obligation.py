@@ -26,11 +26,11 @@ class fiscal_obligation(osv.Model):
             if obligation.description == 'Sped Fiscal':
                 generator = generate_sped_fiscal()
                 generator.generate(cr, uid, obligation.id, context, obligation)
-                print 'Executou fiscal'
+                
             elif obligation.description == 'Sped Contabil':
                 generator = generate_sped_contabil()
                 generator.generate(cr, uid, obligation.id, context, obligation)           
-                print 'Executou contabil'
+                
         
         return True
         
@@ -48,6 +48,7 @@ class fiscal_obligation_execution(osv.Model):
         'running':fields.boolean('Executando'),
         'fiscal_obligation_id': fields.many2one('fiscal.obligation', 'Obrigação fiscal',
                                     required=True),
+        'efd_fiscal_file': fields.binary('Arquivo EFD-Fiscal gerado',filters='*.txt', help="Arquivo resultante do processo de geração do EFD Fiscal"),
         'messages': fields.one2many('fiscal.obligation.messages', 'fiscal_obligation_execution_id','Mensagens'),
     }
     _defaults = {            
