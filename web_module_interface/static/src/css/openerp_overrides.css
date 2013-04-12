@@ -1,8 +1,29 @@
 @CHARSET "UTF-8";
 
-openerp .oe_web_example {
-    color: white;
-    background-color: black;
-    height: 100%;
-    font-size: 400%;
+.openerp .oe_login { background-image: none; }
+
+.openerp .oe_login .oe_login_pane {
+    background: white; 
+    -webkit-box-shadow: 0 0 50px rgba(255, 255, 255, 0.9);
+    -moz-box-shadow:0 0 50px rgba(255, 255, 255, 0.9);
+    box-shadow:0 0 50px rgba(255, 255, 255, 0.9);    
+    padding: 40px;  
+    border-radius: 8px;
+    border: 8px solid #cfdfe3;
+    border-bottom-color: #d2e2e7;    
+    color:inherit;
+    top: 45%;
 }
+
+.openerp .oe_login .oe_login_bottom {  
+  top: 45%;
+  background-color: #0CA3F2;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#0ca3d2), to(#0CA3F2));
+  background-image: -webkit-linear-gradient(top, #0ca3d2, #0CA3F2);
+  background-image: -moz-linear-gradient(top, #0ca3d2, #0CA3F2);
+  background-image: -ms-linear-gradient(top, #0ca3d2, #0CA3F2);
+  background-image: -o-linear-gradient(top, #0ca3d2, #0CA3F2);
+  background-image: linear-gradient(to bottom, #0ca3d2, #0CA3F2);    
+}
+
+.openerp .oe_login .oe_login_footer { bottom:-70px; }

@@ -114,12 +114,12 @@ class opendb_backup(osv.osv):
                     zipped.write(file_path)
                 zipped.close()
                 os.remove(file_path)
-                self.send_for_ftp(cr, user, context, rec, zip_path)
+                self.send_for_ftp(cr, user, rec, zip_path, zip_file, context)
             else:
                 pass            
                 #logger.notifyChannel('backup', netsvc.LOG_INFO, "database %s doesn't exist on http://%s:%s" %(rec.name, rec.host, rec.port))
                 
-    def send_for_ftp(self, cr, user, context=None, db_backup, file_to_send, name_to_store):
+    def send_for_ftp(self, cr, user, db_backup, file_to_send, name_to_store, context=None):
         if db_backup.use_ftp:            
             ftp = FTP(db_backup.ftp_address)
             ftp.login(db_backup.ftp_username, db_backup.ftp_password)
