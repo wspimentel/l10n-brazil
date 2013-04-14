@@ -219,7 +219,7 @@ class l10n_br_account_invoice_invalid_number(osv.Model):
             states={'draft': [('readonly', False)]}, required=True),
         'state': fields.selection(
             [('draft', 'Rascunho'), ('cancel', 'Cancelado'),
-            ('done', u'Concluído')], 'Status', required=True),
+            ('done', u'Autorizado Sefaz')], 'Status', required=True),
     }
     _rec_name = 'document_serie_id'
     _defaults = {

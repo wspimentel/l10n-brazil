@@ -182,7 +182,7 @@
 						<field name="number_end"/>
 						<group colspan="4">
 						<field name="state" widget="statusbar" statusbar_visible="draft,done"/>
-						<button name="action_draft_done" states="draft" colspan="2" string="Confirmar" type="object" icon="gtk-convert"/>
+						<button name="action_draft_done" states="draft" colspan="2" string="Enviar SEFAZ" type="object" icon="gtk-convert"/>
 						</group>
 					</form>
 				</field>

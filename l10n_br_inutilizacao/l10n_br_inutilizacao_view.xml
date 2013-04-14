@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="l10n_br_inutilizacao_invoice_invalid_number_form">
+            <field name="name">l10n_br_account.invoice.invalid.number.form</field>
+            <field name="model">l10n_br_account.invoice.invalid.number</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="l10n_br_account.l10n_br_account_invoice_invalid_number_form"/>
+            <field name="arch" type="xml">
+                
+                    <field name="number_end" position="after">
+                        <field name="justificative"/>
+                    </field>
+                
+            </field>
+        </record>
+
+    </data>
+</openerp>
