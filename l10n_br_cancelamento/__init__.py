@@ -1,0 +1,1 @@
+from l10n_br_cancelamento import account_invoice
