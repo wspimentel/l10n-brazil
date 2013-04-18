@@ -9,6 +9,12 @@ class l10n_br_account_invoice_invalid_number(osv.Model):
     _columns = {
             'justificative': fields.char('Justificativa', size=255,required=True),
         }
+    def _check_justificative(self, cr,uid, ids):
+        for invalid in self.browse(cr, uid, ids):
+            if len(invalid.justificative) < 15:return  False
+        return True
+    
+    _constraints = [(_check_justificative,'Justificativa deve ter tamanho minimo de 15 caracteres.', ['justificative'])]
     
 
     def action_draft_done(self, cr, uid, ids, *args):        

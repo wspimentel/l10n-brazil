@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_server_manager_form">
+            <field name="name">Configure server</field>
+            <field name="model">server.manager</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Configurar o servidor" version="7.0">
+                    <header>
+                        <button name="create_subdomain" colspan="2" string="Gerar subdominio" type="object" icon="terp-personal+"/>
+                        <button name="duplicate_database" colspan="2" string="Gerar banco de dados" type="object" icon="gtk-copy"/>
+                    </header>
+                    <group>
+                        <field name="api_dns_email" select="2" string="Email DNS"/>
+                        <field name="api_dns_key" select="2" />
+                        <field name="default_domain" select="2"/>
+                        <field name="empresa" select="2"/>
+                        <field name="base_database" select="2"/>                        
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_server_manager_tree">
+            <field name="name">Server manager tree</field>
+            <field name="model">server.manager</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Empresas">
+                    <field name="empresa" />
+                    <field name="api_dns_email" />                    
+                    <field name="default_domain" />
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_server_manager_form">
+            <field name="name">Gerenciar servidores</field>
+            <field name="res_model">server.manager</field>
+            <field name="view_type">form</field>
+            <field name='view_mode'>tree,form</field>
+            <field name='view_id' ref='view_server_manager_tree'/>
+        </record>
+        <menuitem parent="base.menu_config" action="action_server_manager_form" id="server_manager_menu"/>
+
+    </data>
+</openerp>
