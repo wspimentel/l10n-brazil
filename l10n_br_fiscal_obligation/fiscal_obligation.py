@@ -77,6 +77,11 @@ class contador(osv.Model):
                 }
     _defaults = {}
     
+    def create(self, cr, uid, vals, context=None):
+        if not context:
+            context = {}
+        vals.update({'is_accountant':True, 'customer':False})
+        return super(contador, self).create(cr, uid, vals, context)    
     
     
 contador()

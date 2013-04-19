@@ -24,7 +24,7 @@ class account_invoice(osv.Model):
         company = company_pool.browse(cr, uid, record.company_id.id)
                 
         p = pysped.nfe.ProcessadorNFe()
-        p.versao = '2.00'
+        p.versao = company.nfe_version
         p.estado = company.partner_id.l10n_br_city_id.state_id.code
         
         file_content_decoded = base64.decodestring(company.nfe_a1_file)
