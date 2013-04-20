@@ -19,12 +19,14 @@
 
 import re
 import string
+import base64
 from datetime import datetime
 
 from openerp import pooler
 from openerp.osv import orm
 from openerp.tools.translate import _
 from ..document import FiscalDocument
+from validator import txt
 
 
 class NFe200(FiscalDocument):
@@ -32,7 +34,7 @@ class NFe200(FiscalDocument):
     def _serializer(self, cr, uid, ids, nfe_environment, context=None):
         """"""
         try:
-            from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200
+            from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200            
         except ImportError:
             raise orm.except_orm(
                 _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
@@ -146,7 +148,7 @@ class NFe200(FiscalDocument):
             nfe.infNFe.emit.enderEmit.cMun.valor = '%s%s' % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
             nfe.infNFe.emit.enderEmit.xMun.valor = company.l10n_br_city_id.name or ''
             nfe.infNFe.emit.enderEmit.UF.valor = company.state_id.code or ''
-            nfe.infNFe.emit.enderEmit.CEP.valor = company.zip or ''
+            nfe.infNFe.emit.enderEmit.CEP.valor = re.sub('[^0-9]','', company.zip or '')
             nfe.infNFe.emit.enderEmit.cPais.valor = company.country_id.bc_code[1:]
             nfe.infNFe.emit.enderEmit.xPais.valor = company.country_id.name
             nfe.infNFe.emit.enderEmit.fone.valor = re.sub('[%s]' % re.escape(string.punctuation), '', str(company.phone or '').replace(' ',''))
@@ -375,15 +377,50 @@ class NFe200(FiscalDocument):
         return nfes
 
     # TODO
-    def _deserializer():
+    def _deserializer(self):
         """"""
         pass
 
     def get_xml(self, cr, uid, ids, nfe_environment, context=None):
-        """"""
+        try:
+            from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200
+            from pysped.nfe import ProcessadorNFe
+            from pysped.nfe.webservices_flags import *
+            from pysped.nfe.leiaute import *
+        except ImportError:
+            raise orm.except_orm(
+                _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        
+        #txt.validate(cr, uid, ids,context)        
+        
+        pool = pooler.get_pool(cr.dbname)
+        invoice = pool.get('account.invoice').browse(cr, uid, ids[0], context)
+        
+        company_pool = pool.get('res.company')        
+        company = company_pool.browse(cr, uid, invoice.company_id.id)
+                
+        p = ProcessadorNFe()
+        p.versao = '2.00' if (company.nfe_version == '200') else '1.10'
+        p.estado = company.partner_id.l10n_br_city_id.state_id.code
+        
+        file_content_decoded = base64.decodestring(company.nfe_a1_file)
+        filename = company.nfe_export_folder + 'certificate.pfx'
+        fichier = open(filename,'w+')
+        fichier.write(file_content_decoded)
+        fichier.close()
+                   
+        p.certificado.arquivo = filename
+        p.certificado.senha = company.nfe_a1_password
+    
+        p.salva_arquivos      = True
+        p.contingencia_SCAN   = False
+        p.caminho = company.nfe_export_folder
+        
+        nfe = self._serializer(cr, uid, ids, nfe_environment, context)
         result = []
-        for nfe in self._serializer(cr, uid, ids, nfe_environment, context):
-            result.append({'key': nfe.infNFe.Id.valor, 'nfe': nfe.get_xml()})
+        
+        for processo in p.processar_notas(nfe):      
+            result.append({'key': nfe[0].infNFe.Id.valor, 'nfe': processo.resposta.xml})
         return result
 
     # TODO
