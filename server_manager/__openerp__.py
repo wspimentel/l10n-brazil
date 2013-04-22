@@ -1,7 +1,6 @@
 {
     "name": "Server manager",
     "version": "1.0",
-    "depends": ["base"],
     "author": "Danimar Ribeiro",
     "category": "Tools",
     "description": """
@@ -9,9 +8,15 @@
         Necessita da api para o Zerigo DNS:
         https://bitbucket.org/petersanchez/zerigodns
     """,
+    'depends': [
+        'base',
+        'auth_signup',
+    ],
     "init_xml": [],
-    'update_xml': ["server_manager_view.xml"],
+    'update_xml': ["server_manager_view.xml", "customer_manager_view.xml"],
     'demo_xml': [],
     'installable': True,
     'active': False,
+    'qweb': ['static/src/xml/auth_signup.xml'],
+    'bootstrap': True,
 }
