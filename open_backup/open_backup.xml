@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <openerp>
-    <data>
+    <data>    	
+    	
         <record id="ir_cron_backupscheduler0" model="ir.cron">
             <field eval="&quot;&quot;&quot;schedule_backup&quot;&quot;&quot;" name="function"/>
             <field name="interval_number">1</field>
@@ -66,7 +67,7 @@
             <field name='view_mode'>tree,form</field>
             <field name='view_id' ref='view_backup_conf_tree'/>
         </record>
-        <menuitem parent="base.menu_config" action="action_backup_conf_form" id="backup_conf_menu"/>
+        <menuitem parent="server_manager.tools_base_menu" action="action_backup_conf_form" id="backup_conf_menu"/>
 
     </data>
 </openerp>

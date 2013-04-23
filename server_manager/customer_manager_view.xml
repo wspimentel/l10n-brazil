@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <record model="ir.ui.view" id="view_server_manager_form">
+        <record model="ir.ui.view" id="view_licence_software_form">
             <field name="name">Configurar licença</field>
             <field name="model">licence.software</field>
             <field name="type">form</field>
@@ -44,7 +44,7 @@
             <field name='view_mode'>tree,form</field>
             <field name='view_id' ref='view_licence_software_tree'/>
         </record>
-        <menuitem parent="base.menu_config" action="action_licence_software_form" id="licence_software_menu"/>
+        <menuitem parent="tools_base_menu" action="action_licence_software_form" id="licence_software_menu"/>
 
     </data>
 </openerp>

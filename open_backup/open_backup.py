@@ -38,8 +38,6 @@ def execute(connector, method, *args):
             raise e
     return res
 
-addons_path = tools.config['addons_path'] + '/auto_backup/DBbackups'
-
 class opendb_backup(osv.osv):
     _name = 'opendb.backup'
     
@@ -56,7 +54,7 @@ class opendb_backup(osv.osv):
         }
     
     _defaults = {
-        'backup_dir' : lambda *a : addons_path,
+        'backup_dir' : lambda *a : os.getcwd() + '/auto_bkp/DBbackups',
         'host' : lambda *a : 'localhost',
         'port' : lambda *a : '8069',
         'ftp_port':lambda *a: 21,    
@@ -66,12 +64,8 @@ class opendb_backup(osv.osv):
         uri = 'http://' + host + ':' + port
         conn = xmlrpclib.ServerProxy(uri + '/xmlrpc/db')
         db_list = execute(conn, 'list')
-        return db_list
-        
-    def get_addons_path(self, cr, user, context={}):
-        addons_path = '/home/danimar/Área de Trabalho/auto_bkp/DBbackups'
-        return addons_path    
-    
+        return db_list        
+     
     
     def _check_db_exist(self, cr, user, ids):
         for rec in self.browse(cr,user,ids):

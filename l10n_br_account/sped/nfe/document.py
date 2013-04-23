@@ -382,11 +382,8 @@ class NFe200(FiscalDocument):
         pass
 
     def get_xml(self, cr, uid, ids, nfe_environment, context=None):
-        try:
-            from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200
+        try:            
             from pysped.nfe import ProcessadorNFe
-            from pysped.nfe.webservices_flags import *
-            from pysped.nfe.leiaute import *
         except ImportError:
             raise orm.except_orm(
                 _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
