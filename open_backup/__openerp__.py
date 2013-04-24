@@ -1,15 +1,14 @@
 {
     "name": "OpenDB Backup",
-    "version": "1.0",
-    "depends": ["base"],
+    "version": "1.0",    
     "author": "Danimar Ribeiro",
     "category": "Tools",
     "description": """
     Este módulo permite configurar backup das bases de dados para rodar periodicamente
     """,
-    "init_xml": [],
+    "depends": ["base", "server_manager"],    
     'update_xml': ["open_backup.xml"],
-    'demo_xml': [],
+    'data':["security/ir.model.access.csv"],    
     'installable': True,
     'active': False,
 }

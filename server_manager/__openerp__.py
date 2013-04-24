@@ -11,10 +11,9 @@
     'depends': [
         'base',
         'auth_signup',
-    ],
-    "init_xml": [],
-    'update_xml': ["server_manager_view.xml", "customer_manager_view.xml"],
-    'demo_xml': [],
+    ],    
+    'update_xml': ["server_manager_view.xml", "customer_manager_view.xml","security/ir.model.access.csv"],
+    'data':[],    
     'installable': True,
     'active': False,
     'qweb': ['static/src/xml/auth_signup.xml'],

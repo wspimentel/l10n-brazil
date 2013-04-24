@@ -2,16 +2,7 @@
 from openerp.osv import fields,osv
 import xmlrpclib
 import socket
-import os
-import time
-import base64
-from openerp import tools
-import zipfile
-from ftplib import FTP
-from openerp.service.wsgi_server import serve
 import zerigodns
-import time
-import sys
 
 def execute(connector, method, *args):
     res = False
@@ -98,7 +89,7 @@ server_subdomain()
 
 
 class server_settings(osv.osv_memory):
-    _description = 'Configurações gerenciamento servidores'
+    _description = u'Configurações gerenciamento servidores'
     _name = 'server.config.settings'
     _inherit = 'res.config.settings'
     _columns = {
@@ -107,6 +98,28 @@ class server_settings(osv.osv_memory):
         'default_database_template_id': fields.many2one('database.template', 'Template Default Banco de dados',
                             required=True), 
         'default_server_id':fields.many2one('server.location', 'Servidor Default', required=True),
+        'default_email_template':fields.many2one('email.template', 'Email Default', required=False),
     }
+    
+    def default_get(self, cr, uid, fields, context=None):
+        ids = self.search(cr, uid, [])
+        values = self.browse(cr, uid, ids, context)
+        val = {}
+        if len(values)>0:
+            val["zerigo_email_api"] = values[0].zerigo_email_api
+            val["zerigo_dns_key"] = values[0].zerigo_dns_key
+            val["default_database_template_id"] = values[0].default_database_template_id.id
+            val["default_server_id"] = values[0].default_server_id.id
+            val["default_email_template"] = values[0].default_email_template.id
+            
+        return val
+    
+    def create(self, cr, uid, vals, context=None):
+        ids = self.search(cr, uid, [])
+        if len(ids)>0:
+            self.write(cr, uid, ids[0], vals, context)
+            return ids[0]
+        else:
+            return super(server_settings,self).create(cr, uid, vals, context)        
 
 server_settings()
