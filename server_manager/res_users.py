@@ -19,9 +19,9 @@ class res_users(osv.Model):
         created_user = super(res_users, self).signup(cr, uid, values, token, context)
         #TODO Pegar os valores e modificar o que é necessario
         if not values["licence_key"]:
-            raise orm.except_orm(_('Error !'), ("Chave da licença é obrigatório"))
+            raise osv.except_osv(_('Warning !'), ("Chave da licença é obrigatório"))
         if not values["company_name"]:
-            raise orm.except_orm(_('Error !'), ("Nome da empresa é obrigatório"))
+            raise osv.except_osv(_('Warning !'), ("Nome da empresa é obrigatório"))
         licence_pool = self.pool.get('licence.software')
         licence_ids = licence_pool.search(cr, uid, [('licence_key','=',values['licence_key'])])
         if len(licence_ids) > 0:
@@ -39,9 +39,9 @@ class res_users(osv.Model):
                 
                 self._setup_environment(cr, uid, values, user, context)
             else:
-                raise orm.except_orm(_('Error !'), ("Erro ao criar o usuário"))
+                raise osv.except_osv(_('Warning !'), ("Erro ao criar o usuário"))
         else:
-            raise orm.except_orm(_('Error !'), ("A licença não é válida"))
+            raise osv.except_osv(_('Warning !'), ("A licença não é válida"))
         return created_user
     
     def _setup_environment(self, cr, uid, values, user , context=None):
@@ -57,16 +57,22 @@ class res_users(osv.Model):
             server = manager_pool.browse(cr, uid, id_manager, context)
             server.create_subdomain()
             server.duplicate_database()
-                        
+            
+            context = { "subdomain_id": id_manager }
             self.pool.get('email.template').send_mail(cr, uid, config.default_email_template.id, user.id, force_send=True, context=context)
             
         else:
-            raise orm.except_orm(_('Error !'), ("Desculpe nossa falha, ainda estamos configurando nosso sistema."))
+            raise osv.except_osv(_('Warning !'), ("Desculpe nossa falha, ainda estamos configurando nosso sistema."))
         
     
     
     def get_signup_url(self,cr, uid, values, context=None):
-        return "http://admin.emissaocte.com.br:8069"
+        subdomain_pool = self.pool.get('server.subdomain')        
+        subdomain = subdomain_pool.browse(cr, uid, context["subdomain_id"])
+        if not subdomain is None:            
+            return "http://" + subdomain.subdomain + "." + subdomain.default_server_id.url_server 
+        else:        
+            return "http://admin.emissaocte.com.br"
     
 res_users()
 

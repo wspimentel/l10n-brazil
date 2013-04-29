@@ -114,7 +114,7 @@ class generate_sped_fiscal():
         partner_pool = obligation.pool.get('res.partner')        
         accountant_ids = partner_pool.search(cr, uid, ['&',('company_id.id','=',company.id),('is_accountant','=',True)], context, limit=1)
         if len(accountant_ids)>0:
-            accountant = partner_pool.browse(cr, uid, accountant_ids, context)
+            accountant = partner_pool.browse(cr, uid, accountant_ids[0], context)
             
             reg0100 = pysped_efd.r0100(NOME=accountant.name, CPF=accountant.cnpj_cpf, 
                  CRC=accountant.inscricao_crc, CNPJ=accountant.cnpj_empresa, 
