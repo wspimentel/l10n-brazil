@@ -19,7 +19,8 @@
 						<group states="done" string="Resultado da Exportação">
 							<field nolabel="1" readonly="1" colspan="4" name="nfe_export_result">
 								<tree colors="green:status == 'success';red:status == 'error'">
-									<field name="document"/>
+									<field name="file" filename="name" />		
+									<field name="xml_type"/>
 									<field name="message"/>
 									<field name="status"/>
 								</tree>

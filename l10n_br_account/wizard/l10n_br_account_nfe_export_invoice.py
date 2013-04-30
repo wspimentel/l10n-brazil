@@ -24,13 +24,13 @@ from openerp.osv import orm, fields
 from openerp.tools.translate import _
 
 
-class l10n_br_account_nfe_export_invoice(orm.TransientModel):
+class l10n_br_account_nfe_export_invoice(orm.BaseModel):
     """ Export fiscal eletronic file from invoice"""
     _name = 'l10n_br_account.nfe_export_invoice'
-    _description = 'Export eletronic invoice for Emissor de NFe SEFAZ SP'
+    _description = 'Export eletronic invoice for Emissor de NFe SEFAZ'
     _columns = {
         'name': fields.char('Nome', size=255),
-        'file': fields.binary('Arquivo', readonly=True),
+        'file': fields.binary('NFe protocolada', readonly=True),
         'file_type': fields.selection(
             [('xml', 'XML'), ('txt', ' TXT')], 'Tipo do Arquivo'),
         'state': fields.selection(
@@ -114,19 +114,20 @@ class l10n_br_account_nfe_export_invoice(orm.TransientModel):
                 cr, uid, export_inv_ids, data['nfe_environment'],
                 '200', context)
 
+            nfe_result_pool = self.pool.get('l10n_br_account.nfe_export_invoice_result')
             for nfe in nfes:
                 #if nfe['message']:
                     #status = 'error'
                 #else:
                     #status = 'success'
-
-                #self.pool.get(self._name + '_result').create(
-                    #cr, uid, {'document': nfe['key'],
-                        #'message': nfe['message'],
-                        #'status': status,
-                        #'wizard_id': data['id']})
-
                 nfe_file = nfe['nfe'].encode('utf8')
+                
+                nfe_result_pool.create(
+                    cr, uid, {'name': nfe['key'],
+                        'message': nfe['message'],
+                        'status': nfe['status'],
+                        'wizard_id': data['id'],
+                        'file': base64.b64encode(nfe_file) })                
 
             self.write(
                 cr, uid, ids, {'file': base64.b64encode(nfe_file),
@@ -155,13 +156,15 @@ class l10n_br_account_nfe_export_invoice(orm.TransientModel):
         }
 
 
-class l10n_br_account_nfe_export_invoice_result(orm.TransientModel):
+class l10n_br_account_nfe_export_invoice_result(orm.BaseModel):
     _name = 'l10n_br_account.nfe_export_invoice_result'
     _columns = {
         'wizard_id': fields.many2one(
             'l10n_br_account.nfe_export_invoice', 'Wizard ID',
             ondelete='cascade', select=True),
-        'document': fields.char('Documento', size=255),
+        'name':fields.char('Nome', size=255),
+        'xml_type': fields.char('Tipo', size=255),
+        'file': fields.binary('Arquivo xml', readonly=True),        
         'status': fields.selection(
             [('success', 'Sucesso'), ('error', 'Erro')], 'Status'),
         'message': fields.char('Mensagem', size=255),

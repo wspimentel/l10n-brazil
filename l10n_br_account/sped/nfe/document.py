@@ -35,7 +35,7 @@ class NFe200(FiscalDocument):
         """"""
         try:
             from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200            
-        except ImportError:
+        except ImportError as e:
             raise orm.except_orm(
                 _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
@@ -384,9 +384,9 @@ class NFe200(FiscalDocument):
     def get_xml(self, cr, uid, ids, nfe_environment, context=None):
         try:            
             from pysped.nfe import ProcessadorNFe
-        except ImportError:
+        except ImportError as e:
             raise orm.except_orm(
-                _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+                _(u'Erro!'), _(u"Biblioteca PySPED não instalada! " + str(e)))
         
         #txt.validate(cr, uid, ids,context)        
         
@@ -417,7 +417,8 @@ class NFe200(FiscalDocument):
         result = []
         
         for processo in p.processar_notas(nfe):      
-            result.append({'key': nfe[0].infNFe.Id.valor, 'nfe': processo.resposta.xml})
+            result.append({'status':'success', 'message':'Recebido com sucesso.', 'key': nfe[0].infNFe.Id.valor, 'nfe': processo.envio.xml})
+            result.append({'status':'success', 'message':'Recebido com sucesso.','key': nfe[0].infNFe.Id.valor, 'nfe': processo.resposta.xml})
         return result
 
     # TODO

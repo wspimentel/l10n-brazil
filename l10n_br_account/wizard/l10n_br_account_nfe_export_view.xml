@@ -2,7 +2,7 @@
 <openerp>
 	<data>
 
-               <record id="l10n_br_account_nfe_export_form" model="ir.ui.view">
+         <record id="l10n_br_account_nfe_export_form" model="ir.ui.view">
 			<field name="name">l10n_br_account.nfe_export.form</field>
 			<field name="model">l10n_br_account.nfe_export</field>
 			<field name="inherit_id" ref="l10n_br_account_nfe_export_invoice_form"/>

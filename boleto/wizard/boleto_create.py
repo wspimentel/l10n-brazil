@@ -65,7 +65,7 @@ class boleto_create(osv.osv_memory):
         if context is None:
             context = {}
         data = self.read(cr, uid, ids, [], context=context)[0]
-        bol_conf_id = data['boleto_company_config_ids']
+        bol_conf_id = int(data['boleto_company_config_ids'])
         inv_obj = self.pool.get('account.invoice')
         boleto_obj = self.pool.get('boleto.boleto')
         active_ids = context.get('active_ids', [])
@@ -97,14 +97,32 @@ class boleto_create(osv.osv_memory):
                     'data_documento': move_line.date_created,
                     'valor': move_line.debit,
                     'numero_documento': move_line.id,
-                    'endereco': invoice.address_invoice_id.id
+                    'endereco': invoice.partner_id.id
                     }
                     boleto_id = boleto_obj.create(cr, uid, boleto, context)
                     boleto_ids.append(boleto_id)
         boleto_file = self.gen_boleto(cr, uid, ids, boleto_ids, context)
         self.write(cr, uid, ids, {'file': boleto_file, 'state': 'done'}, context=context)
 
-        return False
+        mod_obj = self.pool.get('ir.model.data')
+        model_data_ids = mod_obj.search(
+            cr, uid, [('model', '=', 'ir.ui.view'),
+            ('name', '=', 'view_boleto_create')],
+            context=context)
+        resource_id = mod_obj.read(
+            cr, uid, model_data_ids,
+            fields=['res_id'], context=context)[0]['res_id']
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_id': data['id'],
+            'views': [(resource_id, 'form')],
+            'target': 'new',
+            'context': {'active_ids': active_ids}
+        }
 
     def gen_boleto(self, cr, uid, ids, boleto_ids, context=None):
         boleto_obj = self.pool.get('boleto.boleto')
@@ -112,7 +130,7 @@ class boleto_create(osv.osv_memory):
         boleto_pdf = BoletoPDF(fbuffer)
 
         for bol in boleto_obj.browse(cr, uid, boleto_ids, context=context):
-            partner_ad = bol.sacado.address[0]
+            partner_ad = bol.sacado
 
             if bol.banco == 'bb':
                 boleto = BoletoBB(7, 2)
