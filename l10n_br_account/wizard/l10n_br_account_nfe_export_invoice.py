@@ -123,7 +123,7 @@ class l10n_br_account_nfe_export_invoice(orm.BaseModel):
                 nfe_file = nfe['nfe'].encode('utf8')
                 
                 nfe_result_pool.create(
-                    cr, uid, {'name': nfe['key'],
+                    cr, uid, {'name': 'resultado.xml',
                         'message': nfe['message'],
                         'status': nfe['status'],
                         'wizard_id': data['id'],

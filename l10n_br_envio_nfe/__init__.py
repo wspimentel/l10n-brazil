@@ -1,0 +1,1 @@
+from l10n_br_envio_nfe import account_invoice
