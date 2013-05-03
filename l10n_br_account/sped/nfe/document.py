@@ -26,7 +26,6 @@ from openerp import pooler
 from openerp.osv import orm
 from openerp.tools.translate import _
 from ..document import FiscalDocument
-from validator import txt
 
 
 class NFe200(FiscalDocument):
@@ -384,12 +383,11 @@ class NFe200(FiscalDocument):
     def get_xml(self, cr, uid, ids, nfe_environment, context=None):
         try:            
             from pysped.nfe import ProcessadorNFe
+            from pysped.nfe import webservices_flags
         except ImportError as e:
             raise orm.except_orm(
                 _(u'Erro!'), _(u"Biblioteca PySPED não instalada! " + str(e)))
-        
-        #txt.validate(cr, uid, ids,context)        
-        
+                             
         pool = pooler.get_pool(cr.dbname)
         invoice = pool.get('account.invoice').browse(cr, uid, ids[0], context)
         
@@ -416,9 +414,50 @@ class NFe200(FiscalDocument):
         nfe = self._serializer(cr, uid, ids, nfe_environment, context)
         result = []
         
-        for processo in p.processar_notas(nfe):      
-            result.append({'status':'success', 'message':'Recebido com sucesso.', 'key': nfe[0].infNFe.Id.valor, 'nfe': processo.envio.xml})
-            result.append({'status':'success', 'message':'Recebido com sucesso.','key': nfe[0].infNFe.Id.valor, 'nfe': processo.resposta.xml})
+        for processo in p.processar_notas(nfe):   
+            #result.append({'status':'success', 'message':'Recebido com sucesso.', 'key': nfe[0].infNFe.Id.valor, 'nfe': processo.envio.xml})
+            #result.append({'status':'success', 'message':'Recebido com sucesso.','key': nfe[0].infNFe.Id.valor, 'nfe': processo.resposta.xml})
+                        
+            status = processo.resposta.cStat.valor
+            message = processo.resposta.xMotivo.valor
+            name = 'xml_enviado.xml'
+            name_result = 'xml_retorno.xml'
+            file_sent = processo.envio.xml
+            file_result = processo.resposta.xml
+            
+            type_xml = ''
+            if processo.webservice == webservices_flags.WS_NFE_CONSULTA:
+                type_xml = 'Situação NF-e'
+            elif processo.webservice == webservices_flags.WS_NFE_SITUACAO:                
+                type_xml = 'Status'
+            elif processo.webservice == webservices_flags.WS_NFE_ENVIO_LOTE:
+                type_xml = 'Envio NF-e'
+            elif processo.webservice == webservices_flags.WS_NFE_CONSULTA_RECIBO:
+                type_xml = 'Recibo NF-e'                        
+            
+            resultado = {'name':name,'name_result':name_result, 'message':message, 'xml_type':type_xml, 
+                'status_code':status,'xml_sent': file_sent,'xml_result': file_result, 'status':'success'}
+                        
+            if processo.webservice == webservices_flags.WS_NFE_CONSULTA_RECIBO:                
+                for prot in processo.resposta.protNFe:
+                    resultado["status_code"] = prot.infProt.cStat.valor
+                    resultado["message"] = prot.infProt.xMotivo.valor
+                    if prot.infProt.cStat.valor in ('100', '150', '110', '301', '302'):
+                        nfe_xml = processo.resposta.dic_procNFe[prot.infProt.chNFe.valor].xml
+                        danfe_pdf = processo.resposta.dic_procNFe[prot.infProt.chNFe.valor].danfe_pdf
+                    
+                        danfe_nfe = {'name':'danfe.pdf','name_result':'nfe_protocolada.xml', 
+                            'message':prot.infProt.xMotivo.valor, 'xml_type':'Danfe/NF-e', 
+                            'status_code':prot.infProt.cStat.valor,'xml_sent': danfe_pdf,
+                            'xml_result': nfe_xml , 'status':'success'}
+                        
+                        result.append(danfe_nfe)
+                        
+                    else:
+                        resultado["status"] = "error"
+            
+            result.append(resultado)
+            
         return result
 
     # TODO

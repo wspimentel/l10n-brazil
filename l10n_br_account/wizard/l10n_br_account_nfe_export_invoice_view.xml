@@ -6,11 +6,11 @@
 			<field name="name">Exportar Nota Fiscal</field>
 			<field name="model">l10n_br_account.nfe_export_invoice</field>
 			<field name="arch" type="xml">
-				<form string="Exportar Nota Fiscal" version="7.0">
+				<form string="Enviar Nota Fiscal Eletrônica" version="7.0">
 					<field invisible="1" name="state"/>
 					<field name="name" invisible="1" />
 					<group>
-						<group states="init" string="Click em exportar para iniciar a exportação...">
+						<group states="init" string="Clique em enviar para iniciar ao envio...">
 							<field name="file_type" />
 							<field name="nfe_environment" />
 							<field name="sign_xml" attrs="{'invisible': [('file_type','!=', 'xml')]}"/>
@@ -19,17 +19,18 @@
 						<group states="done" string="Resultado da Exportação">
 							<field nolabel="1" readonly="1" colspan="4" name="nfe_export_result">
 								<tree colors="green:status == 'success';red:status == 'error'">
-									<field name="file" filename="name" />		
+									<field name="file" filename="name" />
+									<field name="file_result" filename="name_result" />		
 									<field name="xml_type"/>
-									<field name="message"/>
 									<field name="status"/>
+									<field name="message"/>									
 								</tree>
 							</field>
 							<field name="file" colspan="4" filename="name" attrs="{'invisible': [('export_folder','=', True)]}" />
 						</group>
 					</group>
 						<footer states="init">
-							<button name="nfe_export" string="Exportar" type="object" class="oe_highlight" /> ou
+							<button name="nfe_export" string="Enviar NFe" type="object" class="oe_highlight" /> ou
 	                        <button special="cancel" string="Cancel" type="object" class="oe_link"/>
                     	</footer>
 	                    <footer states="done">

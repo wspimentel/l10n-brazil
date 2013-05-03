@@ -115,23 +115,35 @@ class l10n_br_account_nfe_export_invoice(orm.BaseModel):
                 '200', context)
 
             nfe_result_pool = self.pool.get('l10n_br_account.nfe_export_invoice_result')
-            for nfe in nfes:
-                #if nfe['message']:
-                    #status = 'error'
-                #else:
-                    #status = 'success'
-                nfe_file = nfe['nfe'].encode('utf8')
+            final_xml = ''
+            for nfe in nfes:                
+                xml_sent = ''
+                if nfe["xml_type"] == "Danfe/NF-e":
+                    xml_sent = nfe['xml_sent']
+                else:
+                    xml_sent = nfe['xml_sent'].encode('utf8')
+                xml_result = nfe['xml_result'].encode('utf8')
                 
                 nfe_result_pool.create(
-                    cr, uid, {'name': 'resultado.xml',
+                    cr, uid, {'name': nfe['name'],
+                        'name_result': nfe['name_result'],
                         'message': nfe['message'],
+                        'xml_type': nfe['xml_type'],
                         'status': nfe['status'],
                         'wizard_id': data['id'],
-                        'file': base64.b64encode(nfe_file) })                
+                        'file': base64.b64encode(xml_sent),
+                        'file_result': base64.b64encode(xml_result), })  
+                if nfe["xml_type"] == "Danfe/NF-e":
+                    final_xml = base64.b64encode(xml_result)              
 
-            self.write(
-                cr, uid, ids, {'file': base64.b64encode(nfe_file),
-                'state': 'done', 'name': name}, context=context)
+            if final_xml != "":
+                self.write(
+                    cr, uid, ids, {'file': base64.b64encode(xml_result),
+                    'state': 'done', 'name': name}, context=context)
+            else:
+                self.write(
+                    cr, uid, ids, {'state': 'done'}, context=context)
+            
 
         if err_msg:
             raise orm.except_orm(_('Error!'), _("'%s'") % _(err_msg, ))
@@ -162,10 +174,13 @@ class l10n_br_account_nfe_export_invoice_result(orm.BaseModel):
         'wizard_id': fields.many2one(
             'l10n_br_account.nfe_export_invoice', 'Wizard ID',
             ondelete='cascade', select=True),
-        'name':fields.char('Nome', size=255),
         'xml_type': fields.char('Tipo', size=255),
-        'file': fields.binary('Arquivo xml', readonly=True),        
+        'name':fields.char('Nome envio', size=255),                
+        'file': fields.binary('Xml envio', readonly=True),
+        'name_result':fields.char('Nome retorno', size=255),        
+        'file_result': fields.binary('Xml retorno', readonly=True),        
         'status': fields.selection(
             [('success', 'Sucesso'), ('error', 'Erro')], 'Status'),
+        'status_code':fields.char('Código',size=5),
         'message': fields.char('Mensagem', size=255),
     }

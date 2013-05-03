@@ -25,12 +25,12 @@ class account_invoice(osv.Model):
                 inv = self.browse(cr, uid, invoice.id)
                 return inv.nfe_export_invoice_id.open_window()
                             
-            
-            #TODO deletar os resultados anteriores
-            #result_pool =  self.pool.get('l10n_br_account.nfe_export_invoice_result')
-            #result_pool.unlink(cr, uid, invoice.nfe_export_invoice_id.nfe_export_result, context)           
                         
-            nfe_export_pool.write(cr, uid, invoice.nfe_export_invoice_id.id, {'state':'init'})
+            result_pool =  self.pool.get('l10n_br_account.nfe_export_invoice_result')
+            for result_id in invoice.nfe_export_invoice_id.nfe_export_result:
+                result_pool.unlink(cr, uid, result_id.id, context)           
+                        
+            nfe_export_pool.write(cr, uid, invoice.nfe_export_invoice_id.id, {'state':'init', 'file':'', 'name':''})
             return invoice.nfe_export_invoice_id.open_window()
         
     
