@@ -26,7 +26,6 @@ import socket
 import os
 import time
 import base64
-from openerp import tools
 import zipfile
 from ftplib import FTP
 

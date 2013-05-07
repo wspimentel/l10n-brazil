@@ -3,7 +3,7 @@
 	<data>
 
 		<act_window id="envio_nfe_export_invoice" key2="client_action_multi"
-			name="Exportar NFe" res_model="l10n_br_account.nfe_export_invoice"
+			name="Enviar NFe" res_model="l10n_br_account.nfe_export_invoice"
 			src_model="account.invoice" view_id="l10n_br_account.l10n_br_account_nfe_export_invoice_form"
 			view_mode="form" target="new" view_type="form" />
 		

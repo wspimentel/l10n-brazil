@@ -6,8 +6,6 @@ Created on 01/05/2013
 '''
 
 from openerp.osv import osv, fields
-import pysped.nfe
-import base64
 
 class account_invoice(osv.Model):
     _inherit = 'account.invoice'

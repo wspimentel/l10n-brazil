@@ -5,7 +5,7 @@ Created on 16/04/2013
 @author: Danimar Ribeiro
 '''
 
-from openerp.osv import osv, fields, orm
+from openerp.osv import osv, orm
 from openerp.tools.translate import _
 import pysped.nfe
 import base64
