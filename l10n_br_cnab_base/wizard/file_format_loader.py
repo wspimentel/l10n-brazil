@@ -31,7 +31,7 @@ from lxml.etree import XML, XMLParser
 import logging
 import base64
 
-from openerp.addons.tko_cnab_base import file_format
+from openerp.addons.l10n_br_cnab_base import file_format
 FORMAT_TYPES = file_format.FORMAT_TYPES
 
 def create_new_rows(func, values, sequence=False):
