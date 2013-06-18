@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+    <record id="action_cnab_file_format_loader" model="ir.actions.act_window">
+        <field name="name">File Format Loader</field>
+        <field name="res_model">cnab.wizard.file_format_loader</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="domain">[]</field>
+    </record>
+    
+    <menuitem 
+        id="menu_cnab_file_format_loader" 
+        name="File Format Loader"
+        action="action_cnab_file_format_loader" 
+        parent="menu_cnab_root"
+        sequence="20" />
+        
+    <record id="cnab_file_format_loader_form" model="ir.ui.view">
+        <field name="name">cnab.wizard.file_format_loader</field>
+        <field name="view_type">form</field>
+        <field name="model">cnab.wizard.file_format_loader</field>
+        <field name="arch" type="xml">
+            <form string="File Format Loader">
+                <field name="file" colspan="4"/>
+                <field name="type" colspan="4"/>
+                <field name="replace"/>
+                <newline/>
+                <group col="8">
+                    <label string=" " colspan="6"/>
+                    <button type="object" name="load" string="Load"/>
+                </group>
+            </form>
+        </field>
+    </record>
+    </data>
+    
+</openerp>

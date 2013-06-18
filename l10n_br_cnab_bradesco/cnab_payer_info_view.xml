@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+    <record id="cnab_bradesco_payer_info_form" model="ir.ui.view">
+        <field name="name">CNAB Bradesco Payer Info</field>
+        <field name="view_type">form</field>
+        <field name="model">cnab.bradesco.payer_info</field>
+        <field name="arch" type="xml">
+            <form string="CNAB Bradesco Payer Info">
+                <group string="Agencia">
+                    <field name="codigo_agencia"/>
+                    <field name="digito_agencia"/>
+                </group>
+                <group string="Conta">
+                    <field name="razao_conta"/>
+                    <field name="numero_conta"/>
+                    <field name="digito_conta"/>
+                </group>
+            </form>
+        </field>
+    </record>
+    
+    </data>
+</openerp>
