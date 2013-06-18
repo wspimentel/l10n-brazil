@@ -3,7 +3,7 @@
     <data>
     
         <record id="action_cnab_file_format" model="ir.actions.act_window">
-            <field name="name">File Formats</field>
+            <field name="name">Formato de Arquivos</field>
             <field name="res_model">cnab.file_format</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
@@ -12,7 +12,7 @@
         
         <menuitem
             id="menu_cnab_file_format"
-            name="File Formats"
+            name="Formato de Arquivos"
             action="action_cnab_file_format"
             parent="menu_cnab_root"
             sequence="10" />
@@ -22,12 +22,14 @@
             <field name="view_type">form</field>
             <field name="model">cnab.file_format</field>
             <field name="arch" type="xml">
-                <form string="File Format">
-                    <field name="name"/>
-                    <field name="version"/>
-                    <field name="type"/>
-                    <field name="description" colspan="4"/>
-                    <field name="records_ids"/>
+                <form string="Formato de Arquivos">
+                    <group>
+                        <field name="name"/>
+                        <field name="version"/>
+                        <field name="type"/>
+                        <field name="description"/>
+                        <field name="records_ids"/>
+                    </group>
                 </form>
             </field>
         </record>
@@ -37,7 +39,7 @@
             <field name="view_type">tree</field>
             <field name="model">cnab.file_format</field>
             <field name="arch" type="xml">
-                <tree string="File Format">
+                <tree string="Formatos de Arquivos">
                     <field name="name"/>
                     <field name="version"/>
                 </tree>
@@ -61,13 +63,15 @@
             <field name="view_type">form</field>
             <field name="model">cnab.record_format</field>
             <field name="arch" type="xml">
-                <form string="Record Format">
-                    <field name="identifier"/>
-                    <field name="name"/>
-                    <field name="repeatable"/>
-                    <field name="description" colspan="4"/>
-                    <field name="records_ids" colspan="4"/>
-                    <field name="fields_ids" colspan="4"/>
+                <form string="Formato de Campos">
+                    <group>
+                        <field name="identifier"/>
+                        <field name="name"/>
+                        <field name="repeatable"/>
+                        <field name="description"/>
+                        <field name="records_ids"/>
+                        <field name="fields_ids"/>
+                    </group>
                 </form>
             </field>
         </record>
@@ -77,7 +81,7 @@
             <field name="view_type">tree</field>
             <field name="model">cnab.record_format</field>
             <field name="arch" type="xml">
-                <tree string="Record Format">
+                <tree string="Formato de Campos">
                     <field name="name"/>
                 </tree>
             </field>

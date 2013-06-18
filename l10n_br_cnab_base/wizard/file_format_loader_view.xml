@@ -3,7 +3,7 @@
     <data>
     
     <record id="action_cnab_file_format_loader" model="ir.actions.act_window">
-        <field name="name">File Format Loader</field>
+        <field name="name">Carregar Formato de Arquivos</field>
         <field name="res_model">cnab.wizard.file_format_loader</field>
         <field name="view_type">form</field>
         <field name="view_mode">form</field>
@@ -13,7 +13,7 @@
     
     <menuitem 
         id="menu_cnab_file_format_loader" 
-        name="File Format Loader"
+        name="Carregar Formato de Arquivos"
         action="action_cnab_file_format_loader" 
         parent="menu_cnab_root"
         sequence="20" />
@@ -23,15 +23,15 @@
         <field name="view_type">form</field>
         <field name="model">cnab.wizard.file_format_loader</field>
         <field name="arch" type="xml">
-            <form string="File Format Loader">
-                <field name="file" colspan="4"/>
-                <field name="type" colspan="4"/>
-                <field name="replace"/>
-                <newline/>
-                <group col="8">
-                    <label string=" " colspan="6"/>
-                    <button type="object" name="load" string="Load"/>
+            <form string="Carregar Formato de Arquivos">
+                <group>
+                    <field name="file"/>
+                    <field name="type"/>
+                    <field name="replace"/>
                 </group>
+                <footer>
+                    <button type="object" name="load" string="Load"/>
+                </footer>
             </form>
         </field>
     </record>

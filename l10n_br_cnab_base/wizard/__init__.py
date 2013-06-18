@@ -22,6 +22,6 @@
 #
 ##############################################################################
 
-import file_format
-import wizard
-import res_bank
+import file_format_loader
+import export_cnab
+import import_cnab

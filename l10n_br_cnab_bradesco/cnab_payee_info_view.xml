@@ -7,8 +7,8 @@
             <field name="view_type">form</field>
             <field name="model">cnab.bradesco.payee_info</field>
             <field name="arch" type="xml">
-                <form string="CNAB Bradesco Payee Info">
-                    <group string="Codigos" colspan="2">
+                <form string="Informação do Recebedor">
+                    <group string="Códigos" colspan="2">
                         <field name="codigo_empresa"/>
                         <field name="codigo_carteira"/>
                         <field name="codigo_agencia"/>
