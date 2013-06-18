@@ -7,7 +7,7 @@
         <field name="view_type">form</field>
         <field name="model">cnab.wizard.exporter</field>
         <field name="arch" type="xml">
-            <form string="Exportar CNAB">
+            <form string="Exportar CNAB" version="7.0">
                 <field name="state" invisible="1"/>
                 <group states="init">
                     <field name="bank_id"/>

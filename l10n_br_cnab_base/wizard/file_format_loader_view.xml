@@ -23,7 +23,7 @@
         <field name="view_type">form</field>
         <field name="model">cnab.wizard.file_format_loader</field>
         <field name="arch" type="xml">
-            <form string="Carregar Formato de Arquivos">
+            <form string="Carregar Formato de Arquivos" version="7.0">
                 <group>
                     <field name="file"/>
                     <field name="type"/>
