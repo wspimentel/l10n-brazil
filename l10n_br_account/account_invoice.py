@@ -730,7 +730,7 @@ class account_invoice(orm.Model):
         if not result['value'].get('journal_id', False):
             raise orm.except_orm(
                 _('Nenhum Diário !'),
-                _("Categoria fisca: '%s', não tem um diário contábil para a \
+                _("Categoria fiscal: '%s', não tem um diário contábil para a \
                 empresa %s") % (fcategory.name, obj_company.name))
 
         obj_fp_rule = self.pool.get('account.fiscal.position.rule')
