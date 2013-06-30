@@ -689,7 +689,7 @@ class account_invoice(osv.osv):
         StrFile = ''
         StrNF = 'NOTA FISCAL|%s|\n' % len(ids)
         StrFile = StrNF
-        
+              
         for inv in self.browse(cr, uid, ids, context={'lang': 'pt_BR'}):
             #Endereço do company
             company_addr = self.pool.get('res.partner').address_get(cr, uid, [inv.company_id.partner_id.id], ['default'])
@@ -883,6 +883,9 @@ class account_invoice(osv.osv):
                     StrFile += StrG0
             
             i = 0
+            
+            vCredICMSSNTotal = 0
+            pICMSSNTotal =''
             for inv_line in inv.invoice_line:
                 i += 1
             
@@ -1100,7 +1103,8 @@ class account_invoice(osv.osv):
                        'pCredSN': str("%.2f" % inv_line.icms_percent),
                        'vCredICMSSN': str("%.2f" % inv_line.icms_value),
                     }
-
+                    pICMSSNTotal = inv_line.icms_percent
+                    vCredICMSSNTotal += inv_line.icms_value
                     StrN10c = 'N10c|%s|%s|%s|%s|\n' % (StrRegN10c['Orig'],
                                                        StrRegN10c['CSOSN'],
                                                        StrRegN10c['pCredSN'],
@@ -1130,7 +1134,8 @@ class account_invoice(osv.osv):
                        'PICMSST': str("%.2f" % inv_line.icms_st_percent),
                        'VICMSST': str("%.2f" % inv_line.icms_st_value),
                     }
-
+                    pICMSSNTotal = inv_line.icms_percent
+                    vCredICMSSNTotal += inv_line.icms_value
                     StrN10e = 'N10c|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (StrRegN10e['Orig'],
                                                        StrRegN10e['CSOSN'],
                                                        StrRegN10e['pCredSN'],
@@ -1198,7 +1203,8 @@ class account_invoice(osv.osv):
                                   'pCredSN': str("%.2f" % 0.00),
                                   'vCredICMSSN': str("%.2f" % 0.00),
                                   }
-
+                    pICMSSNTotal = inv_line.icms_percent
+                    vCredICMSSNTotal += inv_line.icms_value
                     StrN10h = 'N10h|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegN10h['Orig'],
                                                                                         StrRegN10h['CSOSN'],
                                                                                         StrRegN10h['modBC'],
@@ -1492,12 +1498,18 @@ class account_invoice(osv.osv):
                     StrY07 = 'Y07|%s|%s|%s|\n' % (StrRegY07['NDup'], StrRegY07['DVenc'], StrRegY07['VDup'])
                     
                     StrFile += StrY07
-    
-            StrRegZ = {
-                       'InfAdFisco': '',
-                       'InfCpl': normalize('NFKD',unicode(inv.comment or '')).encode('ASCII','ignore'),
-                       }
-            
+            if vCredICMSSNTotal > 0:
+                strInfoICMSSN = 'PERMITE O APROVEITAMENTO DO CRÉDITO DE ICMS NO VALOR DE R$ %s; CORRESPONDENTE À ALÍQUOTA DE %s %, NOS TERMOS DO ART. 23 DA LC 123/2006' % ( vCredICMSSNTotal, pICMSSNTotal )       
+                StrRegZ = {
+                           'InfAdFisco': '',
+                           'InfCpl': normalize('NFKD',unicode(strInfoICMSSN + '  '  + inv.comment or '')).encode('ASCII','ignore'),
+                           }
+            else: 
+                StrRegZ = {
+                           'InfAdFisco': '',
+                           'InfCpl': normalize('NFKD',unicode(inv.comment or '')).encode('ASCII','ignore'),
+                           }
+                
             StrZ = 'Z|%s|%s|\n' % (StrRegZ['InfAdFisco'], StrRegZ['InfCpl'])
 
             StrFile += StrZ
