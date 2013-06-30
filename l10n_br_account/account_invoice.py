@@ -1102,7 +1102,7 @@ class account_invoice(osv.osv):
                        'CSOSN': inv_line.icms_cst,
                        'pCredSN': str("%.2f" % inv_line.icms_percent),
                        'vCredICMSSN': str("%.2f" % inv_line.icms_value),
-                    }
+                       }
                     pICMSSNTotal = inv_line.icms_percent
                     vCredICMSSNTotal += inv_line.icms_value
                     StrN10c = 'N10c|%s|%s|%s|%s|\n' % (StrRegN10c['Orig'],
@@ -1115,7 +1115,7 @@ class account_invoice(osv.osv):
                     StrRegN10d = {
                        'Orig': inv_line.product_id.origin or '0',
                        'CSOSN': inv_line.icms_cst,
-                    }
+                       }
 
                     StrN10d = 'N10d|%s|%s|\n' % (StrRegN10d['Orig'],
                                                  StrRegN10d['CSOSN'])
@@ -1133,7 +1133,7 @@ class account_invoice(osv.osv):
                        'VBCST': str("%.2f" % inv_line.icms_st_base),
                        'PICMSST': str("%.2f" % inv_line.icms_st_percent),
                        'VICMSST': str("%.2f" % inv_line.icms_st_value),
-                    }
+                       }
                     pICMSSNTotal = inv_line.icms_percent
                     vCredICMSSNTotal += inv_line.icms_value
                     StrN10e = 'N10c|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s\n' % (StrRegN10e['Orig'],
@@ -1158,8 +1158,7 @@ class account_invoice(osv.osv):
                        'VBCST': str("%.2f" % inv_line.icms_st_base),
                        'PICMSST': str("%.2f" % inv_line.icms_st_percent),
                        'VICMSST': str("%.2f" % inv_line.icms_st_value),
-                    }
-
+                       }
                     StrN10e = 'N10c|%s|%s|%s|%s|%s|%s|%s|%s\n' % (StrRegN10e['Orig'],
                                                        StrRegN10e['CSOSN'],
                                                        StrRegN10e['ModBCST'],
@@ -1170,19 +1169,17 @@ class account_invoice(osv.osv):
                                                        StrRegN10e['VICMSST'])
                     StrFile += StrN10e                    
 
-        		if inv_line.icms_cst in ('500'):
+                if inv_line.icms_cst in ('500'):
                     StrRegN10g = {
                        'Orig': inv_line.product_id.origin or '0',
                        'CSOSN': inv_line.icms_cst,
                        'vBCSTRet': '', #FIXME
                        'vICMSSTRet ': '', #FIXME
                        }
-
                     StrN10g = 'N10g|%s|%s|%s|%s|\n' % (StrRegN10g['Orig'],
                                                        StrRegN10g['CSOSN'],
                                                        StrRegN10g['vBCSTRet'],
                                                        StrRegN10g['vICMSSTRet'])
-
                     StrFile += StrN10g
 
                 if inv_line.icms_cst in ('900'):
