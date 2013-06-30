@@ -1039,7 +1039,7 @@ class account_invoice(osv.osv):
 
                     StrFile += StrN09
                     
-                if inv_line.icms_cst in ('90', '900'):
+                if inv_line.icms_cst in ('90'):
                     StrRegN10h = {
                                   'Orig': inv_line.product_id.origin or '0',
                                   'CSOSN': inv_line.icms_cst,
@@ -1056,10 +1056,84 @@ class account_invoice(osv.osv):
                                   'vICMSST': '',
                                   'pCredSN': str("%.2f" % 0.00),
                                   'vCredICMSSN': str("%.2f" % 0.00),
+                                  
+                                  
+                                  'Orig': inv_line.product_id.origin or '0',
+                                  'CSOSN': icms_cst,
+                                  'modBC': inv_line.icms_base_type,
+                                  'vBC': str("%.2f" % 0.00),
+                                  'pRedBC': '',
+                                  'pICMS': str("%.2f" % 0.00),
+                                  'vICMS': str("%.2f" % 0.00),
+                                  'modBCST': '',
+                                  'pMVAST': '',
+                                  'pRedBCST': '',
+                                  'vBCST': '',
+                                  'pICMSST': '',
+                                  'vICMSST': '',
+                                  'pCredSN': str("%.2f" % 0.00),
+                                  'vCredICMSSN': str("%.2f" % 0.00),
                                   }
                                     
                     StrN10h = 'N10h|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegN10h['Orig'], 
                                                                                         StrRegN10h['CSOSN'], 
+                                                                                        StrRegN10h['modBC'],
+                                                                                        StrRegN10h['vBC'],
+                                                                                        StrRegN10h['pRedBC'],
+                                                                                        StrRegN10h['pICMS'],
+                                                                                        StrRegN10h['vICMS'],
+                                                                                        StrRegN10h['modBCST'],
+                                                                                        StrRegN10h['pMVAST'],
+                                                                                        StrRegN10h['pRedBCST'],
+                                                                                        StrRegN10h['vBCST'],
+                                                                                        StrRegN10h['pICMSST'],
+                                                                                        StrRegN10h['vICMSST'],
+                                                                                        StrRegN10h['pCredSN'],
+                                                                                        StrRegN10h['vCredICMSSN'])
+
+                    StrFile += StrN10h
+
+                if inv_line.icms_cst in ('101'):
+                    StrRegN10c = {
+                       'Orig': inv_line.product_id.origin or '0',
+                       'CSOSN': inv_line.icms_cst,
+                       'pCredSN': str("%.2f" % inv_line.icms_percent),
+                       'vCredICMSSN': str("%.2f" % inv_line.icms_value),
+                    }
+
+                    StrN10c = 'N10c|%s|%s|%s|%s|\n' % (StrRegN10c['Orig'], StrRegN10c['CSOSN'], StrRegN10c['pCredSN'], StrRegN10c['vCredICMSSN'])
+                    StrFile += StrN10c
+
+                if inv_line.icms_cst in ('400'):
+                    StrRegN10d = {
+                       'Orig': inv_line.product_id.origin or '0',
+                       'CSOSN': inv_line.icms_cst,
+                    }
+
+                    StrN10d = 'N10d|%s|%s|\n' % (StrRegN10d['Orig'], StrRegN10d['CSOSN'])
+                    StrFile += StrN10d
+
+                if inv_line.icms_cst in ('900'):
+                    StrRegN10h = {
+                                  'Orig': inv_line.product_id.origin or '0',
+                                  'CSOSN': inv_line.icms_cst,
+                                  'modBC': inv_line.icms_base_type,
+                                  'vBC': str("%.2f" % 0.00),
+                                  'pRedBC': '',
+                                  'pICMS': str("%.2f" % 0.00),
+                                  'vICMS': str("%.2f" % 0.00),
+                                  'modBCST': '',
+                                  'pMVAST': '',
+                                  'pRedBCST': '',
+                                  'vBCST': '',
+                                  'pICMSST': '',
+                                  'vICMSST': '',
+                                  'pCredSN': str("%.2f" % 0.00),
+                                  'vCredICMSSN': str("%.2f" % 0.00),
+                                  }
+
+                    StrN10h = 'N10h|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegN10h['Orig'],
+                                                                                        StrRegN10h['CSOSN'],
                                                                                         StrRegN10h['modBC'],
                                                                                         StrRegN10h['vBC'],
                                                                                         StrRegN10h['pRedBC'],
