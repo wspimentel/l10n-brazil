@@ -1167,7 +1167,7 @@ class account_invoice(osv.osv):
                                                        StrRegN10e['VBCST'],
                                                        StrRegN10e['PICMSST'],
                                                        StrRegN10e['VICMSST'])
-                    StrFile += StrN10e                    
+                    StrFile += StrN10e
 
                 if inv_line.icms_cst in ('500'):
                     StrRegN10g = {
