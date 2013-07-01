@@ -1496,7 +1496,8 @@ class account_invoice(osv.osv):
                     
                     StrFile += StrY07
             if vCredICMSSNTotal > 0:
-                strInfoICMSSN = 'PERMITE O APROVEITAMENTO DO CRÉDITO DE ICMS NO VALOR DE R$ %s; CORRESPONDENTE À ALÍQUOTA DE %s %, NOS TERMOS DO ART. 23 DA LC 123/2006' % ( vCredICMSSNTotal, pICMSSNTotal )       
+                
+                strInfoICMSSN = ' PERMITE O APROVEITAMENTO DO CREDITO DE ICMS NO VALOR DE R$ {vCredICMSSNTotal}; CORRESPONDENTE À ALÍQUOTA DE {pICMSSNTotal}%, NOS TERMOS DO ART. 23 DA LC 123/2006 '.format(vCredICMSSNTotal=vCredICMSSNTotal,pICMSSNTotal=pICMSSNTotal*100)       
                 StrRegZ = {
                            'InfAdFisco': '',
                            'InfCpl': normalize('NFKD',unicode(strInfoICMSSN + '  '  + inv.comment or '')).encode('ASCII','ignore'),
