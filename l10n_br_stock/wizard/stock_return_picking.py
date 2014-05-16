@@ -39,46 +39,105 @@ class stock_return_picking(orm.TransientModel):
          @param context: A standard dictionary
          @return: A dictionary which of fields with values.
         """
-        result = super(stock_return_picking, self).create_returns(
-            cr, uid, ids, context)
-
-        data = self.read(cr, uid, ids[0])
-
-        if data['invoice_state'] == 'none':
-            return result
 
         picking_obj = self.pool.get('stock.picking')
-        result_domain = eval(result['domain'])
-        record_ids = result_domain and result_domain[0] and result_domain[0][2]
-        pickings = picking_obj.browse(cr, uid, record_ids, context=context)
+        move_obj = self.pool.get('stock.move')
+        
+        if not context:
+            context = {}
 
-        for picking in pickings:
-            fc_return_id = picking.fiscal_category_id \
-            and picking.fiscal_category_id.refund_fiscal_category_id \
-            and picking.fiscal_category_id.refund_fiscal_category_id.id
+        for send_picking in picking_obj.browse(cr, uid, context.get('active_ids'), context):        
 
-            if not fc_return_id:
-                raise orm.except_orm(
-                    _('Error!'),
-                    _("""This Fiscal Operation does not has Fiscal Operation
-                    for Returns!"""))
+            result = super(stock_return_picking, self).create_returns(
+                cr, uid, ids, context)
 
-            values = {
-                'fiscal_category_id': fc_return_id,
-                'fiscal_position': False}
+            result_domain = eval(result['domain'])
+            picking_ids = result_domain and result_domain[0] and result_domain[0][2]            
 
-            partner_invoice_id = self.pool.get('res.partner').address_get(
-                cr, uid, [picking.partner_id.id], ['invoice'])['invoice']
+            for picking in picking_obj.browse(cr, uid, picking_ids, context=context):
+                
+                move_ids = move_obj.search(cr, uid, [('picking_id', '=', picking.id)])
+                
+    
+                fiscal_category_id = send_picking.fiscal_category_id \
+                    and send_picking.fiscal_category_id.refund_fiscal_category_id \
+                    and send_picking.fiscal_category_id.refund_fiscal_category_id.id
+        
+                if not fiscal_category_id:
+                    raise orm.except_orm(
+                        _('Error!'),
+                        _("""This Fiscal Operation does not has Fiscal Operation
+                        for Returns!"""))
+     
+                values = {
+                    'fiscal_category_id': fiscal_category_id,
+                    'fiscal_position': False}
+     
+                partner_invoice_id = self.pool.get('res.partner').address_get(
+                    cr, uid, [picking.partner_id.id], ['invoice'])['invoice']
+     
+                kwargs = {
+                   'partner_id': picking.partner_id.id,
+                   'partner_invoice_id': partner_invoice_id,
+                   'partner_shipping_id': picking.partner_id.id,
+                   'company_id': picking.company_id.id,
+                   'context': context,
+                   'fiscal_category_id': fiscal_category_id
+                }
+                
+                values.update(self._fiscal_position_map(
+                    cr, uid, {'value': {}}, **kwargs).get('value'))
 
-            kwargs = {
-               'partner_id': picking.partner_id.id,
-               'partner_invoice_id': partner_invoice_id,
-               'partner_shipping_id': picking.partner_id.id,
-               'company_id': picking.company_id.id,
-               'context': context,
-               'fiscal_category_id': fc_return_id
-            }
-            values.update(self._fiscal_position_map(
-                cr, uid, {'value': {}}, **kwargs).get('value'))
-            picking_obj.write(cr, uid, picking.id, values)
+                picking_obj.write(cr, uid, [picking.id], values)
+                               
+                for idx, send_move in enumerate(send_picking.move_lines):
+
+#                     line_fiscal_category_id = send_move.fiscal_category_id.refund_fiscal_category_id.id
+#                     
+#                     context.update({'parent_fiscal_category_id':line_fiscal_category_id 
+#                                     })
+#                     
+#                     line_onchange = move_obj.onchange_product_id2(cr, uid, ids, send_move.product_id.id, send_move.location_id.id,
+#                             send_move.location_dest_id.id, picking.partner_id.id, context)
+#                     
+                    
+             
+             
+                    line_onchange['value']['fiscal_category_id'] = line_fiscal_category_id
+                
+                    move_obj.write(cr, uid, move_ids[idx],v,context)
             return result
+
+
+#     
+#                 kwargs = {
+#                    'partner_id': picking.partner_id.id,
+#                    'partner_invoice_id': partner_invoice_id,
+#                    'partner_shipping_id': picking.partner_id.id,
+#                    'company_id': picking.company_id.id,
+#                    'context': context,
+#                    'fiscal_category_id': fc_return_id
+#                 }
+#                 values.update(self._fiscal_position_map(
+#                     cr, uid, {'value': {}}, **kwargs).get('value'))
+#                 picking_obj.write(cr, uid, picking.id, values)
+#                 
+#                 move_ids = move_obj.search(cr, uid, [('picking_id', 'in', [picking.id])])
+#                 
+#                 old_move_ids = move_obj.search(cr, uid, [('picking_id', 'in', [context.get('active_ids')])])
+#                 
+#                 new_move = move_obj.browse(cr, uid, move_ids) #não pega
+#                 
+#                 for idx, old_move in enumerate(picking.move_lines):
+#                     fc_return_id = old_move.fiscal_category_id \
+#                         and old_move.fiscal_category_id.refund_fiscal_category_id \
+#                         and old_move.fiscal_category_id.refund_fiscal_category_id.id
+#                     
+#                     values['fiscal_category_id'] = fc_return_id
+#                     values['fiscal_postion_id'] = move_obj.onchange_product_id(cr, uid, , prod_id=False, loc_id=False,
+#                                 loc_dest_id=False, partner_id=False)['values']['fiscal_postion_id']
+#                     
+#                     
+#                     new_move.write(cr, uid, move_ids[idx] , values)
+#                 
+#             return result
