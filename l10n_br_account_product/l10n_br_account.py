@@ -18,6 +18,7 @@
 ###############################################################################
 
 from openerp.osv import orm, fields
+from osv import fields,osv
 
 from .l10n_br_account_product import (
     PRODUCT_FISCAL_TYPE,
@@ -56,3 +57,51 @@ class L10n_brAccountPartnerFiscalType(orm.Model):
         'icms': True,
         'ipi': True
     }
+
+class L10n_brAccountMde(osv.osv):
+ 
+    _name = 'l10n_br_account.mde'
+    _columns = {
+        'chNFe': fields.integer("Chave de Acesso", size=44, readonly=True),
+        'nSeqEvento': fields.integer("Série", readonly=True),
+        'idLote': fields.integer("Id Lote", readonly=True),
+        'xNome': fields.char("Razão Social", readonly=True),
+        'partner_id': fields.many2one('res.partner','Partner'),
+        'IE': fields.related('partner_id', 'IE', type='char', string='Inscrição Estadual', readonly=True),
+        'dEmi': fields.date("Data Emissão", readonly=True),
+        'tpNF': fields.integer("Tipo de Operação", readonly=True),
+        'vNF': fields.integer("Valor Total da NF-e", readonly=True),
+        'cSitNFe': fields.integer("Situação da NF-e", readonly=True),
+        'cSitConf': fields.integer("Situação da Manifestação", readonly=True),
+        'formInclusao': fields.char("Forma de Inclusão", readonly=True),
+        'dataInclusao': fields.date("Data de Inclusão", readonly=True),
+        'versao': fields.integer("Versão", readonly=True),
+    }
+    
+                 
+    def action_search_nfe(self, cr, uid, ids, context=None):
+        print "Acao ! action_search_nfe"
+        return True
+    
+    def action_known_emission(self, cr, uid, ids, context=None):
+        print "Acao ! action_known_emission"
+        return True
+    
+    def action_confirm_operation(self, cr, uid, ids, context=None):
+        print "Acao ! action_confirm_operation"
+        return True
+    
+    def action_unknown_operation(self, cr, uid, ids, context=None):
+        print "Acao ! action_unknown_operation"
+        return True
+    
+    def action_not_operation(self, cr, uid, ids, context=None):
+        print "Acao ! action_not_operation"
+        return True
+    
+    def action_download_xml(self, cr, uid, ids, context=None):
+        print "Acao ! action_download_xml"
+        return True
+    
+    
+    

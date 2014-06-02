@@ -27,22 +27,21 @@
 	        		</header>		
 	        		<sheet>		
 	        			<group>	
-			               		<field name="chNFe" select="1"/>
-				                <field name="nSeqEvento" select="2"/>
-				                <field name="idLote" select="0"/>
-				                <field name="xNome" select="0"/>
+			                	<field name="chNFe" select="1"/>
+			                	<field name="nSeqEvento" select="2"/>
+			               		<field name="idLote" select="0"/>
+			               		<field name="xNome" select="0"/>
 				                <field name="IE" select="0"/>
-			        	        <field name="dEmi" select="0"/>		                
-			               		<field name="tpNF" select="0"/>
+				                <field name="dEmi" select="0"/>		                
+				                <field name="tpNF" select="0"/>
 				                <field name="vNF" select="0"/>
-				                <field name="cSitNFe" select="0"/>
-				                <field name="cSitConf" select="0"/>
+			        	        <field name="cSitNFe" select="0"/>
+			                	<field name="cSitConf" select="0"/>
 				                <field name="formInclusao" select="0"/>
 				                <field name="dataInclusao" select="0"/>
-			        	        <field name="versao" select="0"/>               
-		                	</group>
-	                	</sheet>	
-			</form>
+				                <field name="versao" select="0"/>               
+		        	        </group>
+		                </s</form>
 	        </field>
 	    </record>
 	    <record model="ir.ui.view" id="view_l10n_br_account_mde_tree">
