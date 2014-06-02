@@ -16,33 +16,29 @@
 	        <field name="model">l10n_br_account.mde</field>
 	        <field name="type">form</field>
 	        <field name="arch" type="xml">
-	        	<form string="l10n_br_account_mde">	
-		        	<header>
-		        		<button name="action_search_nfe" string="Pesquisar NF-e" type="object"/> 
-		        		<button name="action_known_emission" string="Ciência da Emissão" type="object"/> 		
-		        		<button name="action_confirm_operation" string="Confirmar Operação" type="object"/> 		
-		        		<button name="action_unknown_operation" string="Desconhecer Operação" type="object"/> 		
-		        		<button name="action_not_operation" string="Operação não Realizada" type="object"/> 		
-		        		<button name="action_download_xml" string="Download do XML" type="object"/> 
-	        		</header>		
-	        		<sheet>		
-	        			<group>	
-			               		<field name="chNFe" select="1"/>
-				                <field name="nSeqEvento" select="2"/>
-				                <field name="idLote" select="0"/>
-				                <field name="xNome" select="0"/>
-				                <field name="IE" select="0"/>
-			        	        <field name="dEmi" select="0"/>		                
-			               		<field name="tpNF" select="0"/>
-				                <field name="vNF" select="0"/>
-				                <field name="cSitNFe" select="0"/>
-				                <field name="cSitConf" select="0"/>
-				                <field name="formInclusao" select="0"/>
-				                <field name="dataInclusao" select="0"/>
-			        	        <field name="versao" select="0"/>               
-		                	</group>
-	                	</sheet>	
-			</form>
+	        	<form string="Manifestacao" version="7.0">
+	        		<header>	        	
+			        		<button name="action_search_nfe" string="Pesquisar NF-e" type="object"/> 
+			        		<button name="action_known_emission" string="Ciência da Emissão" type="object"/> 		
+			        		<button name="action_confirm_operation" string="Confirmar Operação" type="object"/> 		
+			        		<button name="action_unknown_operation" string="Desconhecer Operação" type="object"/> 		
+			        		<button name="action_not_operation" string="Operação não Realizada" type="object"/> 		
+			        		<button name="action_download_xml" string="Download do XML" type="object"/>   
+		        	</header>       		  		
+               		<field name="chNFe" select="1"/>
+	                <field name="nSeqEvento" select="2"/>
+	                <field name="idLote" select="0"/>
+	                <field name="xNome" select="0"/>
+	                <field name="IE" select="0"/>
+        	        <field name="dEmi" select="0"/>		                
+               		<field name="tpNF" select="0"/>
+	                <field name="vNF" select="0"/>
+	                <field name="cSitNFe" select="0"/>
+	                <field name="cSitConf" select="0"/>
+	                <field name="formInclusao" select="0"/>
+	                <field name="dataInclusao" select="0"/>
+        	        <field name="versao" select="0"/>   	                 	               	
+				</form>
 	        </field>
 	    </record>
 	    <record model="ir.ui.view" id="view_l10n_br_account_mde_tree">
@@ -50,7 +46,7 @@
 	        <field name="model">l10n_br_account.mde</field>
 	        <field name="type">tree</field>
 	        <field name="arch" type="xml">
-	            <tree string="l10n_br_account_mde" create="false">
+	            <tree string="l10n_br_account_mde" version="7.0" create="false">
 	            	<field name="chNFe"/>
 	                <field name="nSeqEvento"/>
 	                <field name="idLote"/>
