@@ -32,8 +32,6 @@ PRODUCT_FISCAL_TYPE = [
 
 PRODUCT_FISCAL_TYPE_DEFAULT = PRODUCT_FISCAL_TYPE[0][0]
 
-
-
 class L10n_brAccountcce(orm.Model):
     _name = 'l10n_br_account_cce'
     _description = u'Cartão de Correção no Sefaz'
@@ -46,10 +44,6 @@ class L10n_brAccountcce(orm.Model):
         'cce_document_event_ids': fields.one2many(
             'l10n_br_account.document_event', 'document_event_ids', u'Eventos')
     }
-
-
-
-
 
 class L10n_brAccountInvoiceCancel(orm.Model):
     _name = 'l10n_br_account.invoice.cancel'

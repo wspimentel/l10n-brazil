@@ -257,6 +257,7 @@ class AccountInvoice(orm.Model):
         default.update({
             'internal_number': False,
             'nfe_access_key': False,
+            'nfe_protocol_number': False,
             'nfe_status': False,
             'nfe_date': False,
             'nfe_export_date': False,
