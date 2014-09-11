@@ -35,7 +35,16 @@ FISCAL_RULE_COLUMNS = {
         help="Faixa inicial de faturamento bruto"),
     'revenue_end': fields.float(
         'Faturamento Final', digits_compute=dp.get_precision('Account'),
-        help="Faixa inicial de faturamento bruto")
+        help="Faixa inicial de faturamento bshipingruto"),
+    'from_city': fields.many2one(
+        'l10n_br_base.city', 'City From',
+        domain="[('state_id','=',from_state)]"),
+    'to_invoice_city': fields.many2one(
+        'l10n_br_base.city', 'Invoice City',
+        domain="[('state_id','=',to_invoice_state)]"),
+    'to_shipping_city': fields.many2one(
+        'l10n_br_base.city', 'Destination City',
+        domain="[('state_id','=',to_shiping_city)]"),                   
 }
 
 OTHERS_FISCAL_RULE_COLUMNS_TEMPLATE = {
@@ -82,6 +91,7 @@ class AccountFiscalPositionRule(orm.Model):
 
         from_country = company.partner_id.country_id.id
         from_state = company.partner_id.state_id.id
+        from_city = company.partner_id.l10n_br_city_id.id
         fiscal_rule_parent_id = company.fiscal_rule_parent_id.id
         partner_fiscal_type_id = partner.partner_fiscal_type_id.id
 
@@ -98,6 +108,8 @@ class AccountFiscalPositionRule(orm.Model):
             ('from_country', '=', False),
             '|', ('from_state', '=', from_state),
             ('from_state', '=', False),
+            '|', ('from_city', '=', from_city),
+            ('from_city', '=', False),
             '|', ('parent_id', '=', fiscal_rule_parent_id),
             ('parent_id', '=', False),
             '|', ('date_start', '=', False),
@@ -113,12 +125,17 @@ class AccountFiscalPositionRule(orm.Model):
         for address_type, address in addrs.items():
             key_country = 'to_%s_country' % address_type
             key_state = 'to_%s_state' % address_type
+            key_city = 'to_%s_city' % address_type
             to_country = address.country_id.id or False
             domain += ['|', (key_country, '=', to_country),
                 (key_country, '=', False)]
             to_state = address.state_id.id or False
             domain += ['|', (key_state, '=', to_state),
                 (key_state, '=', False)]
+            to_city = address.l10n_br_city_id.id or False
+            domain += ['|', (key_city, '=', to_city),
+                (key_city, '=', False)]
+
 
         return domain
 
