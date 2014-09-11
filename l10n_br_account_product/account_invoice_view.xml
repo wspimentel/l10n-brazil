@@ -11,6 +11,19 @@
 				</label>
 				<field name="comment" position="replace">
 				</field>
+                <group class="oe_subtotal_footer oe_right" position="after">
+                    <div style="width: 50%%">
+                        <group>
+                                <field name="retention_pis_value"/>
+                                <field name="retention_cofins_value"/>
+                                <field name="retention_csll_value"/>
+                                <field name="retention_irrf_base"/>
+                                <field name="retention_irrf_value"/>    
+                                <field name="retention_inss_base"/>
+                                <field name="retention_inss_value"/>
+                        </group>
+                    </div>
+                </group>
 				<notebook position="inside">
 					<page string="Documentos Relacionados">
 						<field colspan="4" nolabel="1" name="fiscal_document_related_ids">
@@ -278,6 +291,17 @@
 											<field name="issqn_value"/>
 										</group>
 									</page>
+                                    <page string="Retenções" attrs="{'invisible': [('product_type','!=', 'service')]}">
+                                        <group>
+                                            <field name="retention_pis_value"/>
+                                            <field name="retention_cofins_value"/>
+                                            <field name="retention_csll_value"/>
+                                            <field name="retention_irrf_base"/>
+                                            <field name="retention_irrf_value"/>    
+                                            <field name="retention_inss_base"/>
+                                            <field name="retention_inss_value"/>
+                                        </group>
+                                    </page>
 									<page string="IPI" attrs="{'invisible': [('product_type','=', 'service')]}">
 										<group string="Detalhes do IPI">
 											<group>

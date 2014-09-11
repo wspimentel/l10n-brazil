@@ -56,6 +56,13 @@ class AccountInvoice(orm.Model):
                 'amount_costs': 0.0,
                 'amount_gross': 0.0,
                 'amount_discount': 0.0,
+                'retention_pis_value': 0.0,
+                'retention_cofins_value': 0.0,
+                'retention_csll_value':  0.0,
+                'retention_irrf_base': 0.0,
+                'retention_irrf_value': 0.0,
+                'retention_inss_base':  0.0,
+                'retention_inss_value': 0.0,
             }
             for line in invoice.invoice_line:
                 result[invoice.id]['amount_untaxed'] += line.price_total
@@ -76,7 +83,14 @@ class AccountInvoice(orm.Model):
                 result[invoice.id]['amount_costs'] += line.other_costs_value
                 result[invoice.id]['amount_gross'] += line.price_gross
                 result[invoice.id]['amount_discount'] += line.discount_value
-
+                result[invoice.id]['retention_pis_value'] += line.retention_pis_value
+                result[invoice.id]['retention_cofins_value'] += line.retention_cofins_value
+                result[invoice.id]['retention_csll_value'] += line.retention_csll_value
+                result[invoice.id]['retention_irrf_base'] += line.retention_irrf_base
+                result[invoice.id]['retention_irrf_value'] += line.retention_irrf_value
+                result[invoice.id]['retention_inss_base'] += line.retention_inss_base
+                result[invoice.id]['retention_inss_value'] += line.retention_inss_value
+                
             for invoice_tax in invoice.tax_line:
                 if not invoice_tax.tax_code_id.tax_discount:
                     result[invoice.id]['amount_tax'] += invoice_tax.amount
@@ -395,6 +409,91 @@ class AccountInvoice(orm.Model):
                     ['invoice_line'], 20),
                 'account.invoice.line': (_get_invoice_line,
                     ['other_costs_value'], 20)}, multi='all'),
+        'retention_pis_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor Retido de PIS',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'retention_cofins_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor Retido de Cofins',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),                
+        'retention_csll_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor Retido de CSLL',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'retention_irrf_base': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Base de Cálculo do IRRF',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'retention_irrf_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor Retido do IRRF',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+                
+        'retention_inss_base': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Base de Cálculo da Retenção da Previdência Social',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'retention_inss_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor da Retenção da Previdência Social',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),        
     }
 
     def _default_fiscal_category(self, cr, uid, context=None):
@@ -656,7 +755,21 @@ class AccountInvoiceLine(orm.Model):
         'other_costs_value': fields.float('Outros Custos',
             digits_compute=dp.get_precision('Account')),
         'freight_value': fields.float('Frete',
-            digits_compute=dp.get_precision('Account'))
+            digits_compute=dp.get_precision('Account')),
+        'retention_pis_value': fields.float('Valor da retenção do PIS',
+            digits_compute=dp.get_precision('Account')),
+        'retention_cofins_value': fields.float('Valor da retenção do Cofins',
+            digits_compute=dp.get_precision('Account')),
+        'retention_csll_value': fields.float('Valor da retenção de CSLL',
+            digits_compute=dp.get_precision('Account')),
+        'retention_irrf_base': fields.float('Base de calculo retenção do IRRF',
+            digits_compute=dp.get_precision('Account')),
+        'retention_irrf_value': fields.float('Valor da retenção de IRRF',
+            digits_compute=dp.get_precision('Account')),
+        'retention_inss_base': fields.float('Base de Cálculo da Retenção da Previdência Social',
+            digits_compute=dp.get_precision('Account')),
+        'retention_inss_value': fields.float('Valor da Retenção da Previdência Social ',
+            digits_compute=dp.get_precision('Account')),
     }
     _defaults = {
         'product_type': 'product',
