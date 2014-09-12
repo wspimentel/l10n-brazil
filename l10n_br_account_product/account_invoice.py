@@ -62,27 +62,43 @@ class AccountInvoice(orm.Model):
                 'retention_irrf_base': 0.0,
                 'retention_irrf_value': 0.0,
                 'retention_inss_base':  0.0,
-                'retention_inss_value': 0.0,
+                'retention_inss_value': 0.0,            
+                'amount_services' : 0.0,
+                'issqn_base': 0.0,
+                'issqn_value': 0.0,
+                'service_pis_value': 0.0,
+                'service_cofins_value': 0.0,
+                
             }
             for line in invoice.invoice_line:
-                result[invoice.id]['amount_untaxed'] += line.price_total
-                if line.icms_cst_id.code not in ('101','102','201','202','300','500'):
-                    result[invoice.id]['icms_base'] += line.icms_base
-                    result[invoice.id]['icms_value'] += line.icms_value
-                result[invoice.id]['icms_st_base'] += line.icms_st_base
-                result[invoice.id]['icms_st_value'] += line.icms_st_value
-                result[invoice.id]['ipi_base'] += line.ipi_base
-                result[invoice.id]['ipi_value'] += line.ipi_value
-                result[invoice.id]['pis_base'] += line.pis_base
-                result[invoice.id]['pis_value'] += line.pis_value
-                result[invoice.id]['cofins_base'] += line.cofins_base
-                result[invoice.id]['cofins_value'] += line.cofins_value
-                result[invoice.id]['ii_value'] += line.ii_value
-                result[invoice.id]['amount_insurance'] += line.insurance_value
-                result[invoice.id]['amount_freight'] += line.freight_value
-                result[invoice.id]['amount_costs'] += line.other_costs_value
-                result[invoice.id]['amount_gross'] += line.price_gross
-                result[invoice.id]['amount_discount'] += line.discount_value
+
+                if line.product_type ==  'product':
+                    result[invoice.id]['amount_untaxed'] += line.price_total
+                    if line.icms_cst_id.code not in ('101','102','201','202','300','500'):
+                        result[invoice.id]['icms_base'] += line.icms_base
+                        result[invoice.id]['icms_value'] += line.icms_value
+                    result[invoice.id]['icms_st_base'] += line.icms_st_base
+                    result[invoice.id]['icms_st_value'] += line.icms_st_value
+                    result[invoice.id]['ipi_base'] += line.ipi_base
+                    result[invoice.id]['ipi_value'] += line.ipi_value
+                    result[invoice.id]['pis_base'] += line.pis_base
+                    result[invoice.id]['pis_value'] += line.pis_value
+                    result[invoice.id]['cofins_base'] += line.cofins_base
+                    result[invoice.id]['cofins_value'] += line.cofins_value
+                    result[invoice.id]['ii_value'] += line.ii_value
+                    result[invoice.id]['amount_insurance'] += line.insurance_value
+                    result[invoice.id]['amount_freight'] += line.freight_value
+                    result[invoice.id]['amount_costs'] += line.other_costs_value
+                    result[invoice.id]['amount_gross'] += line.price_gross
+                    result[invoice.id]['amount_discount'] += line.discount_value
+                    
+                elif line.product_type == 'service':
+                    result[invoice.id]['amount_services'] += line.price_total
+                    result[invoice.id]['issqn_base'] += line.issqn_base
+                    result[invoice.id]['issqn_value'] += line.issqn_value
+                    result[invoice.id]['service_pis_value'] += line.pis_value
+                    result[invoice.id]['service_cofins_value'] += line.cofins_value       
+                            
                 result[invoice.id]['retention_pis_value'] += line.retention_pis_value
                 result[invoice.id]['retention_cofins_value'] += line.retention_cofins_value
                 result[invoice.id]['retention_csll_value'] += line.retention_csll_value
@@ -95,7 +111,7 @@ class AccountInvoice(orm.Model):
                 if not invoice_tax.tax_code_id.tax_discount:
                     result[invoice.id]['amount_tax'] += invoice_tax.amount
 
-            result[invoice.id]['amount_total'] = result[invoice.id]['amount_tax'] + result[invoice.id]['amount_untaxed']
+            result[invoice.id]['amount_total'] = result[invoice.id]['amount_tax'] + result[invoice.id]['amount_untaxed'] + result[invoice.id]['amount_services']
         return result
 
     def _get_invoice_line(self, cr, uid, ids, context=None):
@@ -493,7 +509,68 @@ class AccountInvoice(orm.Model):
                                          ['price_unit',
                                           'invoice_line_tax_id',
                                           'quantity', 'discount'], 20),
-            }, multi='all'),        
+            }, multi='all'),
+        'amount_services': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Total dos serviços',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'issqn_base': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Base de Cálculo do ISSQN',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'issqn_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor do ISSQN',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+                
+        'service_pis_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor do Pis sobre Serviços',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'service_cofins_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor do Cofins sobre Serviços',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
     }
 
     def _default_fiscal_category(self, cr, uid, context=None):

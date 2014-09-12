@@ -27,6 +27,22 @@ from openerp.tools.translate import _
 from openerp.addons.l10n_br_account.sped.document import FiscalDocument
 
 
+from pysped.nfe.leiaute import NFe_200
+from pysped.nfe.leiaute import NFRef_200
+from pysped.nfe.leiaute import Det_200
+from pysped.nfe.leiaute import DI_200
+from pysped.nfe.leiaute import Adi_200
+from pysped.nfe.leiaute import Med_200
+from pysped.nfe.leiaute import Arma_200
+from pysped.nfe.leiaute import Reboque_200
+from pysped.nfe.leiaute import Vol_200
+from pysped.nfe.leiaute import Lacres_200
+from pysped.nfe.leiaute import Dup_200
+from pysped.nfe.leiaute import ObsCont_200
+from pysped.nfe.leiaute import ObsFisco_200
+from pysped.nfe.leiaute import ProcRef_200
+
+
 class NFe200(FiscalDocument):
 
     def _serializer(self, cr, uid, ids, nfe_environment, context=None):
@@ -299,6 +315,8 @@ class NFe200(FiscalDocument):
                 det.imposto.COFINSST.qBCProd.valor = ''
                 det.imposto.COFINSST.vAliqProd.valor = ''
                 det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
+                
+              #  det.imposto.vTotTrib.valor = str("%.2f" % 10.00)
 
                 nfe.infNFe.det.append(det)
 
@@ -348,8 +366,11 @@ class NFe200(FiscalDocument):
             nfe.infNFe.infAdic.infCpl.valor = inv.comment or ''
 
             #
-            # Totais
+            # Grupo de Valores Totais referentes ao ICMS
             #
+            
+            #NFe/infNFe/total/ISSQNtot
+            
             nfe.infNFe.total.ICMSTot.vBC.valor     = str("%.2f" % inv.icms_base)
             nfe.infNFe.total.ICMSTot.vICMS.valor   = str("%.2f" % inv.icms_value)
             nfe.infNFe.total.ICMSTot.vBCST.valor   = str("%.2f" % inv.icms_st_base)
@@ -364,7 +385,30 @@ class NFe200(FiscalDocument):
             nfe.infNFe.total.ICMSTot.vCOFINS.valor = str("%.2f" % inv.cofins_value)
             nfe.infNFe.total.ICMSTot.vOutro.valor  = str("%.2f" % inv.amount_costs)
             nfe.infNFe.total.ICMSTot.vNF.valor     = str("%.2f" % inv.amount_total)
+        #    nfe.infNFe.total.ICMSTot.vTotTrib.valor = str("%.2f" % 10.00)
 
+            nfe.infNFe.total.ISSQNTot.vServ.valor  = str("%.2f" % inv.amount_services)
+            nfe.infNFe.total.ISSQNTot.vBC.valor    = str("%.2f" % inv.issqn_base)
+            nfe.infNFe.total.ISSQNTot.vISS.valor   = str("%.2f" % inv.issqn_value)
+            nfe.infNFe.total.ISSQNTot.vPIS.valor     = str("%.2f" % inv.service_pis_value)
+            nfe.infNFe.total.ISSQNTot.vCOFINS.valor    = str("%.2f" % inv.service_cofins_value)
+            
+            #
+            # Grupo de Valores Totais referentes ao ISSQN
+            # 
+
+            
+            #
+            # Grupo de Retenções de Tributos
+            # 
+            nfe.infNFe.total.retTrib.vRetPIS.valor    = str("%.2f" % inv.retention_pis_value)
+            nfe.infNFe.total.retTrib.vRetCOFINS.valor = str("%.2f" % inv.retention_cofins_value)
+            nfe.infNFe.total.retTrib.vRetCSLL.valor  = str("%.2f" % inv.retention_csll_value)
+            nfe.infNFe.total.retTrib.vBCIRRF.valor  = str("%.2f" % inv.retention_irrf_base)
+            nfe.infNFe.total.retTrib.vIRRF.valor     = str("%.2f" % inv.retention_irrf_value)
+            nfe.infNFe.total.retTrib.vBCRetPrev.valor  = str("%.2f" % inv.retention_inss_base)
+            nfe.infNFe.total.retTrib.vRetPrev.valor     = str("%.2f" % inv.retention_inss_value)
+            
             # Gera Chave da NFe
             nfe.gera_nova_chave()
             nfes.append(nfe)
