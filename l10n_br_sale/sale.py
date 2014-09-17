@@ -19,7 +19,6 @@
 ###############################################################################
 
 from openerp.osv import orm, fields
-from openerp.tools.translate import _
 from openerp.addons import decimal_precision as dp
 
 
@@ -34,25 +33,11 @@ class SaleShop(orm.Model):
 class SaleOrder(orm.Model):
     _inherit = 'sale.order'
 
-    # def _amount_products_all(self, cr, uid, ids, field_name, arg, context=None):
-    #     cur_obj = self.pool.get('res.currency')
-    #     res = {}
-    #     for order in self.browse(cr, uid, ids, context=context):
-    #         res[order.id] = {
-    #             'amount_product': 0.0,
-    #         }
-    #         val = 0.0
-    #         cur = order.pricelist_id.currency_id
-    #         for line in order.order_line:
-    #             val += line.price_gross
-    #         res[order.id]['amount_product'] = cur_obj.round(cr, uid, cur, val)
-    #     return res
-
     def _amount_all(self, cr, uid, ids, field_name, arg, context=None):
         cur_obj = self.pool.get('res.currency')
-        res = {}
+        result = {}
         for order in self.browse(cr, uid, ids, context=context):
-            res[order.id] = {
+            result[order.id] = {
                 'amount_untaxed': 0.0,
                 'amount_tax': 0.0,
                 'amount_total': 0.0,
@@ -65,16 +50,28 @@ class SaleOrder(orm.Model):
             for line in order.order_line:
                 val1 += line.price_subtotal
                 val += self._amount_line_tax(cr, uid, line, context=context)
-                val2 += (line.insurance_value + line.freight_value + line.other_costs_value)
                 val3 += line.discount_value
                 val4 += line.price_gross
-            res[order.id]['amount_tax'] = cur_obj.round(cr, uid, cur, val)
-            res[order.id]['amount_untaxed'] = cur_obj.round(cr, uid, cur, val1)
-            res[order.id]['amount_extra'] = cur_obj.round(cr, uid, cur, val2)
-            res[order.id]['amount_total'] = res[order.id]['amount_untaxed'] + res[order.id]['amount_tax'] + res[order.id]['amount_extra']
-            res[order.id]['amount_discount'] = cur_obj.round(cr, uid, cur, val3)
-            res[order.id]['amount_gross'] = cur_obj.round(cr, uid, cur, val4)
-        return res
+            result[order.id]['amount_tax'] = cur_obj.round(cr, uid, cur, val)
+            result[order.id]['amount_untaxed'] = cur_obj.round(cr, uid, cur, val1)
+            result[order.id]['amount_extra'] = cur_obj.round(cr, uid, cur, val2)
+            result[order.id]['amount_total'] = result[order.id]['amount_untaxed'] + result[order.id]['amount_tax'] + result[order.id]['amount_extra']
+            result[order.id]['amount_discount'] = cur_obj.round(cr, uid, cur, val3)
+            result[order.id]['amount_gross'] = cur_obj.round(cr, uid, cur, val4)
+        return result
+
+    def _amount_line_tax(self, cr, uid, line, context=None):
+        value = 0.0
+        for c in self.pool.get('account.tax').compute_all(
+            cr, uid, line.tax_id,
+            line.price_unit * (1 - (line.discount or 0.0) / 100.0),
+            line.product_uom_qty, line.order_id.partner_invoice_id.id,
+            line.product_id, line.order_id.partner_id,
+            fiscal_position=line.fiscal_position)['taxes']:
+            tax = self.pool.get('account.tax').browse(cr, uid, c['id'])
+            if not tax.tax_code_id.tax_discount:
+                value += c.get('amount', 0.0)
+        return value
 
     def _get_order(self, cr, uid, ids, context=None):
         result = {}
@@ -112,63 +109,64 @@ class SaleOrder(orm.Model):
             readonly=True, states={'draft': [('readonly', False)]}),
         'invoiced_rate': fields.function(
             _invoiced_rate, method=True, string='Invoiced', type='float'),
-        'amount_untaxed': fields.function(_amount_all, digits_compute=dp.get_precision('Account'), string='Untaxed Amount',
+        'copy_note': fields.boolean(
+            u'Copiar Observação no documentos fiscal'),
+        'amount_untaxed': fields.function(_amount_all, string='Untaxed Amount',
+            digits_compute=dp.get_precision('Account'),
             store={
-                'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
-                'sale.order.line': (_get_order, ['price_unit', 'tax_id', 'discount', 'product_uom_qty'], 10),
-            },
-            multi='sums', help="The amount without tax.", track_visibility='always'),
-        'amount_tax': fields.function(_amount_all, digits_compute=dp.get_precision('Account'), string='Taxes',
-            store={
-                'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                'sale.order': (lambda self, cr, uid, ids,
+                    c={}: ids, ['order_line'], 10),
                 'sale.order.line': (_get_order, ['price_unit', 'tax_id',
-                    'discount', 'product_uom_qty', 'freight_value',
-                    'insurance_value', 'other_costs_value'], 10),
+                    'discount', 'product_uom_qty'], 10),
+            },
+            multi='sums', help="The amount without tax.",
+            track_visibility='always'),
+        'amount_tax': fields.function(_amount_all, string='Taxes',
+            digits_compute=dp.get_precision('Account'),
+            store={
+                'sale.order': (lambda self, cr, uid, ids,
+                    c={}: ids, ['order_line'], 10),
+                'sale.order.line': (_get_order, ['price_unit', 'tax_id',
+                    'discount', 'product_uom_qty'], 10),
             },
             multi='sums', help="The tax amount."),
-        'amount_total': fields.function(_amount_all, digits_compute=dp.get_precision('Account'), string='Total',
+        'amount_total': fields.function(_amount_all, string='Total',
+            digits_compute=dp.get_precision('Account'),
             store={
-                'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                'sale.order': (lambda self, cr, uid, ids,
+                    c={}: ids, ['order_line'], 10),
                 'sale.order.line': (_get_order, ['price_unit', 'tax_id',
-                    'discount', 'product_uom_qty', 'freight_value',
-                    'insurance_value', 'other_costs_value'], 10),
+                    'discount', 'product_uom_qty'], 10),
             },
               multi='sums', help="The total amount."),
-        'amount_extra': fields.function(_amount_all, digits_compute=dp.get_precision('Account'), string='Extra',
+        'amount_extra': fields.function(_amount_all, string='Extra',
+            digits_compute=dp.get_precision('Account'),
             store={
-                'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                'sale.order': (lambda self, cr, uid, ids,
+                    c={}: ids, ['order_line'], 10),
                 'sale.order.line': (_get_order, ['price_unit', 'tax_id',
-                    'discount', 'product_uom_qty', 'freight_value',
-                    'insurance_value', 'other_costs_value'], 10),
+                    'discount', 'product_uom_qty'], 10),
             },
               multi='sums', help="The total amount."),
-        'amount_discount': fields.function(_amount_all, digits_compute=dp.get_precision('Account'), string='Desconto (-)',
+        'amount_discount': fields.function(_amount_all, string='Desconto (-)',
+            digits_compute=dp.get_precision('Account'),
             store={
-                'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                'sale.order': (lambda self, cr, uid, ids,
+                    c={}: ids, ['order_line'], 10),
                 'sale.order.line': (_get_order, ['price_unit', 'tax_id',
-                    'discount', 'product_uom_qty', 'freight_value',
-                    'insurance_value', 'other_costs_value'], 10),
+                    'discount', 'product_uom_qty'], 10),
             },
               multi='sums', help="The discount amount."),
-        'amount_gross': fields.function(_amount_all, digits_compute=dp.get_precision('Account'), string='Vlr. Bruto',
+        'amount_gross': fields.function(_amount_all, string='Vlr. Bruto',
+            digits_compute=dp.get_precision('Account'),
             store={
-                'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                'sale.order': (lambda self, cr, uid, ids,
+                    c={}: ids, ['order_line'], 10),
                 'sale.order.line': (_get_order, ['price_unit', 'tax_id',
-                    'discount', 'product_uom_qty', 'freight_value',
-                    'insurance_value', 'other_costs_value'], 10),
-            },
-              multi='sums', help="The discount amount."),
-        'amount_freight': fields.float('Frete',
-             digits_compute=dp.get_precision('Account'), readonly=True,
-                               states={'draft': [('readonly', False)]}),
-        'amount_costs': fields.float('Outros Custos',
-            digits_compute=dp.get_precision('Account'), readonly=True,
-                               states={'draft': [('readonly', False)]}),
-        'amount_insurance': fields.float('Seguro',
-            digits_compute=dp.get_precision('Account'), readonly=True,
-                               states={'draft': [('readonly', False)]}),
-        'discount_rate': fields.float('Desconto', readonly=True,
-                               states={'draft': [('readonly', False)]}),
+                    'discount', 'product_uom_qty'], 10),
+            }, multi='sums', help="The discount amount."),
+            'discount_rate': fields.float('Desconto', readonly=True,
+            states={'draft': [('readonly', False)]}),
     }
 
     def _default_fiscal_category(self, cr, uid, context=None):
@@ -184,9 +182,6 @@ class SaleOrder(orm.Model):
 
     _defaults = {
         'fiscal_category_id': _default_fiscal_category,
-        'amount_freight': 0.00,
-        'amount_costs': 0.00,
-        'amount_insurance': 0.00,
     }
 
     def onchange_discount_rate(self, cr, uid, ids, discount_rate):
@@ -197,11 +192,12 @@ class SaleOrder(orm.Model):
                 line_obj.write(cr, uid, [line.id], {'discount': discount_rate}, context=None)
         return res
 
-
     def onchange_address_id(self, cr, uid, ids, partner_invoice_id,
                             partner_shipping_id, partner_id,
-                            shop_id=None, context=None,
-                            fiscal_category_id=None, **kwargs):
+                            shop_id=None, context=None, **kwargs):
+        if not context:
+            context = {}
+        fiscal_category_id=context.get('fiscal_category_id')
         return super(SaleOrder, self).onchange_address_id(
             cr, uid, ids, partner_invoice_id, partner_shipping_id,
             partner_id, shop_id, context,
@@ -209,8 +205,10 @@ class SaleOrder(orm.Model):
 
     def onchange_shop_id(self, cr, uid, ids, shop_id=None, context=None,
                          partner_id=None, partner_invoice_id=None,
-                         partner_shipping_id=None,
-                         fiscal_category_id=None, **kwargs):
+                         partner_shipping_id=None, **kwargs):
+        if not context:
+            context = {}
+        fiscal_category_id=context.get('fiscal_category_id')
         return super(SaleOrder, self).onchange_shop_id(
             cr, uid, ids, shop_id, context, partner_id, partner_invoice_id,
             partner_shipping_id, fiscal_category_id=fiscal_category_id)
@@ -237,35 +235,8 @@ class SaleOrder(orm.Model):
         fp_rule_obj = self.pool.get('account.fiscal.position.rule')
         return fp_rule_obj.apply_fiscal_mapping(cr, uid, result, **kwargs)
 
-    def _make_invoice(self, cr, uid, order, lines, context=None):
-        if not context:
-            context = {}
-
-        obj_company = self.pool.get('res.company').browse(
-            cr, uid, order.shop_id.company_id.id)
-
-        #FIXME - criar um módulo l10n_br_sale_service
-        #if not obj_company.service_invoice_id:
-        #    raise orm.except_orm(
-        #        _('No fiscal document serie found !'),
-        #        _("No fiscal document serie found for selected company %s") % (
-        #            order.company_id.name))
-
-        if order.fiscal_category_id:
-            if not order.fiscal_category_id.property_journal:
-                raise orm.except_orm(
-                    _('Error !'),
-                    _("""There is no journal defined for this company in Fiscal
-                    Category: %s Company: %s""") % (
-                        order.fiscal_category_id.name, order.company_id.name))
-
-        return super(SaleOrder, self)._make_invoice(
-            cr, uid, order, lines, context=context)
-
     def _fiscal_comment(self, cr, uid, order, context=None):
-
         fp_comment = []
-        fc_comment = []
         fp_ids = []
 
         for line in order.order_line:
@@ -276,7 +247,7 @@ class SaleOrder(orm.Model):
                     fp_comment.append(line.fiscal_position.note)
                     fp_ids.append(line.fiscal_position.id)
 
-        return fp_comment + fc_comment
+        return fp_comment
 
     def _prepare_invoice(self, cr, uid, order, lines, context=None):
         """Prepare the dict of values to create the new invoice for a
@@ -292,13 +263,13 @@ class SaleOrder(orm.Model):
         result = super(SaleOrder, self)._prepare_invoice(
             cr, uid, order, lines, context)
 
-        obj_inv_lines = self.pool.get('account.invoice.line').read(
+        inv_lines = self.pool.get('account.invoice.line').read(
             cr, uid, lines, ['fiscal_category_id', 'fiscal_position'])
 
-        if context.get('fiscal_type') == 'service':
-            if obj_inv_lines:
-                fiscal_category_id = obj_inv_lines[0]['fiscal_category_id'][0]
-                result['fiscal_position'] = obj_inv_lines[0]['fiscal_position'][0]
+        if (context.get('fiscal_type') == 'service' and
+            inv_lines and inv_lines[0]['fiscal_category_id']):
+                fiscal_category_id = inv_lines[0]['fiscal_category_id'][0]
+                result['fiscal_position'] = inv_lines[0]['fiscal_position'][0]
         else:
             fiscal_category_id = order.fiscal_category_id.id
 
@@ -313,29 +284,14 @@ class SaleOrder(orm.Model):
         order.partner_shipping_id.id or False
 
         comment = []
-        if order.note:
+        if order.note and order.copy_note:
             comment.append(order.note)
 
         fiscal_comment = self._fiscal_comment(cr, uid, order, context=context)
-        result['comment'] = " - ".join(comment + fiscal_comment)
+        result['comment'] = " - ".join(comment)
+        result['fiscal_comment'] = " - ".join(fiscal_comment)
         result['fiscal_category_id'] = fiscal_category_id
         return result
-
-    def _amount_line_tax(self, cr, uid, line, context=None):
-        val = 0.0
-        for c in self.pool.get('account.tax').compute_all(
-            cr, uid, line.tax_id,
-            line.price_unit * (1 - (line.discount or 0.0) / 100.0),
-            line.product_uom_qty, line.order_id.partner_invoice_id.id,
-            line.product_id, line.order_id.partner_id,            
-            fiscal_position=line.fiscal_position,
-            insurance_value=line.insurance_value,
-            freight_value=line.freight_value,
-            other_costs_value=line.other_costs_value)['taxes']:
-            tax = self.pool.get('account.tax').browse(cr, uid, c['id'])
-            if not tax.tax_code_id.tax_discount:
-                val += c.get('amount', 0.0)
-        return val
 
 
 class SaleOrderLine(orm.Model):
@@ -357,15 +313,12 @@ class SaleOrderLine(orm.Model):
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
             taxes = tax_obj.compute_all(cr, uid, line.tax_id, price,
                 line.product_uom_qty, line.order_id.partner_invoice_id.id,
-                line.product_id, line.order_id.partner_id,                
-                fiscal_position=line.fiscal_position,
-                insurance_value=line.insurance_value,
-                freight_value=line.freight_value,
-                other_costs_value=line.other_costs_value)
+                line.product_id, line.order_id.partner_id,
+                fiscal_position=line.fiscal_position)
             cur = line.order_id.pricelist_id.currency_id
             res[line.id]['price_subtotal'] = cur_obj.round(cr, uid, cur, taxes['total'])
             res[line.id]['price_gross'] = line.price_unit * line.product_uom_qty
-            res[line.id]['discount_value'] = res[line.id]['price_gross']-(price * line.product_uom_qty) 
+            res[line.id]['discount_value'] = res[line.id]['price_gross']-(price * line.product_uom_qty)
         return res
 
     _columns = {
@@ -386,63 +339,63 @@ class SaleOrderLine(orm.Model):
             _amount_line, string='Vlr. Bruto',
             digits_compute=dp.get_precision('Sale Price'), multi='sums'),
         'price_subtotal': fields.function(
-            _amount_line, string='Subtotal',            
+            _amount_line, string='Subtotal',
             digits_compute=dp.get_precision('Sale Price'), multi='sums'),
-        'insurance_value': fields.float('Insurance',
-             digits_compute=dp.get_precision('Account')),
-        'other_costs_value': fields.float('Other costs',
-             digits_compute=dp.get_precision('Account')),
-        'freight_value': fields.float('Freight',
-             digits_compute=dp.get_precision('Account')),
-                 }
-
- 
+    }
 
     def _fiscal_position_map(self, cr, uid, result, **kwargs):
-
         kwargs['context'].update({'use_domain': ('use_sale', '=', True)})
         obj_shop = self.pool.get('sale.shop').browse(
             cr, uid, kwargs.get('shop_id'))
         company_id = obj_shop.company_id.id
         kwargs.update({'company_id': company_id})
         fp_rule_obj = self.pool.get('account.fiscal.position.rule')
-
         return fp_rule_obj.apply_fiscal_mapping(cr, uid, result, **kwargs)
 
     def product_id_change(self, cr, uid, ids, pricelist, product, qty=0,
                           uom=False, qty_uos=0, uos=False, name='',
                           partner_id=False, lang=False, update_tax=True,
                           date_order=False, packaging=False,
-                          fiscal_position=False, flag=False, context=None,
-                          parent_fiscal_category_id=False, shop_id=False,
-                          parent_fiscal_position=False,
-                          partner_invoice_id=False, **kwargs):
-        uom=False
-        result = super(SaleOrderLine, self).product_id_change(
+                          fiscal_position=False, flag=False, context=None):
+        if not context:
+            context = {}
+        parent_fiscal_category_id = context.get('parent_fiscal_category_id')
+        shop_id = context.get('shop_id')
+        partner_invoice_id = context.get('partner_invoice_id')
+        result = {'value': {}}
+        if parent_fiscal_category_id and product and partner_invoice_id \
+        and shop_id:
+            obj_fp_rule = self.pool.get('account.fiscal.position.rule')
+            product_fc_id = obj_fp_rule.product_fiscal_category_map(
+                cr, uid, product, parent_fiscal_category_id)
+
+            if product_fc_id:
+                parent_fiscal_category_id = product_fc_id
+
+            result['value']['fiscal_category_id'] = parent_fiscal_category_id
+
+            kwargs = {
+                'shop_id': shop_id,
+                'partner_id': partner_id,
+                'partner_invoice_id': partner_invoice_id,
+                'fiscal_category_id': parent_fiscal_category_id,
+                'context': context
+            }
+            result.update(self._fiscal_position_map(cr, uid, result, **kwargs))
+            if result['value'].get('fiscal_position'):
+                fiscal_position = result['value'].get('fiscal_position')
+
+            obj_product = self.pool.get('product.product').browse(
+                cr, uid, product)
+            context.update({'fiscal_type': obj_product.fiscal_type,
+                'type_tax_use': 'sale'})
+
+        result_super = super(SaleOrderLine, self).product_id_change(
             cr, uid, ids, pricelist, product, qty, uom, qty_uos, uos, name,
             partner_id, lang, update_tax, date_order, packaging,
             fiscal_position, flag, context)
-
-        if not parent_fiscal_category_id or not product or not partner_invoice_id:
-            return result
-
-        obj_fp_rule = self.pool.get('account.fiscal.position.rule')
-        product_fiscal_category_id = obj_fp_rule.product_fiscal_category_map(
-            cr, uid, product, parent_fiscal_category_id)
-
-        if product_fiscal_category_id:
-            parent_fiscal_category_id = product_fiscal_category_id
-
-        result['value']['fiscal_category_id'] = parent_fiscal_category_id
-
-        kwargs = {
-            'shop_id': shop_id,
-            'partner_id': partner_id,
-            'partner_invoice_id': partner_invoice_id,
-            'fiscal_category_id': parent_fiscal_category_id,
-            'context': context
-        }
-        return self._fiscal_position_map(cr, uid, result, **kwargs)
+        result_super['value'].update(result['value'])
+        return result_super
 
     def onchange_fiscal_category_id(self, cr, uid, ids, partner_id,
                                         partner_invoice_id=False,
@@ -452,7 +405,6 @@ class SaleOrderLine(orm.Model):
 
         if not context:
             context = {}
-
         result = {'value': {}}
 
         if not shop_id or not partner_id or not fiscal_category_id:
@@ -471,12 +423,21 @@ class SaleOrderLine(orm.Model):
                                  partner_invoice_id=False, shop_id=False,
                                  product_id=False, fiscal_position=False,
                                  fiscal_category_id=False):
-
         result = {'value': {'tax_id': False}}
-        if not shop_id or not partner_id or not fiscal_position:
+        if not shop_id or not partner_id:
             return result
 
-        if product_id:
+        kwargs = {
+            'shop_id': shop_id,
+            'partner_id': partner_id,
+            'partner_invoice_id': partner_invoice_id,
+            'fiscal_category_id': fiscal_category_id,
+            'context': {}
+        }
+        result.update(self._fiscal_position_map(cr, uid, result, **kwargs))
+        fiscal_position = result['value'].get('fiscal_position')
+
+        if product_id and fiscal_position:
             obj_fposition = self.pool.get('account.fiscal.position').browse(
                 cr, uid, fiscal_position)
             obj_product = self.pool.get('product.product').browse(
@@ -489,14 +450,7 @@ class SaleOrderLine(orm.Model):
 
             result['value']['tax_id'] = tax_ids
 
-        kwargs = {
-            'shop_id': shop_id,
-            'partner_id': partner_id,
-            'partner_invoice_id': partner_invoice_id,
-            'fiscal_category_id': fiscal_category_id,
-            'context': {}
-        }
-        return self._fiscal_position_map(cr, uid, result, **kwargs)
+        return result
 
     def _prepare_order_line_invoice_line(self, cr, uid, line,
                                          account_id=False, context=None):
@@ -511,7 +465,4 @@ class SaleOrderLine(orm.Model):
         fp_id = line.fiscal_position or line.order_id.fiscal_position or False
         if fp_id:
             result['fiscal_position'] = fp_id.id
-
-        result['partner_id'] = line.order_id.partner_id.id
-        result['company_id'] = line.order_id.company_id.id
         return result

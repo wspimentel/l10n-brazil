@@ -28,7 +28,7 @@ class stock_return_picking(orm.TransientModel):
         kwargs['context'].update({'use_domain': ('use_picking', '=', True)})
         fp_rule_obj = self.pool.get('account.fiscal.position.rule')
         return fp_rule_obj.apply_fiscal_mapping(cr, uid, result, **kwargs)
-
+    
     def create_returns(self, cr, uid, ids, context=None):
         """
          Creates return picking.
@@ -48,6 +48,10 @@ class stock_return_picking(orm.TransientModel):
             return result
 
         picking_obj = self.pool.get('stock.picking')
+        data_obj = self.pool.get('stock.return.picking.memory')
+        move_obj = self.pool.get('stock.move')
+        picking_type = context.get('default_type')
+        
         result_domain = eval(result['domain'])
         record_ids = result_domain and result_domain[0] and result_domain[0][2]
         pickings = picking_obj.browse(cr, uid, record_ids, context=context)
@@ -81,4 +85,23 @@ class stock_return_picking(orm.TransientModel):
             values.update(self._fiscal_position_map(
                 cr, uid, {'value': {}}, **kwargs).get('value'))
             picking_obj.write(cr, uid, picking.id, values)
-            return result
+            
+            for move in picking.move_lines:
+                
+                parent = move.move_history_ids[0]
+                
+                move_fc_return_id = parent.fiscal_category_id \
+                    and parent.fiscal_category_id.refund_fiscal_category_id \
+                    and parent.fiscal_category_id.refund_fiscal_category_id.id
+                
+                context.update({'parent_fiscal_category_id':move_fc_return_id,
+                                'picking_type' : picking_type,                                    
+                                })
+                fiscal_position = move_obj.onchange_product_id(cr, uid, ids, move.product_id.id, move.location_id.id,
+                         move.location_dest_id.id, picking.partner_id.id, context)['value'].get('fiscal_position') or False
+                fiscal_category_id = move_fc_return_id or False
+                  
+                move_obj.write(cr, uid, move.id,{'fiscal_position': fiscal_position,
+                                                        'fiscal_category_id': fiscal_category_id,
+                                                        },context)
+        return result

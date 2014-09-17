@@ -25,15 +25,12 @@
     'website': 'http://openerpbrasil.org',
     'version': '7.0',
     'depends': [
-        'l10n_br_stock',
-        'l10n_br_sale',
+        'l10n_br_sale_stock',
         'delivery',
     ],
     'data': [
-        'res_company_view.xml',
         'account_invoice_view.xml',
         'delivery_view.xml',
-        'sale_view.xml',
         'stock_view.xml',
         'l10n_br_delivery_view.xml',
         'security/ir.model.access.csv',

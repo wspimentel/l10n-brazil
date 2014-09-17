@@ -19,7 +19,7 @@
 
 {
     'name': 'Brazilian Localization Account Product',
-    'description': """Brazilian Localization Account Product""",
+    'description': "Brazilian Localization Account Product",
     'category': 'Localisation',
     'license': 'AGPL-3',
     'author': 'Akretion, OpenERP Brasil',
@@ -47,6 +47,7 @@
         'wizard/l10n_br_account_nfe_export_invoice_view.xml',
         'wizard/l10n_br_account_nfe_export_view.xml',
         'wizard/l10n_br_account_document_status_sefaz_view.xml',
+        'wizard/l10n_br_refund_view.xml',
         'security/l10n_br_account_product_security.xml',
         'security/ir.model.access.csv',
     ],
@@ -56,6 +57,7 @@
         'demo/l10n_br_account_product_demo.xml',
         'demo/account_fiscal_position_rule_demo.xml',
         'demo/product_demo.xml',
+        'demo/base_demo.xml',
         'demo/product_taxes.yml',
     ],
     'test': [],

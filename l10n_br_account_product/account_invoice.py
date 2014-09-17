@@ -17,12 +17,10 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.        #
 ###############################################################################
 
-from lxml import etree
 import time
 
 from openerp.osv import orm, fields
 from openerp.addons import decimal_precision as dp
-from openerp.addons.l10n_br_account.account_invoice import OPERATION_TYPE
 
 from .l10n_br_account_product import (
     PRODUCT_FISCAL_TYPE,
@@ -61,8 +59,9 @@ class AccountInvoice(orm.Model):
             }
             for line in invoice.invoice_line:
                 result[invoice.id]['amount_untaxed'] += line.price_total
-                result[invoice.id]['icms_base'] += line.icms_base
-                result[invoice.id]['icms_value'] += line.icms_value
+                if line.icms_cst_id.code not in ('101','102','201','202','300','500'):
+                    result[invoice.id]['icms_base'] += line.icms_base
+                    result[invoice.id]['icms_value'] += line.icms_value
                 result[invoice.id]['icms_st_base'] += line.icms_st_base
                 result[invoice.id]['icms_st_value'] += line.icms_st_value
                 result[invoice.id]['ipi_base'] += line.ipi_base
@@ -122,34 +121,38 @@ class AccountInvoice(orm.Model):
             ('proforma', 'Pro-forma'),
             ('proforma2', 'Pro-forma'),
             ('sefaz_export', 'Enviar para Receita'),
-            ('sefaz_exception', 'Erro de autorização da Receita'),
+            ('sefaz_exception', u'Erro de autorização da Receita'),
+            ('sefaz_cancelled', 'Cancelado no Sefaz'),
             ('open', 'Open'),
             ('paid', 'Paid'),
             ('cancel', 'Cancelled')
             ], 'State', select=True, readonly=True,
-            help=' * The \'Draft\' state is used when a user is encoding a new and unconfirmed Invoice. \
+            help=u' * The \'Draft\' state is used when a user is encoding a new and unconfirmed Invoice. \
             \n* The \'Pro-forma\' when invoice is in Pro-forma state,invoice does not have an invoice number. \
             \n* The \'Open\' state is used when user create invoice,a invoice number is generated.Its in open state till user does not pay invoice. \
             \n* The \'Paid\' state is set automatically when invoice is paid.\
             \n* The \'sefaz_out\' Gerado aquivo de exportação para sistema daReceita.\
             \n* The \'sefaz_aut\' Recebido arquivo de autolização da Receita.\
             \n* The \'Cancelled\' state is used when user cancel invoice.'),
-        'fiscal_type': fields.selection(PRODUCT_FISCAL_TYPE, 'Tipo Fiscal', requeried=True),
+        'fiscal_type': fields.selection(PRODUCT_FISCAL_TYPE, 'Tipo Fiscal', required=True),
         'partner_shipping_id': fields.many2one(
-            'res.partner', 'Endereço de Entrega', readonly=True,
+            'res.partner', u'Endereço de Entrega', readonly=True,
             states={'draft': [('readonly', False)]},
             help="Shipping address for current sales order."),
         'nfe_purpose': fields.selection(
             [('1', 'Normal'),
              ('2', 'Complementar'),
-             ('3', 'Ajuste')], 'Finalidade da Emissão', readonly=True,
+             ('3', 'Ajuste')], u'Finalidade da Emissão', readonly=True,
             states={'draft': [('readonly', False)]}),
         'nfe_access_key': fields.char(
             'Chave de Acesso NFE', size=44,
             readonly=True, states={'draft': [('readonly', False)]}),
+        'nfe_protocol_number': fields.char(
+            'Protocolo', size=15,
+            readonly=True, states={'draft': [('readonly', False)]}),        
         'nfe_status': fields.char('Status na Sefaz', size=44, readonly=True),
         'nfe_date': fields.datetime('Data do Status NFE', readonly=True),
-        'nfe_export_date': fields.datetime('Exportação NFE', readonly=True),
+        'nfe_export_date': fields.datetime(u'Exportação NFE', readonly=True),
         'cfop_ids': fields.function(
             _get_cfops, method=True, type='many2many',
             relation='l10n_br_account_product.cfop', string='CFOP'),
@@ -186,7 +189,7 @@ class AccountInvoice(orm.Model):
                     _get_invoice_line, ['price_unit',
                                         'invoice_line_tax_id',
                                         'quantity', 'discount'], 20),
-            }, multi='all'),     
+            }, multi='all'),
         'amount_untaxed': fields.function(
             _amount_all, method=True,
             digits_compute=dp.get_precision('Account'), string='Untaxed',
@@ -363,7 +366,13 @@ class AccountInvoice(orm.Model):
                                     readonly=True,
                                     states={'draft': [('readonly', False)]}),
         'number_of_packages': fields.integer(
-            'Volume', readonly=True, states={'draft': [('readonly', False)]}),
+            'Quantidade de Volumes',  readonly=True, states={'draft': [('readonly', False)]}),
+        'kind_of_packages': fields.char(
+            'Espécie', size=60, readonly=True, states={'draft': [('readonly', False)]}),
+        'brand_of_packages': fields.char(
+            'Brand',  size=60, readonly=True, states={'draft': [('readonly', False)]}),
+        'notation_of_packages': fields.char(
+            'Numeração', size=60, readonly=True, states={'draft': [('readonly', False)]}),
         'amount_insurance': fields.function(
             _amount_all, method=True,
             digits_compute=dp.get_precision('Account'),
@@ -460,37 +469,6 @@ class AccountInvoice(orm.Model):
 class AccountInvoiceLine(orm.Model):
     _inherit = 'account.invoice.line'
 
-    def fields_view_get(self, cr, uid, view_id=None, view_type=False,
-                        context=None, toolbar=False, submenu=False):
-
-        result = super(AccountInvoiceLine, self).fields_view_get(
-            cr, uid, view_id=view_id, view_type=view_type, context=context,
-            toolbar=toolbar, submenu=submenu)
-
-        if context is None:
-            context = {}
-
-        if view_type == 'form':
-            eview = etree.fromstring(result['arch'])
-
-            if 'type' in context.keys():
-                cfops = eview.xpath("//field[@name='cfop_id']")
-                for cfop_id in cfops:
-                    cfop_id.set('domain', "[('type','=','%s')]" % (
-                        OPERATION_TYPE[context['type']],))
-                    cfop_id.set('required', '1')
-
-            if context.get('fiscal_type', False) == 'service':
-
-                cfops = eview.xpath("//field[@name='cfop_id']")
-                for cfop_id in cfops:
-                    cfop_id.set('invisible', '1')
-                    cfop_id.set('required', '0')
-
-            result['arch'] = etree.tostring(eview)
-
-        return result
-
     def _amount_line(self, cr, uid, ids, prop, unknow_none, unknow_dict):
         res = {}
         tax_obj = self.pool.get('account.tax')
@@ -536,7 +514,7 @@ class AccountInvoiceLine(orm.Model):
             domain="[('fiscal_category_id','=',fiscal_category_id)]"),
         'cfop_id': fields.many2one('l10n_br_account_product.cfop', 'CFOP'),
         'fiscal_classification_id': fields.many2one(
-            'account.product.fiscal.classification', 'Classficação Fiscal'),
+            'account.product.fiscal.classification', u'Classficação Fiscal'),
         'product_type': fields.selection(
             [('product', 'Produto'), ('service', u'Serviço')],
             'Tipo do Produto', required=True),
@@ -564,8 +542,8 @@ class AccountInvoiceLine(orm.Model):
         'icms_origin': fields.selection(PRODUCT_ORIGIN, 'Origem'),
         'icms_base_type': fields.selection(
             [('0', 'Margem Valor Agregado (%)'), ('1', 'Pauta (valor)'),
-            ('2', 'Preço Tabelado Máximo (valor)'),
-            ('3', 'Valor da Operação')],
+            ('2', u'Preço Tabelado Máximo (valor)'),
+            ('3', u'Valor da Operação')],
             'Tipo Base ICMS', required=True),
         'icms_base': fields.float('Base ICMS', required=True,
             digits_compute=dp.get_precision('Account')),
@@ -575,10 +553,10 @@ class AccountInvoiceLine(orm.Model):
             digits_compute=dp.get_precision('Account')),
         'icms_percent': fields.float('Perc ICMS',
             digits_compute=dp.get_precision('Discount')),
-        'icms_percent_reduction': fields.float('Perc Redução de Base ICMS',
+        'icms_percent_reduction': fields.float(u'Perc Redução de Base ICMS',
             digits_compute=dp.get_precision('Discount')),
         'icms_st_base_type': fields.selection(
-            [('0', 'Preço tabelado ou máximo  sugerido'),
+            [('0', u'Preço tabelado ou máximo  sugerido'),
             ('1', 'Lista Negativa (valor)'),
             ('2', 'Lista Positiva (valor)'), ('3', 'Lista Neutra (valor)'),
             ('4', 'Margem Valor Agregado (%)'), ('5', 'Pauta (valor)')],
@@ -590,7 +568,7 @@ class AccountInvoiceLine(orm.Model):
         'icms_st_percent': fields.float('Percentual ICMS ST',
             digits_compute=dp.get_precision('Discount')),
         'icms_st_percent_reduction': fields.float(
-            'Perc Redução de Base ICMS ST',
+            u'Perc Redução de Base ICMS ST',
             digits_compute=dp.get_precision('Discount')),
         'icms_st_mva': fields.float('MVA ICMS ST',
             digits_compute=dp.get_precision('Discount')),
@@ -604,7 +582,7 @@ class AccountInvoiceLine(orm.Model):
             ('S', 'Substituta'), ('I', 'Isenta')], 'Tipo do ISSQN',
             required=True),
         'service_type_id': fields.many2one(
-            'l10n_br_account.service.type', 'Tipo de Serviço'),
+            'l10n_br_account.service.type', u'Tipo de Serviço'),
         'issqn_base': fields.float('Base ISSQN', required=True,
             digits_compute=dp.get_precision('Account')),
         'issqn_percent': fields.float('Perc ISSQN', required=True,
@@ -738,7 +716,10 @@ class AccountInvoiceLine(orm.Model):
         'ii_base': 0.0,
         'ii_value': 0.0,
         'ii_iof': 0.0,
-        'ii_customhouse_charges': 0.0
+        'ii_customhouse_charges': 0.0,
+        'insurance_value': 0.0,
+        'other_costs_value': 0.0,
+        'freight_value': 0.0,
     }
 
     def _amount_tax_icms(self, cr, uid, tax=None):
