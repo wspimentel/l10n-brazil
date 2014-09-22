@@ -18,8 +18,13 @@
                                 <field name="issqn_base"/>
                                 <field name="issqn_value"/>
                                 <field name="service_pis_value"/>
-                                <field name="service_cofins_value"/>      
-
+                                <field name="service_cofins_value"/>
+                        </group>
+                    </div>
+                </group>
+				<notebook position="inside">
+                    <page string="Retenções">
+                            <group>
                                 <field name="retention_pis_value"/>
                                 <field name="retention_cofins_value"/>
                                 <field name="retention_csll_value"/>
@@ -27,10 +32,8 @@
                                 <field name="retention_irrf_value"/>    
                                 <field name="retention_inss_base"/>
                                 <field name="retention_inss_value"/>
-                        </group>
-                    </div>
-                </group>
-				<notebook position="inside">
+                           </group>
+                    </page>
 					<page string="Documentos Relacionados">
 						<field colspan="4" nolabel="1" name="fiscal_document_related_ids">
 							<tree>
