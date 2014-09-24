@@ -20,6 +20,11 @@
 from openerp.osv import orm, fields
 from openerp.addons import decimal_precision as dp
 
+COMPANY_WITHHOLDING_TYPE = [
+    ('1', 'Regime de Caixa'),
+    ('2', u'Regime de Competência'),
+]
+
 COMPANY_FISCAL_TYPE = [
     ('1', 'Simples Nacional'),
     ('2', 'Simples Nacional – excesso de sublimite de receita bruta'),
@@ -60,6 +65,38 @@ class ResCompany(orm.Model):
         'fiscal_rule_parent_id': fields.many2one(
             'account.fiscal.position.rule', u'Conjunto de Regras Fiscais',
             domain="[('parent_id', '=', False)]"),
+        'wh_type': fields.selection(COMPANY_WITHHOLDING_TYPE,
+            u'Forma de Retenção',  help=u"Regime de Caixa: A retenção é aplicada caso soma dos vencimentos\
+            mensais utrapasse os limites; Regime de Competência: A retenção é aplicada caso a soma do valor faturado \
+              ultrapasse os limites"),
+        'wh_on_nfe_limit': fields.boolean(
+            u'Retenção sempre que ultrapassar o valor da NF?'),
+        'irrf_wh_percent': fields.float(
+            u'Alícota de IRRF (%)',
+            digits_compute=dp.get_precision('Account')),
+        'irrf_wh_value': fields.float(
+            u'Valor mínimo IRRF',
+            digits_compute=dp.get_precision('Account')),
+        'cofins_wh_value': fields.float(
+            u'Valor mínimo COFINS',
+            digits_compute=dp.get_precision('Account')),
+        'pis_wh_value': fields.float(
+            u'Valor mínimo PIS',
+            digits_compute=dp.get_precision('Account')),
+        'csll_wh_value': fields.float(
+            u'Valor mínimo CSLL',
+            digits_compute=dp.get_precision('Account')),
+        'issqn_wh': fields.boolean(
+            u'Retém ISSQN'),
+        'inss_wh': fields.boolean(
+            u'Retém INSS'),
+        'pis_wh': fields.boolean(
+            u'Retém PIS'),
+        'cofins_wh': fields.boolean(
+            u'Retém COFINS'),
+        'csll_wh': fields.boolean(
+            u'Retém CSLL'),
+
     }
     _defaults = {
         'fiscal_type': COMPANY_FISCAL_TYPE_DEFAULT,
