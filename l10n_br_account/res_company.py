@@ -55,11 +55,11 @@ class res_company(orm.Model):
             ('1', 'Simples Nacional'),
             ('2', 'Simples Nacional – excesso de sublimite de receita bruta'),
             ('3', 'Regime Normal')],
-            'Regime Tributário', required=True),
+            u'Regime Tributário', required=True),
         'annual_revenue': fields.float(
             'Faturamento Anual', required=True,
             digits_compute=dp.get_precision('Account'),
-            help="Faturamento Bruto dos últimos 12 meses"),
+            help=u"Faturamento Bruto dos últimos 12 meses"),
         'product_invoice_id': fields.many2one(
             'l10n_br_account.fiscal.document',
             'Documento Fiscal'),
@@ -69,27 +69,27 @@ class res_company(orm.Model):
         'document_serie_product_ids': fields.many2many(
             'l10n_br_account.document.serie',
             'res_company_l10n_br_account_document_serie', 'company_id',
-            'document_serie_product_id', 'Série de Documentos Fiscais',
+            'document_serie_product_id', u'Série de Documentos Fiscais',
             domain="[('company_id', '=', active_id),('active','=',True),"
             "('fiscal_type','=','product')]"),
         'document_serie_service_id': fields.many2one(
-            'l10n_br_account.document.serie', 'Série Fiscais para Serviço',
+            'l10n_br_account.document.serie', u'Série Fiscais para Serviço',
             domain="[('company_id', '=', active_id),('active','=',True),"
             "('fiscal_type','=','service')]"),
         'cnae_main_id': fields.many2one('l10n_br_account.cnae',
-                                        'CNAE Primário'),
+                                        u'CNAE Primário'),
         'cnae_secondary_ids': fields.many2many(
             'l10n_br_account.cnae',
             'res_company_l10n_br_account_cnae',
             'company_id', 'cnae_id',
-            'CNAE Segundários'),
+            u'CNAE Segundários'),
         'nfe_version': fields.selection([('110', '1.10'),
-                                         ('200', '2.00')], 'Versão NFe',
+                                         ('200', '2.00')], u'Versão NFe',
                                         required=True),
-        'nfe_import_folder': fields.char('Pasta de Importação', size=254),
-        'nfe_export_folder': fields.char('Pasta de Exportação', size=254),
+        'nfe_import_folder': fields.char(u'Pasta de Importação', size=254),
+        'nfe_export_folder': fields.char(u'Pasta de Exportação', size=254),
         'nfe_backup_folder': fields.char('Pasta de Backup', size=254),
-        'nfse_version': fields.selection([('100', '1.00')], 'Versão NFse',
+        'nfse_version': fields.selection([('100', '1.00')], u'Versão NFse',
                                          required=True),
         'nfse_import_folder': fields.char('Pasta de Origem', size=254),
         'nfse_export_folder': fields.char('Pasta de Destino', size=254),
@@ -108,30 +108,30 @@ class res_company(orm.Model):
             relation='account.tax', string='Product Taxes', multi='all'),
         'in_invoice_fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category',
-            'Categoria Fiscal de Produto Padrão de Entrada',
+            u'Categoria Fiscal de Produto Padrão de Entrada',
             domain="[('journal_type','=','purchase'),"
             " ('fiscal_type','=','product'), ('type','=','input')]"),
         'out_invoice_fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category',
-            'Categoria Fiscal de Produto Padrão de Saida',
+            u'Categoria Fiscal de Produto Padrão de Saida',
             domain="[('journal_type','=','sale'), "
             " ('fiscal_type','=','product'), ('type','=','output')]"),
         'in_refund_fiscal_category_id': fields.many2one(
-            'l10n_br_account.fiscal.category', 'Devolução Entrada',
+            'l10n_br_account.fiscal.category', u'Devolução Entrada',
             domain="[('journal_type','=','purchase_refund'),"
             " ('fiscal_type','=','product'), ('type','=','output')]"),
         'out_refund_fiscal_category_id': fields.many2one(
-            'l10n_br_account.fiscal.category', 'Devolução Saida',
+            'l10n_br_account.fiscal.category', u'Devolução Saida',
             domain="[('journal_type','=','sale_refund'),"
             " ('fiscal_type','=','product'), ('type','=','input')]"),
         'in_invoice_service_fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category',
-            'Categoria Fiscal Padrão de Aquisição de Serviço',
+            u'Categoria Fiscal Padrão de Aquisição de Serviço',
             domain="[('journal_type','=','purchase'),"
             " ('fiscal_type','=','service'), ('type','=','input')]"),
         'out_invoice_service_fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category',
-            'Categoria Fiscal Padrão de Prestação de Serviço',
+            u'Categoria Fiscal Padrão de Prestação de Serviço',
             domain="[('journal_type','=','sale'),"
             " ('fiscal_type','=','service'), ('type','=','output')]"),
         'ecnpj_a1_file': fields.binary('Arquivo e-CNPJ A1'),

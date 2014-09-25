@@ -210,27 +210,27 @@ class account_invoice(orm.Model):
             ('proforma', 'Pro-forma'),
             ('proforma2', 'Pro-forma'),
             ('sefaz_export', 'Enviar para Receita'),
-            ('sefaz_exception', 'Erro de autorização da Receita'),
+            ('sefaz_exception', u'Erro de autorização da Receita'),
             ('open', 'Open'),
             ('paid', 'Paid'),
             ('cancel', 'Cancelled')
             ], 'State', select=True, readonly=True,
-            help=' * The \'Draft\' state is used when a user is encoding a new and unconfirmed Invoice. \
+            help=u' * The \'Draft\' state is used when a user is encoding a new and unconfirmed Invoice. \
             \n* The \'Pro-forma\' when invoice is in Pro-forma state,invoice does not have an invoice number. \
             \n* The \'Open\' state is used when user create invoice,a invoice number is generated.Its in open state till user does not pay invoice. \
             \n* The \'Paid\' state is set automatically when invoice is paid.\
             \n* The \'sefaz_out\' Gerado aquivo de exportação para sistema daReceita.\
             \n* The \'sefaz_aut\' Recebido arquivo de autolização da Receita.\
             \n* The \'Cancelled\' state is used when user cancel invoice.'),
-        'partner_shipping_id': fields.many2one('res.partner', 'Endereço de Entrega', readonly=True, states={'draft': [('readonly', False)]}, help="Shipping address for current sales order."),
+        'partner_shipping_id': fields.many2one('res.partner', u'Endereço de Entrega', readonly=True, states={'draft': [('readonly', False)]}, help="Shipping address for current sales order."),
         'issuer': fields.selection(
-            [('0', 'Emissão própria'),
+            [('0', u'Emissão própria'),
             ('1', 'Terceiros')], 'Emitente', readonly=True,
             states={'draft': [('readonly', False)]}),
         'nfe_purpose': fields.selection(
             [('1', 'Normal'),
              ('2', 'Complementar'),
-             ('3', 'Ajuste')], 'Finalidade da Emissão', readonly=True,
+             ('3', 'Ajuste')], u'Finalidade da Emissão', readonly=True,
             states={'draft': [('readonly', False)]}),
         'internal_number': fields.char('Invoice Number', size=32,
                                        readonly=True,
@@ -238,16 +238,16 @@ class account_invoice(orm.Model):
                                        help="Unique number of the invoice, \
                                        computed automatically when the \
                                        invoice is created."),
-        'vendor_serie': fields.char('Série NF Entrada', size=12, readonly=True,
+        'vendor_serie': fields.char(u'Série NF Entrada', size=12, readonly=True,
                                     states={'draft': [('readonly', False)]},
-                                    help="Série do número da Nota Fiscal do \
+                                    help=u"Série do número da Nota Fiscal do \
                                     Fornecedor"),
         'nfe_access_key': fields.char(
             'Chave de Acesso NFE', size=44,
             readonly=True, states={'draft': [('readonly', False)]}),
         'nfe_status': fields.char('Status na Sefaz', size=44, readonly=True),
         'nfe_date': fields.datetime('Data do Status NFE', readonly=True),
-        'nfe_export_date': fields.datetime('Exportação NFE', readonly=True),
+        'nfe_export_date': fields.datetime(u'Exportação NFE', readonly=True),
         'fiscal_document_id': fields.many2one(
             'l10n_br_account.fiscal.document', 'Documento', readonly=True,
             states={'draft': [('readonly', False)]}),
@@ -256,13 +256,13 @@ class account_invoice(orm.Model):
             relation='l10n_br_account.fiscal.document', store=True,
             string='Electronic'),
         'fiscal_type': fields.selection([('product', 'Produto'),
-                                         ('service', 'Serviço')],
+                                         ('service', u'Serviço')],
                                         'Tipo Fiscal', requeried=True),
         'move_line_receivable_id': fields.function(
             _get_receivable_lines, method=True, type='many2many',
             relation='account.move.line', string='Entry Lines'),
         'document_serie_id': fields.many2one(
-            'l10n_br_account.document.serie', 'Série',
+            'l10n_br_account.document.serie', u'Série',
             domain="[('fiscal_document_id','=',fiscal_document_id),\
             ('company_id','=',company_id)]", readonly=True,
             states={'draft': [('readonly', False)]}),
@@ -285,7 +285,7 @@ class account_invoice(orm.Model):
         'vehicle_state_id': fields.many2one(
             'res.country.state', 'UF da Placa'),
         'vehicle_l10n_br_city_id': fields.many2one('l10n_br_base.city',
-            'Municipio', domain="[('state_id', '=', vehicle_state_id)]"),
+            u'Municipio', domain="[('state_id', '=', vehicle_state_id)]"),
         'amount_gross': fields.function(
             _amount_all, method=True,
             digits_compute=dp.get_precision('Account'), string='Vlr. Bruto',
@@ -678,7 +678,7 @@ class account_invoice(orm.Model):
                 if invalid_number:
                     raise orm.except_orm(
                         _(u'Número Inválido !'),
-                        _("O número: %s da série: %s, esta inutilizado") % (
+                        _(u"O número: %s da série: %s, esta inutilizado") % (
                             sequence_read['number_next'],
                             inv.document_serie_id.name))
 
@@ -757,8 +757,8 @@ class account_invoice(orm.Model):
         fcategory.property_journal.id or False
         if not result['value'].get('journal_id', False):
             raise orm.except_orm(
-                _('Nenhum Diário !'),
-                _("Categoria fiscal: '%s', não tem um diário contábil para a \
+                _(u'Nenhum Diário !'),
+                _(u"Categoria fiscal: '%s', não tem um diário contábil para a \
                 empresa %s") % (fcategory.name, obj_company.name))
 
         obj_fp_rule = self.pool.get('account.fiscal.position.rule')
@@ -919,7 +919,7 @@ class account_invoice_line(orm.Model):
             domain="[('fiscal_category_id','=',fiscal_category_id)]"),
         'cfop_id': fields.many2one('l10n_br_account.cfop', 'CFOP'),
         'fiscal_classification_id': fields.many2one(
-            'account.product.fiscal.classification', 'Classficação Fiscal'),
+            'account.product.fiscal.classification', u'Classficação Fiscal'),
         'product_type': fields.selection(
             [('product', 'Produto'), ('service', u'Serviço')],
             'Tipo do Produto', required=True),
@@ -943,21 +943,21 @@ class account_invoice_line(orm.Model):
             _amount_line, method=True, string='Total', type="float",
             digits_compute=dp.get_precision('Account'),
             store=True, multi='all'),
-        'icms_manual': fields.boolean('ICMS Manual?'),
+        'icms_manual': fields.boolean(u'ICMS Manual?'),
         'icms_origin': fields.selection(
-            [('0', '0 - Nacional, exceto as indicadas nos códigos 3 a 5'),
-            ('1', '1 - Estrangeira - Importação direta, exceto a indicada no código 6'),
-            ('2', '2 - Estrangeira - Adquirida no mercado interno, exceto a indicada no código 7'),
-            ('3', '3 - Nacional, mercadoria ou bem com Conteúdo de Importação superior a  40% (quarenta por cento)'),
-            ('4', '4 - Nacional, cuja produção tenha sido feita em conformidade com os processos produtivos básicos de que tratam o Decreto-Lei nº 288/67, e as Leis nºs 8.248/91, 8.387/91, 10.176/01 e 11.484/07'),
-            ('5', '5 - Nacional, mercadoria ou bem com Conteúdo de Importação inferior ou igual a 40% (quarenta por cento)'),
-            ('6', '6 - Estrangeira - Importação direta, sem similar nacional, constante em lista de Resolução CAMEX'),
-            ('7', '7 - Estrangeira - Adquirida no mercado interno, sem similar nacional, constante em lista de Resolução CAMEX')],
+            [('0', u'0 - Nacional, exceto as indicadas nos códigos 3 a 5'),
+            ('1', u'1 - Estrangeira - Importação direta, exceto a indicada no código 6'),
+            ('2', u'2 - Estrangeira - Adquirida no mercado interno, exceto a indicada no código 7'),
+            ('3', u'3 - Nacional, mercadoria ou bem com Conteúdo de Importação superior a  40% (quarenta por cento)'),
+            ('4', u'4 - Nacional, cuja produção tenha sido feita em conformidade com os processos produtivos básicos de que tratam o Decreto-Lei nº 288/67, e as Leis nºs 8.248/91, 8.387/91, 10.176/01 e 11.484/07'),
+            ('5', u'5 - Nacional, mercadoria ou bem com Conteúdo de Importação inferior ou igual a 40% (quarenta por cento)'),
+            ('6', u'6 - Estrangeira - Importação direta, sem similar nacional, constante em lista de Resolução CAMEX'),
+            ('7', u'7 - Estrangeira - Adquirida no mercado interno, sem similar nacional, constante em lista de Resolução CAMEX')],
             'Origem'),
         'icms_base_type': fields.selection(
-            [('0', 'Margem Valor Agregado (%)'), ('1', 'Pauta (valor)'),
-            ('2', 'Preço Tabelado Máximo (valor)'),
-            ('3', 'Valor da Operação')],
+            [('0', u'Margem Valor Agregado (%)'), ('1', 'Pauta (valor)'),
+            ('2', u'Preço Tabelado Máximo (valor)'),
+            ('3', u'Valor da Operação')],
             'Tipo Base ICMS', required=True),
         'icms_base': fields.float('Base ICMS', required=True,
             digits_compute=dp.get_precision('Account')),
@@ -967,13 +967,13 @@ class account_invoice_line(orm.Model):
             digits_compute=dp.get_precision('Account')),
         'icms_percent': fields.float('Perc ICMS',
             digits_compute=dp.get_precision('Discount')),
-        'icms_percent_reduction': fields.float('Perc Redução de Base ICMS',
+        'icms_percent_reduction': fields.float(u'Perc Redução de Base ICMS',
             digits_compute=dp.get_precision('Discount')),
         'icms_st_base_type': fields.selection(
-            [('0', 'Preço tabelado ou máximo  sugerido'),
-            ('1', 'Lista Negativa (valor)'),
-            ('2', 'Lista Positiva (valor)'), ('3', 'Lista Neutra (valor)'),
-            ('4', 'Margem Valor Agregado (%)'), ('5', 'Pauta (valor)')],
+            [('0', u'Preço tabelado ou máximo  sugerido'),
+            ('1', u'Lista Negativa (valor)'),
+            ('2', u'Lista Positiva (valor)'), ('3', 'Lista Neutra (valor)'),
+            ('4', u'Margem Valor Agregado (%)'), ('5', 'Pauta (valor)')],
             'Tipo Base ICMS ST', required=True),
         'icms_st_value': fields.float('Valor ICMS ST', required=True,
             digits_compute=dp.get_precision('Account')),
@@ -982,7 +982,7 @@ class account_invoice_line(orm.Model):
         'icms_st_percent': fields.float('Percentual ICMS ST',
             digits_compute=dp.get_precision('Discount')),
         'icms_st_percent_reduction': fields.float(
-            'Perc Redução de Base ICMS ST',
+            u'Perc Redução de Base ICMS ST',
             digits_compute=dp.get_precision('Discount')),
         'icms_st_mva': fields.float('MVA ICMS ST',
             digits_compute=dp.get_precision('Discount')),
@@ -996,14 +996,14 @@ class account_invoice_line(orm.Model):
             ('S', 'Substituta'), ('I', 'Isenta')], 'Tipo do ISSQN',
             required=True),
         'service_type_id': fields.many2one(
-            'l10n_br_account.service.type', 'Tipo de Serviço'),
+            'l10n_br_account.service.type', u'Tipo de Serviço'),
         'issqn_base': fields.float('Base ISSQN', required=True,
             digits_compute=dp.get_precision('Account')),
         'issqn_percent': fields.float('Perc ISSQN', required=True,
             digits_compute=dp.get_precision('Discount')),
         'issqn_value': fields.float('Valor ISSQN', required=True,
             digits_compute=dp.get_precision('Account')),
-        'ipi_manual': fields.boolean('IPI Manual?'),
+        'ipi_manual': fields.boolean(u'IPI Manual?'),
         'ipi_type': fields.selection(
             [('percent', 'Percentual'), ('quantity', 'Em Valor')],
             'Tipo do IPI', required=True),

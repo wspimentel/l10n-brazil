@@ -22,7 +22,7 @@ from osv import osv, fields
 FISCAL_POSITION_COLUMNS = {
     'cfop_id': fields.many2one('l10n_br_account.cfop', 'CFOP'),
     'fiscal_category_id': fields.many2one('l10n_br_account.fiscal.category',
-                                          'Categoria Fiscal'),
+                                          u'Categoria Fiscal'),
     'type': fields.selection([('input', 'Entrada'), ('output', 'Saida')],
                              'Tipo'),
     'type_tax_use': fields.selection([('sale', 'Sale'),
@@ -32,9 +32,9 @@ FISCAL_POSITION_COLUMNS = {
         'fiscal_category_id', 'fiscal_type', type='char', readonly=True,
         relation='l10n_br_account.fiscal.category', store=True,
         string='Fiscal Type'),
-    'inv_copy_note': fields.boolean('Copiar Observação na Nota Fiscal'),
-    'asset_operation': fields.boolean('Operação de Aquisição de Ativo',
-                                      help="Caso seja marcada essa opção, \
+    'inv_copy_note': fields.boolean(u'Copiar Observação na Nota Fiscal'),
+    'asset_operation': fields.boolean(u'Operação de Aquisição de Ativo',
+                                      help=u"Caso seja marcada essa opção, \
                                         será incluido o IPI na base de \
                                         calculo do ICMS.")}
 
@@ -328,6 +328,6 @@ class res_partner(osv.Model):
     _columns = {
         'partner_fiscal_type_id': fields.many2one(
             'l10n_br_account.partner.fiscal.type',
-            'Tipo Fiscal do Parceiro',
+            u'Tipo Fiscal do Parceiro',
             domain="[('is_company','=',is_company)]")
     }

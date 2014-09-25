@@ -293,7 +293,7 @@ class l10n_br_account_invoice_invalid_number(orm.Model):
     _constraints = [
         (_check_range, u'Não é permitido faixas sobrepostas!',
             ['number_start', 'number_end']),
-        (_check_justificative,'Justificativa deve ter tamanho minimo de 15 caracteres.', ['justificative'])
+        (_check_justificative,u'Justificativa deve ter tamanho minimo de 15 caracteres.', ['justificative'])
     ]
 
     def action_draft_done(self, cr, uid, ids, *args):
@@ -322,7 +322,7 @@ class l10n_br_account_partner_fiscal_type(orm.Model):
     _columns = {
         'code': fields.char(u'Código', size=16, required=True),
         'name': fields.char(u'Descrição', size=64),
-        'is_company': fields.boolean('Pessoa Juridica?'),
+        'is_company': fields.boolean(u'Pessoa Juridica?'),
         'icms': fields.boolean('Recupera ICMS'),
         'ipi': fields.boolean('Recupera IPI')
     }
