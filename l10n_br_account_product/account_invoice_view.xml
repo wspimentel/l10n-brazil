@@ -25,13 +25,18 @@
 				<notebook position="inside">
                     <page string="Retenções">
                             <group>
-                                <field name="retention_pis_value"/>
-                                <field name="retention_cofins_value"/>
-                                <field name="retention_csll_value"/>
-                                <field name="retention_irrf_base"/>
-                                <field name="retention_irrf_value"/>    
-                                <field name="retention_inss_base"/>
-                                <field name="retention_inss_value"/>
+                                <group>
+                                    <field name="retention_issqn_value"/>
+                                    <field name="retention_pis_value"/>
+                                    <field name="retention_cofins_value"/>
+                                    <field name="retention_csll_value"/>
+                                </group>
+                                <group>
+                                    <field name="retention_irrf_base"/>
+                                    <field name="retention_irrf_value"/>
+                                    <field name="retention_inss_base"/>
+                                    <field name="retention_inss_value"/>
+                                </group>
                            </group>
                     </page>
 					<page string="Documentos Relacionados">
@@ -293,24 +298,24 @@
 									<page string="ISSQN" attrs="{'invisible': [('product_type','!=', 'service')]}">
 										<group>
 											<field name="issqn_manual" invisible="True"/>
-											<field name="issqn_type"/>
+											<field name="issqn_cst_id"/>
 											<field name="issqn_base"/>
 											<field name="issqn_percent"/>
 											<field name="service_type_id" attrs="{'required': [('product_type','=', 'service')]}" domain="[('internal_type','=','normal')]"/>
 											<field name="issqn_value"/>
 										</group>
 									</page>
-                                    <page string="Retenções" attrs="{'invisible': [('product_type','!=', 'service')]}">
-                                        <group>
-                                            <field name="retention_pis_value"/>
-                                            <field name="retention_cofins_value"/>
-                                            <field name="retention_csll_value"/>
-                                            <field name="retention_irrf_base"/>
-                                            <field name="retention_irrf_value"/>    
-                                            <field name="retention_inss_base"/>
-                                            <field name="retention_inss_value"/>
-                                        </group>
-                                    </page>
+                                    <!--<page string="Retenções" attrs="{'invisible': [('product_type','!=', 'service')]}">-->
+                                        <!--<group>-->
+                                            <!--<field name="retention_pis_value"/>-->
+                                            <!--<field name="retention_cofins_value"/>-->
+                                            <!--<field name="retention_csll_value"/>-->
+                                            <!--<field name="retention_irrf_base"/>-->
+                                            <!--<field name="retention_irrf_value"/>    -->
+                                            <!--<field name="retention_inss_base"/>-->
+                                            <!--<field name="retention_inss_value"/>-->
+                                        <!--</group>-->
+                                    <!--</page>-->
 									<page string="IPI" attrs="{'invisible': [('product_type','=', 'service')]}">
 										<group string="Detalhes do IPI">
 											<group>
