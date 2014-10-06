@@ -71,7 +71,7 @@ class AccountInvoice(orm.Model):
         'fiscal_type': fields.selection(
             PRODUCT_FISCAL_TYPE, 'Tipo Fiscal', required=True),
         'vendor_serie': fields.char(
-            'Série NF Entrada', size=12, readonly=True,
+            u'Série NF Entrada', size=12, readonly=True,
             states={'draft': [('readonly', False)]},
             help=u"Série do número da Nota Fiscal do Fornecedor"),
         'move_line_receivable_id': fields.function(
@@ -99,7 +99,7 @@ class AccountInvoice(orm.Model):
         'account_document_event_ids': fields.one2many(
             'l10n_br_account.document_event', 'document_event_ids',
             u'Eventos'),
-        'fiscal_comment': fields.text('Observação Fiscal'),
+        'fiscal_comment': fields.text(u'Observação Fiscal'),
     }
 
     def _default_fiscal_document(self, cr, uid, context):
@@ -285,12 +285,12 @@ class AccountInvoice(orm.Model):
                 if invalid_number:
                     raise orm.except_orm(
                         _(u'Número Inválido !'),
-                        _("O número: %s da série: %s, esta inutilizado") % (
+                        _(u"O número: %s da série: %s, esta inutilizado") % (
                             sequence_read['number_next'],
                             inv.document_serie_id.name))
 
                 seq_no = sequence.get_id(cr, uid, inv.document_serie_id.internal_sequence_id.id, context=context)
-                self.write(cr, uid, inv.id, {'internal_number': seq_no})
+                self.write(cr, uid, inv.id, {'ref': seq_no, 'internal_number': seq_no})
         return True
 
     def action_number(self, cr, uid, ids, context=None):
@@ -324,23 +324,23 @@ class AccountInvoice(orm.Model):
                 self.log(cr, uid, inv_id, message, context=ctx)
         return True
 
-    def action_move_create(self, cr, uid, ids, *args):
-        result = super(AccountInvoice, self).action_move_create(
-            cr, uid, ids, *args)
-        for inv in self.browse(cr, uid, ids):
-            if inv.move_id:
-                self.pool.get('account.move').write(
-                    cr, uid, [inv.move_id.id], {'ref': inv.internal_number})
-                for move_line in inv.move_id.line_id:
-                    self.pool.get('account.move.line').write(
-                        cr, uid, [move_line.id], {'ref': inv.internal_number})
-                move_lines = [x for x in inv.move_id.line_id if x.account_id.id == inv.account_id.id and x.account_id.type in ('receivable', 'payable')]
-                i = len(move_lines)
-                for move_line in move_lines:
-                    move_line_name = '%s/%s' % (inv.internal_number, i)
-                    self.pool.get('account.move.line').write(
-                        cr, uid, [move_line.id], {'name': move_line_name})
-                    i -= 1
+    def finalize_invoice_move_lines(self, cr, uid, invoice_browse, move_lines):
+        """finalize_invoice_move_lines(cr, uid, invoice, move_lines) -> move_lines
+        Hook method to be overridden in additional modules to verify and possibly alter the
+        move lines to be created by an invoice, for special cases.
+        :param invoice_browse: browsable record of the invoice that is generating the move lines
+        :param move_lines: list of dictionaries with the account.move.lines (as for create())
+        :return: the (possibly updated) final move_lines to create for this invoice
+        """
+        move_lines = super(AccountInvoice, self).finalize_invoice_move_lines(cr, uid, invoice_browse, move_lines)
+        cont=1
+        result = []
+        for move_line in move_lines:
+            if (move_line[2]['debit'] or move_line[2]['credit']):
+                if (move_line[2]['account_id'] == invoice_browse.account_id.id):
+                    move_line[2]['name'] = '%s/%s' % ( invoice_browse.internal_number, cont)
+                    cont +=1
+                result.append(move_line)
         return result
 
     def _fiscal_position_map(self, cr, uid, result, context=None, **kwargs):
@@ -363,8 +363,8 @@ class AccountInvoice(orm.Model):
         fcategory.property_journal.id or False
         if not result['value'].get('journal_id', False):
             raise orm.except_orm(
-                _('Nenhum Diário !'),
-                _("Categoria fiscal: '%s', não tem um diário contábil para a \
+                _(u'Nenhum Diário !'),
+                _(u"Categoria fiscal: '%s', não tem um diário contábil para a \
                 empresa %s") % (fcategory.name, obj_company.name))
 
         obj_fp_rule = self.pool.get('account.fiscal.position.rule')
