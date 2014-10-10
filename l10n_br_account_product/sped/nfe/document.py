@@ -441,6 +441,10 @@ class NFe310(FiscalDocument):
             nfe.infNFe.ide.dhSaiEnt.valor = pytz.utc.localize(
                 datetime.strptime(inv.date_hour_inout, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
 
+            nfe.infNFe.ide.idDest.valor = inv.fiscal_position.shipping_type or ''
+            nfe.infNFe.ide.indFinal.valor = inv.final_consumer or ''
+            nfe.infNFe.ide.indPres.valor = inv.operation_type or ''
+
             # nfe.infNFe.ide.dhEmi.valor = datetime.now()
             # nfe.infNFe.ide.dSaiEnt.valor = '2014-10-06'
             nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)

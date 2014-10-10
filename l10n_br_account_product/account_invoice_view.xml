@@ -119,6 +119,12 @@
                 <xpath expr="//field[@name='date_invoice']" position="after">
                     <field name="date_hour_invoice" string="Data-hora de emissão"/>
                 </xpath>
+                <xpath expr="//field[@name='fiscal_position']" position="after">
+                    <field name="final_consumer" string="Operação com Consumidor final"/>
+                </xpath>
+                <xpath expr="//field[@name='final_consumer']" position="after">
+                    <field name="operation_type" string="Tipo de operação"/>
+                </xpath>
 			</field>
 		</record>
 

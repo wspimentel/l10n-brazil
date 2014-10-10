@@ -136,6 +136,25 @@ class AccountInvoice(orm.Model):
     _columns = {
         'date_hour_invoice': fields.datetime(u'Data e hora de emissão'),
         'date_hour_inout': fields.datetime(u'Data e hora de entrada saída'),
+
+        'final_consumer': fields.selection([
+            ('0', u'Não'),
+            ('1', u'Consumidor final')
+        ], u'Operação com Consumidor final',
+            help=u'Indica operação com Consumidor final.'),
+
+        'operation_type': fields.selection([
+            ('0', u'Não se aplica'),
+            ('1', u'Operação presencial'),
+            ('2', u'Operação não presencial, pela Internet'),
+            ('3', u'Operação não presencial, Teleatendimento'),
+            ('4', u'NFC-e em operação com entrega em domicílio'),
+            ('9', u'Operação não presencial, outros'),
+        ], u'Tipo de operação',
+           help=u'Indicador de presença do comprador no \
+                \nestabelecimento comercial no momento \
+                \nda operação.'),
+
         'partner_shipping_id': fields.many2one(
             'res.partner', 'Delivery Address',
             readonly=True, required=True,
