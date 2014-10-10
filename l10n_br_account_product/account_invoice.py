@@ -18,6 +18,9 @@
 ###############################################################################
 
 import time
+import datetime
+import pytz
+from openerp import SUPERUSER_ID
 
 from openerp.osv import orm, fields
 from openerp.addons import decimal_precision as dp
@@ -110,7 +113,29 @@ class AccountInvoice(orm.Model):
             result[tax.invoice_id.id] = True
         return list(result.keys())
 
+    def action_move_create(self, cr, uid, ids, context=None):
+
+        super(AccountInvoice, self).action_move_create(cr, uid, ids, context)
+
+        if context is None:
+            context = {}
+
+        for inv in self.browse(cr, uid, ids, context=context):
+
+            ctx = context.copy()
+            ctx.update({'lang': inv.partner_id.lang})
+
+            if not inv.date_hour_invoice:
+                self.write(cr, uid, [inv.id], {'date_hour_invoice': fields.datetime.now()}, context=ctx)
+
+            if not inv.date_hour_inout:
+                self.write(cr, uid, [inv.id], {'date_hour_inout': fields.datetime.now()}, context=ctx)
+
+        return True
+
     _columns = {
+        'date_hour_invoice': fields.datetime(u'Data e hora de emissão'),
+        'date_hour_inout': fields.datetime(u'Data e hora de entrada saída'),
         'partner_shipping_id': fields.many2one(
             'res.partner', 'Delivery Address',
             readonly=True, required=True,
@@ -330,7 +355,7 @@ class AccountInvoice(orm.Model):
                 'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
                                     ['invoice_line'], 20),
                 'account.invoice.tax': (_get_invoice_tax, None, 20),
-                'account.invoice.line': (_get_invoice_line,
+                'acc  ount.invoice.line': (_get_invoice_line,
                                          ['price_unit',
                                           'invoice_line_tax_id',
                                           'quantity', 'discount'], 20),
@@ -366,13 +391,7 @@ class AccountInvoice(orm.Model):
                                     readonly=True,
                                     states={'draft': [('readonly', False)]}),
         'number_of_packages': fields.integer(
-            'Quantidade de Volumes',  readonly=True, states={'draft': [('readonly', False)]}),
-        'kind_of_packages': fields.char(
-            'Espécie', size=60, readonly=True, states={'draft': [('readonly', False)]}),
-        'brand_of_packages': fields.char(
-            'Brand',  size=60, readonly=True, states={'draft': [('readonly', False)]}),
-        'notation_of_packages': fields.char(
-            'Numeração', size=60, readonly=True, states={'draft': [('readonly', False)]}),
+            'Volume', readonly=True, states={'draft': [('readonly', False)]}),
         'amount_insurance': fields.function(
             _amount_all, method=True,
             digits_compute=dp.get_precision('Account'),
@@ -451,7 +470,10 @@ class AccountInvoice(orm.Model):
 
         return fiscal_document_serie
 
+
     _defaults = {
+        # 'date_hour_invoice': fields.datetime.now(),
+        # 'date_hour_inout': fields.datetime.now(),
         'fiscal_category_id': _default_fiscal_category,
         'fiscal_document_id': _default_fiscal_document,
         'document_serie_id': _default_fiscal_document_serie,
@@ -507,6 +529,7 @@ class AccountInvoiceLine(orm.Model):
         return res
 
     _columns = {
+        'date_invoice': fields.date('Invoice Date', readonly=True, states={'draft':[('readonly',False)]}, select=True, help="Keep empty to use the current date"),
         'fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category', 'Categoria'),
         'fiscal_position': fields.many2one(
@@ -514,7 +537,7 @@ class AccountInvoiceLine(orm.Model):
             domain="[('fiscal_category_id','=',fiscal_category_id)]"),
         'cfop_id': fields.many2one('l10n_br_account_product.cfop', 'CFOP'),
         'fiscal_classification_id': fields.many2one(
-            'account.product.fiscal.classification', u'Classficação Fiscal'),
+            'account.product.fiscal.classification', u'Classificação Fiscal'),
         'product_type': fields.selection(
             [('product', 'Produto'), ('service', u'Serviço')],
             'Tipo do Produto', required=True),
