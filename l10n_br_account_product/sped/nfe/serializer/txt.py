@@ -36,6 +36,8 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
     StrFile = StrNF
     pool = pooler.get_pool(cr.dbname)
 
+    a = nfe_version
+
     nfes = []
 
     for inv in pool.get('account.invoice').browse(cr, uid, ids, context={'lang': 'pt_BR'}):
@@ -55,7 +57,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                    'serie': inv.document_serie_id.code,
                    'nNF': inv.internal_number or '',
                    'dEmi': inv.date_invoice or '',
-                   'dSaiEnt': inv.date_invoice or '',
+                   'dSaiEnt': inv.date_in_out or '',
                    'hSaiEnt': '',
                    'tpNF': '',
                    'cMunFG': ('%s%s') % (company_addr_default.state_id.ibge_code, company_addr_default.l10n_br_city_id.ibge_code),

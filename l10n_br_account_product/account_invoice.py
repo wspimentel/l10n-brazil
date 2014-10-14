@@ -113,34 +113,17 @@ class AccountInvoice(orm.Model):
             result[tax.invoice_id.id] = True
         return list(result.keys())
 
-    def action_move_create(self, cr, uid, ids, context=None):
-
-        super(AccountInvoice, self).action_move_create(cr, uid, ids, context)
-
-        if context is None:
-            context = {}
-
-        for inv in self.browse(cr, uid, ids, context=context):
-
-            ctx = context.copy()
-            ctx.update({'lang': inv.partner_id.lang})
-
-            if not inv.date_hour_invoice:
-                self.write(cr, uid, [inv.id], {'date_hour_invoice': fields.datetime.now()}, context=ctx)
-
-            if not inv.date_hour_inout:
-                self.write(cr, uid, [inv.id], {'date_hour_inout': fields.datetime.now()}, context=ctx)
-
-        return True
-
     _columns = {
-        'date_hour_invoice': fields.datetime(u'Data e hora de emissão'),
-        'date_hour_inout': fields.datetime(u'Data e hora de entrada saída'),
+        'date_hour_invoice': fields.datetime(
+            u'Data e hora de emissão', readonly=True,
+            states={'draft': [('readonly', False)]},
+            select=True, help="Deixe em branco para usar a data atual"),
 
         'final_consumer': fields.selection([
             ('0', u'Não'),
             ('1', u'Consumidor final')
-        ], u'Operação com Consumidor final',
+        ], u'Operação com Consumidor final', readonly=True,
+            states={'draft': [('readonly', False)]}, required=True,
             help=u'Indica operação com Consumidor final.'),
 
         'operation_type': fields.selection([
@@ -150,10 +133,16 @@ class AccountInvoice(orm.Model):
             ('3', u'Operação não presencial, Teleatendimento'),
             ('4', u'NFC-e em operação com entrega em domicílio'),
             ('9', u'Operação não presencial, outros'),
-        ], u'Tipo de operação',
-           help=u'Indicador de presença do comprador no \
+        ], u'Tipo de operação', readonly=True,
+            states={'draft': [('readonly', False)]}, required=True,
+            help=u'Indicador de presença do comprador no \
                 \nestabelecimento comercial no momento \
                 \nda operação.'),
+
+        'date_in_out': fields.datetime(
+            u'Data de Entrada/Saida', readonly=True,
+            states={'draft': [('readonly', False)]},
+            select=True, help="Deixe em branco para usar a data atual"),
 
         'partner_shipping_id': fields.many2one(
             'res.partner', 'Delivery Address',
@@ -491,8 +480,7 @@ class AccountInvoice(orm.Model):
 
 
     _defaults = {
-        # 'date_hour_invoice': fields.datetime.now(),
-        # 'date_hour_inout': fields.datetime.now(),
+        'final_consumer': '0',
         'fiscal_category_id': _default_fiscal_category,
         'fiscal_document_id': _default_fiscal_document,
         'document_serie_id': _default_fiscal_document_serie,
@@ -505,6 +493,66 @@ class AccountInvoice(orm.Model):
 
         result = txt.validate(cr, uid, ids, context)
         return result
+
+    def action_move_create(self, cr, uid, ids, *args):
+
+        result = super(AccountInvoice, self).action_move_create(
+            cr, uid, ids, *args)
+
+        for invoice in self.browse(cr, uid, ids):
+
+            date_time_now = fields.datetime.now()
+
+            if not invoice.date_hour_invoice:
+                self.write(cr, uid, [invoice.id], {'date_hour_invoice': date_time_now})
+
+            if not invoice.date_in_out:
+                self.write(cr, uid, [invoice.id], {'date_in_out': date_time_now})
+
+            # if not invoice.date_in_out:
+            #     date_in_out = invoice.date_invoice or time.strftime('%Y-%m-%d')
+            #     self.write(cr, uid, [invoice.id], {'date_in_out': date_in_out})
+
+        return result
+
+    def action_date_assign(self, cr, uid, ids, *args):
+        for inv in self.browse(cr, uid, ids):
+
+            if inv.date_hour_invoice:
+                aux = datetime.datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S').date()
+                inv.date_invoice = aux
+
+            res = self.onchange_payment_term_date_invoice(cr, uid, inv.id, inv.payment_term.id, inv.date_invoice)
+
+            if res and res['value']:
+                self.write(cr, uid, [inv.id], res['value'])
+
+        return True
+
+
+    # def create(self, cr, uid, vals, context=None):
+    #
+    #     aux = vals
+    #     aux['date_invoice'] = vals['date_hour_invoice']
+    #     vals.update(aux)
+    #
+    #     if not context:
+    #         context = {}
+    #
+    #     return super(AccountInvoice, self).create(cr, uid, vals, context)
+    #
+    #
+    # def write(self, cr, uid, ids, vals, context=None):
+    #
+    #     if vals.get('date_hour_invoice') is not None:
+    #         aux = vals
+    #         aux['date_invoice'] = vals['date_hour_invoice']
+    #         vals.update(aux)
+    #
+    #     if not context:
+    #         context = {}
+    #
+    #     return super(AccountInvoice, self).write(cr, uid, ids, vals, context=context)
 
 
 class AccountInvoiceLine(orm.Model):

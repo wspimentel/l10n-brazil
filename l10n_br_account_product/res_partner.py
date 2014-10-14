@@ -24,7 +24,7 @@ FISCAL_POSITION_COLUMNS = {
     'shipping_type': fields.selection([('1', u'Operação interna'),
                                        ('2', u'Operação interestadual'),
                                        ('3', u'Operação com exterior')],
-                                            u'Local de destino da operação',
+                                            u'Local de destino da operação', required=True,
                                             help=u'Identificador de local de destino da operação.'),
 }
 

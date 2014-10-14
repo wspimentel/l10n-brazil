@@ -62,9 +62,8 @@ class NFe200(FiscalDocument):
             nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
             nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
             nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
-            # nfe.infNFe.ide.dhEmi.valor = inv.date_invoice or ''
             nfe.infNFe.ide.dEmi.valor = inv.date_invoice or ''
-            nfe.infNFe.ide.dSaiEnt.valor = inv.date_invoice or ''
+            nfe.infNFe.ide.dSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date() or ''
             nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
             nfe.infNFe.ide.tpImp.valor = 1  # (1 - Retrato; 2 - Paisagem)
             nfe.infNFe.ide.tpEmis.valor = 1
@@ -435,18 +434,16 @@ class NFe310(FiscalDocument):
             nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
             nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
 
-            nfe.infNFe.ide.dhEmi.valor = pytz.utc.localize(
-                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
-
-            nfe.infNFe.ide.dhSaiEnt.valor = pytz.utc.localize(
-                datetime.strptime(inv.date_hour_inout, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
-
             nfe.infNFe.ide.idDest.valor = inv.fiscal_position.shipping_type or ''
             nfe.infNFe.ide.indFinal.valor = inv.final_consumer or ''
             nfe.infNFe.ide.indPres.valor = inv.operation_type or ''
 
-            # nfe.infNFe.ide.dhEmi.valor = datetime.now()
-            # nfe.infNFe.ide.dSaiEnt.valor = '2014-10-06'
+            nfe.infNFe.ide.dhEmi.valor = pytz.utc.localize(
+                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
+
+            nfe.infNFe.ide.dhSaiEnt.valor = pytz.utc.localize(
+                datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
+
             nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
             nfe.infNFe.ide.tpImp.valor = 1  # (1 - Retrato; 2 - Paisagem)
             nfe.infNFe.ide.tpEmis.valor = 1
