@@ -13,9 +13,7 @@
 				</field>
                 <field name="date_invoice" position="after">
 					<field name="date_hour_invoice" string="Data Emissão"/>
-				</field>
-				<field name="date_hour_invoice" position="after">
-					<field name="date_in_out" string="Data de Entrada/Saida"/>
+                    <field name="date_in_out" string="Data de Entrada/Saida"/>
 				</field>
                 <field name="date_invoice" position="replace">
 					<field name="date_invoice" invisible="1"/>
@@ -124,8 +122,6 @@
 				</xpath>
                 <xpath expr="//field[@name='fiscal_position']" position="after">
                     <field name="ind_final" string="Operação com Consumidor final"/>
-                </xpath>
-                <xpath expr="//field[@name='ind_final']" position="after">
                     <field name="ind_pres" string="Tipo de operação"/>
                 </xpath>
 			</field>
