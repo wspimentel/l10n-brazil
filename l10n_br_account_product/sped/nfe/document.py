@@ -434,7 +434,7 @@ class NFe310(FiscalDocument):
             nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
             nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
 
-            nfe.infNFe.ide.idDest.valor = inv.fiscal_position.shipping_type or ''
+            nfe.infNFe.ide.idDest.valor = inv.fiscal_position.id_dest or ''
             nfe.infNFe.ide.indFinal.valor = inv.ind_final or ''
             nfe.infNFe.ide.indPres.valor = inv.ind_pres or ''
 
