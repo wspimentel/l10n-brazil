@@ -435,8 +435,8 @@ class NFe310(FiscalDocument):
             nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
 
             nfe.infNFe.ide.idDest.valor = inv.fiscal_position.shipping_type or ''
-            nfe.infNFe.ide.indFinal.valor = inv.final_consumer or ''
-            nfe.infNFe.ide.indPres.valor = inv.operation_type or ''
+            nfe.infNFe.ide.indFinal.valor = inv.ind_final or ''
+            nfe.infNFe.ide.indPres.valor = inv.ind_pres or ''
 
             nfe.infNFe.ide.dhEmi.valor = pytz.utc.localize(
                 datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''

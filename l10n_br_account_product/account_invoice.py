@@ -119,14 +119,14 @@ class AccountInvoice(orm.Model):
             states={'draft': [('readonly', False)]},
             select=True, help="Deixe em branco para usar a data atual"),
 
-        'final_consumer': fields.selection([
+        'ind_final': fields.selection([
             ('0', u'Não'),
             ('1', u'Consumidor final')
         ], u'Operação com Consumidor final', readonly=True,
             states={'draft': [('readonly', False)]}, required=True,
             help=u'Indica operação com Consumidor final.'),
 
-        'operation_type': fields.selection([
+        'ind_pres': fields.selection([
             ('0', u'Não se aplica'),
             ('1', u'Operação presencial'),
             ('2', u'Operação não presencial, pela Internet'),
@@ -480,7 +480,7 @@ class AccountInvoice(orm.Model):
 
 
     _defaults = {
-        'final_consumer': '0',
+        'ind_final': '0',
         'fiscal_category_id': _default_fiscal_category,
         'fiscal_document_id': _default_fiscal_document,
         'document_serie_id': _default_fiscal_document_serie,
@@ -509,10 +509,6 @@ class AccountInvoice(orm.Model):
             if not invoice.date_in_out:
                 self.write(cr, uid, [invoice.id], {'date_in_out': date_time_now})
 
-            # if not invoice.date_in_out:
-            #     date_in_out = invoice.date_invoice or time.strftime('%Y-%m-%d')
-            #     self.write(cr, uid, [invoice.id], {'date_in_out': date_in_out})
-
         return result
 
     def action_date_assign(self, cr, uid, ids, *args):
@@ -528,31 +524,6 @@ class AccountInvoice(orm.Model):
                 self.write(cr, uid, [inv.id], res['value'])
 
         return True
-
-
-    # def create(self, cr, uid, vals, context=None):
-    #
-    #     aux = vals
-    #     aux['date_invoice'] = vals['date_hour_invoice']
-    #     vals.update(aux)
-    #
-    #     if not context:
-    #         context = {}
-    #
-    #     return super(AccountInvoice, self).create(cr, uid, vals, context)
-    #
-    #
-    # def write(self, cr, uid, ids, vals, context=None):
-    #
-    #     if vals.get('date_hour_invoice') is not None:
-    #         aux = vals
-    #         aux['date_invoice'] = vals['date_hour_invoice']
-    #         vals.update(aux)
-    #
-    #     if not context:
-    #         context = {}
-    #
-    #     return super(AccountInvoice, self).write(cr, uid, ids, vals, context=context)
 
 
 class AccountInvoiceLine(orm.Model):
