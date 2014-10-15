@@ -141,9 +141,19 @@ class L10n_brAccountNfeExportInvoice(orm.TransientModel):
                 data['file_type'], globals(), locals(), data['file_type'])
 
             func = getattr(mod_serializer, 'nfe_export')
+
+            company_pool = self.pool.get('res.company')
+            company = company_pool.browse(cr, uid, inv.company_id.id)
+
+            # Verificamos a versoa da NFe
+            if company.nfe_version == '3.10':
+                str_nfe_version = '310'
+            else:
+                str_nfe_version = '200'
+
             nfes = func(
                 cr, uid, export_inv_ids, data['nfe_environment'],
-                '200', context)
+                str_nfe_version, context)
 
             for nfe in nfes:
                 #if nfe['message']:

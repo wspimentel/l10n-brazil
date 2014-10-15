@@ -18,11 +18,16 @@
 ###############################################################################
 
 from ..document import NFe200
+from ..document import NFe310
 
 
 def nfe_export(cr, uid, ids, nfe_environment='1',
                 nfe_version='200', context=None):
 
-    NFe = NFe200()
+    if nfe_version == '310':
+        NFe = NFe310()
+    else:
+        NFe = NFe200()
+
     nfes = NFe.get_xml(cr, uid, ids, nfe_environment, context)
     return nfes

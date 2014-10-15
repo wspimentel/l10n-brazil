@@ -22,6 +22,8 @@ from datetime import datetime
 import re
 import string
 from unicodedata import normalize
+import pytz
+from openerp import SUPERUSER_ID
 
 from openerp.osv import osv
 from openerp.tools.translate import _
@@ -35,8 +37,6 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
     StrNF = 'NOTA FISCAL|%s|\n' % len(ids)
     StrFile = StrNF
     pool = pooler.get_pool(cr.dbname)
-
-    a = nfe_version
 
     nfes = []
 
@@ -52,13 +52,10 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                    'cUF': company_addr_default.state_id.ibge_code,
                    'cNF': '',
                    'NatOp': normalize('NFKD', unicode(inv.cfop_ids[0].small_name or '')).encode('ASCII','ignore'),
-                   'indPag':  inv.payment_term and inv.payment_term.indPag or '0',
+                   'indPag': inv.payment_term and inv.payment_term.indPag or '0',
                    'mod': inv.fiscal_document_id.code,
                    'serie': inv.document_serie_id.code,
                    'nNF': inv.internal_number or '',
-                   'dEmi': inv.date_invoice or '',
-                   'dSaiEnt': inv.date_in_out or '',
-                   'hSaiEnt': '',
                    'tpNF': '',
                    'cMunFG': ('%s%s') % (company_addr_default.state_id.ibge_code, company_addr_default.l10n_br_city_id.ibge_code),
                    'TpImp': '1',
@@ -72,12 +69,43 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                    'xJust': '',
                    }
 
+
         if inv.cfop_ids[0].type in ("input"):
             StrRegB['tpNF'] = '0'
         else:
             StrRegB['tpNF'] = '1'
 
-        StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
+
+        if nfe_version == '310':
+
+            # Capturar a timezone do usuario
+            user_pool = inv.pool.get('res.users')
+            user = user_pool.browse(cr, SUPERUSER_ID, uid)
+            tz = pytz.timezone(user.partner_id.tz) or pytz.utc
+
+            StrRegB['dhEmi'] = pytz.utc.localize(
+                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
+
+            StrRegB['dhSaiEnt'] = pytz.utc.localize(
+                datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
+
+            StrRegB['idDest'] = inv.fiscal_position.id_dest or ''
+            StrRegB['indFinal'] = inv.ind_final or ''
+            StrRegB['indPres'] = inv.ind_pres or ''
+
+            StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
+                                                                             StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'],
+                                                                             StrRegB['idDest'], StrRegB['indFinal'], StrRegB['indPres'], StrRegB['tpNF'], StrRegB['cMunFG'],
+                                                                             StrRegB['TpImp'], StrRegB['TpEmis'], StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'],
+                                                                             StrRegB['procEmi'], StrRegB['VerProc'], StrRegB['dhCont'], StrRegB['xJust'])
+
+        else:
+            StrRegB['dEmi'] = inv.date_invoice or ''
+            a = str(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date())
+            StrRegB['dSaiEnt'] = a or '',
+            StrRegB['hSaiEnt'] = ''
+
+            StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
                                                                              StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dEmi'], StrRegB['dSaiEnt'],
                                                                              StrRegB['hSaiEnt'], StrRegB['tpNF'], StrRegB['cMunFG'], StrRegB['TpImp'], StrRegB['TpEmis'],
                                                                              StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'], StrRegB['procEmi'], StrRegB['VerProc'],
