@@ -212,7 +212,7 @@ def validate(cr, uid, ids, context=None):
                         strErro += u'Produtos e Serviços: %s - %s, Qtde: %s - CST do IPI\n' % (inv_line.product_id.default_code, inv_line.product_id.name, inv_line.quantity)
 
                 if inv_line.product_type == 'service':
-                    if not inv_line.issqn_type:
+                    if not inv_line.issqn_cst_id:
                         strErro += u'Produtos e Serviços: %s - %s, Qtde: %s - Tipo do ISSQN\n' % (inv_line.product_id.default_code, inv_line.product_id.name, inv_line.quantity)
 
                     if not inv_line.service_type_id:

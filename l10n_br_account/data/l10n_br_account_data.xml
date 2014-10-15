@@ -362,5 +362,7 @@
 			<field ref="l10n_br.tax_code_template_icms" name="ref_tax_code_id"/>
 		</record>
 
+
+
 	</data>
 </openerp>

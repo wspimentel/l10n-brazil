@@ -365,6 +365,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             ipi_cst = inv_line.ipi_cst_id and inv_line.ipi_cst_id.code or ''
             pis_cst = inv_line.pis_cst_id and inv_line.pis_cst_id.code or ''
             cofins_cst = inv_line.cofins_cst_id and inv_line.cofins_cst_id.code or ''
+            issqn_cst = inv_line.issqn_cst_id and inv_line.issqn_cst_id.code or ''
 
             StrM = 'M|\n'
 
@@ -725,7 +726,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                        'VISSQN': str("%.2f" % inv_line.issqn_value),
                        'CMunFG': ('%s%s') % (inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code),
                        'CListServ': re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.service_type_id.code or ''),
-                       'cSitTrib': inv_line.issqn_type
+                       'cSitTrib': inv_line.issqn_cst
                 }
 
                 StrU = ('U|%s|%s|%s|%s|%s|%s|\n') % (

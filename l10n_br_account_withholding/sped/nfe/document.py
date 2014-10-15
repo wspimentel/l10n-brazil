@@ -17,17 +17,10 @@
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.        #
 ###############################################################################
 
-import re
-import string
-from datetime import datetime
-
-from openerp import pooler
-from openerp.osv import orm
-from openerp.tools.translate import _
-from openerp.addons.l10n_br_account.sped.document import FiscalDocument
+from pysped.nfe.leiaute import Dup_200
 
 
-class NFe200(FiscalDocument):
+class Dup200(Dup_200):
 
     def _serializer(self, cr, uid, ids, nfe_environment, context=None):
         """"""

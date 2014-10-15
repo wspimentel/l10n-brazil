@@ -51,37 +51,56 @@ class AccountInvoice(orm.Model):
                 'cofins_base': 0.0,
                 'cofins_value': 0.0,
                 'ii_value': 0.0,
+                'csll_base': 0.0,
+                'csll_value': 0.0,
+                'ir_base': 0.0,
+                'ir_value': 0.0,
                 'amount_insurance': 0.0,
                 'amount_freight': 0.0,
                 'amount_costs': 0.0,
                 'amount_gross': 0.0,
                 'amount_discount': 0.0,
+                'amount_services' : 0.0,
+                'issqn_base': 0.0,
+                'issqn_value': 0.0,
+                'service_pis_value': 0.0,
+                'service_cofins_value': 0.0,
             }
             for line in invoice.invoice_line:
-                result[invoice.id]['amount_untaxed'] += line.price_total
-                if line.icms_cst_id.code not in ('101','102','201','202','300','500'):
-                    result[invoice.id]['icms_base'] += line.icms_base
-                    result[invoice.id]['icms_value'] += line.icms_value
-                result[invoice.id]['icms_st_base'] += line.icms_st_base
-                result[invoice.id]['icms_st_value'] += line.icms_st_value
-                result[invoice.id]['ipi_base'] += line.ipi_base
-                result[invoice.id]['ipi_value'] += line.ipi_value
-                result[invoice.id]['pis_base'] += line.pis_base
-                result[invoice.id]['pis_value'] += line.pis_value
-                result[invoice.id]['cofins_base'] += line.cofins_base
-                result[invoice.id]['cofins_value'] += line.cofins_value
-                result[invoice.id]['ii_value'] += line.ii_value
-                result[invoice.id]['amount_insurance'] += line.insurance_value
-                result[invoice.id]['amount_freight'] += line.freight_value
-                result[invoice.id]['amount_costs'] += line.other_costs_value
-                result[invoice.id]['amount_gross'] += line.price_gross
-                result[invoice.id]['amount_discount'] += line.discount_value
-
+                if line.product_type ==  'product':
+                    result[invoice.id]['amount_untaxed'] += line.price_total
+                    if line.icms_cst_id.code not in ('101','102','201','202','300','500'):
+                        result[invoice.id]['icms_base'] += line.icms_base
+                        result[invoice.id]['icms_value'] += line.icms_value
+                    result[invoice.id]['icms_st_base'] += line.icms_st_base
+                    result[invoice.id]['icms_st_value'] += line.icms_st_value
+                    result[invoice.id]['ipi_base'] += line.ipi_base
+                    result[invoice.id]['ipi_value'] += line.ipi_value
+                    result[invoice.id]['pis_base'] += line.pis_base
+                    result[invoice.id]['pis_value'] += line.pis_value
+                    result[invoice.id]['cofins_base'] += line.cofins_base
+                    result[invoice.id]['cofins_value'] += line.cofins_value
+                    result[invoice.id]['ii_value'] += line.ii_value
+                    result[invoice.id]['amount_insurance'] += line.insurance_value
+                    result[invoice.id]['amount_freight'] += line.freight_value
+                    result[invoice.id]['amount_costs'] += line.other_costs_value
+                    result[invoice.id]['amount_gross'] += line.price_gross
+                    result[invoice.id]['amount_discount'] += line.discount_value
+                else: #line.product_type == 'service':
+                    result[invoice.id]['amount_services'] += line.price_total
+                    result[invoice.id]['issqn_base'] += line.issqn_base
+                    result[invoice.id]['issqn_value'] += line.issqn_value
+                    result[invoice.id]['service_pis_value'] += line.pis_value
+                    result[invoice.id]['service_cofins_value'] += line.cofins_value
+                    result[invoice.id]['csll_base'] += line.csll_base
+                    result[invoice.id]['csll_value'] += line.csll_value
+                    result[invoice.id]['ir_base'] += line.ir_base
+                    result[invoice.id]['ir_value'] += line.ir_value
             for invoice_tax in invoice.tax_line:
                 if not invoice_tax.tax_code_id.tax_discount:
                     result[invoice.id]['amount_tax'] += invoice_tax.amount
 
-            result[invoice.id]['amount_total'] = result[invoice.id]['amount_tax'] + result[invoice.id]['amount_untaxed']
+            result[invoice.id]['amount_total'] = (result[invoice.id]['amount_tax'] + result[invoice.id]['amount_untaxed'] + result[invoice.id]['amount_services'])
         return result
 
     def _get_invoice_line(self, cr, uid, ids, context=None):
@@ -359,6 +378,54 @@ class AccountInvoice(orm.Model):
                                           'invoice_line_tax_id',
                                           'quantity', 'discount'], 20),
             }, multi='all'),
+        'csll_base': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Base CSLL',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'csll_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor CSLL',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'ir_base': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Base IR',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'ir_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor IR',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
         'weight': fields.float('Gross weight', readonly=True,
                                states={'draft': [('readonly', False)]},
                                help="The gross weight in Kg.",),
@@ -401,6 +468,66 @@ class AccountInvoice(orm.Model):
                     ['invoice_line'], 20),
                 'account.invoice.line': (_get_invoice_line,
                     ['other_costs_value'], 20)}, multi='all'),
+        'amount_services': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Total dos serviços',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'issqn_base': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Base de Cálculo do ISSQN',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'issqn_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor do ISSQN',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'service_pis_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor do Pis sobre Serviços',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
+        'service_cofins_value': fields.function(
+            _amount_all, method=True,
+            digits_compute=dp.get_precision('Account'), string='Valor do Cofins sobre Serviços',
+            store={
+                'account.invoice': (lambda self, cr, uid, ids, c={}: ids,
+                                    ['invoice_line'], 20),
+                'account.invoice.tax': (_get_invoice_tax, None, 20),
+                'account.invoice.line': (_get_invoice_line,
+                                         ['price_unit',
+                                          'invoice_line_tax_id',
+                                          'quantity', 'discount'], 20),
+            }, multi='all'),
     }
 
     def _default_fiscal_category(self, cr, uid, context=None):
@@ -577,10 +704,8 @@ class AccountInvoiceLine(orm.Model):
         'icms_cst_id': fields.many2one('account.tax.code', 'CST ICMS',
             domain=[('domain', '=', 'icms')]),
         'issqn_manual': fields.boolean('ISSQN Manual?'),
-        'issqn_type': fields.selection(
-            [('N', 'Normal'), ('R', 'Retida'),
-            ('S', 'Substituta'), ('I', 'Isenta')], 'Tipo do ISSQN',
-            required=True),
+        'issqn_cst_id': fields.many2one('account.tax.code', 'Código de Tributação do ISSQN',
+            domain=[('domain', '=', 'issqn')]),
         'service_type_id': fields.many2one(
             'l10n_br_account.service.type', u'Tipo de Serviço'),
         'issqn_base': fields.float('Base ISSQN', required=True,
@@ -657,6 +782,18 @@ class AccountInvoiceLine(orm.Model):
             digits_compute=dp.get_precision('Account')),
         'ii_customhouse_charges': fields.float('Depesas Atuaneiras',
             required=True, digits_compute=dp.get_precision('Account')),
+        'csll_base': fields.float('Base CSLL', required=True,
+            digits_compute=dp.get_precision('Account')),
+        'csll_value': fields.float('Valor CSLL', required=True,
+            digits_compute=dp.get_precision('Account')),
+        'csll_percent': fields.float('Perc CSLL', required=True,
+            digits_compute=dp.get_precision('Discount')),
+        'ir_base': fields.float('Base IR', required=True,
+            digits_compute=dp.get_precision('Account')),
+        'ir_value': fields.float('Valor IR', required=True,
+            digits_compute=dp.get_precision('Account')),
+        'ir_percent': fields.float('Perc IR', required=True,
+            digits_compute=dp.get_precision('Discount')),
         'insurance_value': fields.float('Valor do Seguro',
             digits_compute=dp.get_precision('Account')),
         'other_costs_value': fields.float('Outros Custos',
@@ -683,7 +820,6 @@ class AccountInvoiceLine(orm.Model):
         'icms_st_base_other': 0.0,
         'icms_st_base_type': '4',
         'issqn_manual': False,
-        'issqn_type': 'N',
         'issqn_base': 0.0,
         'issqn_percent': 0.0,
         'issqn_value': 0.0,
@@ -717,6 +853,12 @@ class AccountInvoiceLine(orm.Model):
         'ii_value': 0.0,
         'ii_iof': 0.0,
         'ii_customhouse_charges': 0.0,
+        'csll_base': 0.0,
+        'csll_value': 0.0,
+        'csll_percent': 0.0,
+        'ir_base': 0.0,
+        'ir_value': 0.0,
+        'ir_percent': 0.0,
         'insurance_value': 0.0,
         'other_costs_value': 0.0,
         'freight_value': 0.0,
@@ -796,16 +938,24 @@ class AccountInvoiceLine(orm.Model):
         }
         return result
 
-    def _amount_tax_issqn(self, cr, uid, tax=False):
-
-        # TODO deixar dinamico a definição do tipo do ISSQN
-        # assim como todos os impostos
-        issqn_type = 'N'
-        if not tax.get('amount'):
-            issqn_type = 'I'
-
+    def _amount_tax_csll(self, cr, uid, tax=False):
         result = {
-            'issqn_type': issqn_type,
+            'csll_base': tax.get('total_base', 0.0),
+            'csll_value': tax.get('amount', 0.0),
+            'csll_percent': tax.get('percent', 0.0) * 100,
+        }
+        return result
+
+    def _amount_tax_ir(self, cr, uid, tax=False):
+        result = {
+            'ir_base': tax.get('total_base', 0.0),
+            'ir_value': tax.get('amount', 0.0),
+            'ir_percent': tax.get('percent', 0.0) * 100,
+        }
+        return result
+
+    def _amount_tax_issqn(self, cr, uid, tax=False):
+        result = {
             'issqn_base': tax.get('total_base', 0.0),
             'issqn_percent': tax.get('percent', 0.0) * 100,
             'issqn_value': tax.get('amount', 0.0),
@@ -835,6 +985,8 @@ class AccountInvoiceLine(orm.Model):
         result['ipi_cst_id'] = tax_codes.get('ipi', False)
         result['pis_cst_id'] = tax_codes.get('pis', False)
         result['cofins_cst_id'] = tax_codes.get('cofins', False)
+        result['issqn_cst_id'] = tax_codes.get('issqn', False)
+
         return result
 
     def _validate_taxes(self, cr, uid, values, context=None):

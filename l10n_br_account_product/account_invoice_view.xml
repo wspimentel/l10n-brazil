@@ -277,7 +277,7 @@
 									<page string="ISSQN" attrs="{'invisible': [('product_type','!=', 'service')]}">
 										<group>
 											<field name="issqn_manual" invisible="True"/>
-											<field name="issqn_type"/>
+                                            <field name="issqn_cst_id"/>
 											<field name="issqn_base"/>
 											<field name="issqn_percent"/>
 											<field name="service_type_id" attrs="{'required': [('product_type','=', 'service')]}" domain="[('internal_type','=','normal')]"/>
@@ -353,6 +353,20 @@
 											<field name="ii_customhouse_charges"/>
 											<field name="ii_iof"/>
 											<field name="ii_value"/>
+										</group>
+									</page>
+                                    <page string="CSLL">
+										<group>
+											<field name="csll_base"/>
+											<field name="csll_percent"/>
+											<field name="csll_value"/>
+										</group>
+									</page>
+                                    <page string="IR">
+										<group>
+											<field name="ir_base"/>
+											<field name="ir_percent"/>
+											<field name="ir_value"/>
 										</group>
 									</page>
 								</notebook>
