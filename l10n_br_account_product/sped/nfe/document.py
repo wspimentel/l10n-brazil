@@ -385,13 +385,17 @@ class NFe200(FiscalDocument):
             nfe.infNFe.total.ISSQNTot.vPIS.valor     = str("%.2f" % inv.service_pis_value)
             nfe.infNFe.total.ISSQNTot.vCOFINS.valor    = str("%.2f" % inv.service_cofins_value)
 
-            # nfe.infNFe.total.retTrib.vRetPIS.valor    = str("%.2f" % inv.retention_pis_value)
-            # nfe.infNFe.total.retTrib.vRetCOFINS.valor = str("%.2f" % inv.retention_cofins_value)
-            # nfe.infNFe.total.retTrib.vRetCSLL.valor  = str("%.2f" % inv.retention_csll_value)
-            # nfe.infNFe.total.retTrib.vBCIRRF.valor  = str("%.2f" % inv.retention_irrf_base)
-            # nfe.infNFe.total.retTrib.vIRRF.valor     = str("%.2f" % inv.retention_irrf_value)
-            # nfe.infNFe.total.retTrib.vBCRetPrev.valor  = str("%.2f" % inv.retention_inss_base)
-            # nfe.infNFe.total.retTrib.vRetPrev.valor     = str("%.2f" % inv.retention_inss_value)
+            try:
+                nfe.infNFe.total.retTrib.vRetPIS.valor    = str("%.2f" % inv.pis_value_wh)
+                nfe.infNFe.total.retTrib.vRetCOFINS.valor = str("%.2f" % inv.cofins_value_wh)
+                nfe.infNFe.total.retTrib.vRetCSLL.valor  = str("%.2f" % inv.csll_value_wh)
+                nfe.infNFe.total.retTrib.vBCIRRF.valor  = str("%.2f" % inv.irrf_base_wh)
+                nfe.infNFe.total.retTrib.vIRRF.valor     = str("%.2f" % inv.irrf_value_wh)
+                nfe.infNFe.total.retTrib.vBCRetPrev.valor  = str("%.2f" % inv.inss_base_wh)
+                nfe.infNFe.total.retTrib.vRetPrev.valor     = str("%.2f" % inv.inss_value_wh)
+            except AttributeError:
+                pass
+
 
             # Gera Chave da NFe
             nfe.gera_nova_chave()
