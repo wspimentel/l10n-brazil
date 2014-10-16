@@ -93,7 +93,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegB['indFinal'] = inv.ind_final or ''
             StrRegB['indPres'] = inv.ind_pres or ''
 
-            #TODO: Inserir os elementos na ordem correta
+            #TODO: Inserir os elementos na ordem correta. Verificar qual a ordem correta
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
                                                                              StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'],
                                                                              StrRegB['idDest'], StrRegB['indFinal'], StrRegB['indPres'], StrRegB['tpNF'], StrRegB['cMunFG'],
@@ -103,7 +103,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         else:
             StrRegB['dEmi'] = inv.date_invoice or ''
             a = str(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date())
-            StrRegB['dSaiEnt'] = a or '',
+            StrRegB['dSaiEnt'] = a or ''
             StrRegB['hSaiEnt'] = ''
 
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
