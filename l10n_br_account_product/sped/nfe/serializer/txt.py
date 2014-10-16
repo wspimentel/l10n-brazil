@@ -93,6 +93,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegB['indFinal'] = inv.ind_final or ''
             StrRegB['indPres'] = inv.ind_pres or ''
 
+            #TODO: Inserir os elementos na ordem correta
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
                                                                              StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'],
                                                                              StrRegB['idDest'], StrRegB['indFinal'], StrRegB['indPres'], StrRegB['tpNF'], StrRegB['cMunFG'],
