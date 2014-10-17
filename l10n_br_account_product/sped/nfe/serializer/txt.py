@@ -45,7 +45,12 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         company_addr = pool.get('res.partner').address_get(cr, uid, [inv.company_id.partner_id.id], ['default'])
         company_addr_default = pool.get('res.partner').browse(cr, uid, [company_addr['default']], context={'lang': 'pt_BR'})[0]
 
-        StrA = 'A|%s|%s|\n' % ('2.00', '')
+        if nfe_version == '310':
+            str_version = '3.10'
+        else:
+            str_version = '2.00'
+
+        StrA = 'A|%s|%s|\n' % (str_version, '')
         StrFile += StrA
 
         StrRegB = {
@@ -64,7 +69,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                    'tpAmb': nfe_environment,
                    'finNFe': inv.nfe_purpose,
                    'procEmi': '0',
-                   'VerProc': '2.2.1',
+                   'VerProc': '2.2.26',
                    'dhCont': '',
                    'xJust': '',
                    }
@@ -83,11 +88,11 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             user = user_pool.browse(cr, SUPERUSER_ID, uid)
             tz = pytz.timezone(user.partner_id.tz) or pytz.utc
 
-            StrRegB['dhEmi'] = pytz.utc.localize(
-                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
+            StrRegB['dhEmi'] = str(pytz.utc.localize(
+                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz)) or ''
 
-            StrRegB['dhSaiEnt'] = pytz.utc.localize(
-                datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
+            StrRegB['dhSaiEnt'] = str(pytz.utc.localize(
+                datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz)) or ''
 
             StrRegB['idDest'] = inv.fiscal_position.id_dest or ''
             StrRegB['indFinal'] = inv.ind_final or ''
@@ -96,14 +101,14 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             #TODO: Inserir os elementos na ordem correta. Verificar qual a ordem correta
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
                                                                              StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'],
-                                                                             StrRegB['idDest'], StrRegB['indFinal'], StrRegB['indPres'], StrRegB['tpNF'], StrRegB['cMunFG'],
-                                                                             StrRegB['TpImp'], StrRegB['TpEmis'], StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'],
+                                                                             StrRegB['tpNF'], StrRegB['idDest'], StrRegB['cMunFG'], StrRegB['TpImp'], StrRegB['TpEmis'],
+                                                                             StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'], StrRegB['indFinal'], StrRegB['indPres'],
                                                                              StrRegB['procEmi'], StrRegB['VerProc'], StrRegB['dhCont'], StrRegB['xJust'])
+
 
         else:
             StrRegB['dEmi'] = inv.date_invoice or ''
-            a = str(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date())
-            StrRegB['dSaiEnt'] = a or ''
+            StrRegB['dSaiEnt'] = str(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date()) or ''
             StrRegB['hSaiEnt'] = ''
 
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
