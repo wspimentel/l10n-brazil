@@ -33,7 +33,9 @@ import pooler
 
 def nfe_export(cr, uid, ids, nfe_environment='1',
                 nfe_version='200', context=False):
-    StrFile = ''
+
+    # StrFile = ''
+
     StrNF = 'NOTA FISCAL|%s|\n' % len(ids)
     StrFile = StrNF
     pool = pooler.get_pool(cr.dbname)
@@ -46,11 +48,10 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         company_addr_default = pool.get('res.partner').browse(cr, uid, [company_addr['default']], context={'lang': 'pt_BR'})[0]
 
         if nfe_version == '310':
-            str_version = '3.10'
+            StrA = 'A|%s|%s|%s|\n' % ('3.10', '', len(ids))
         else:
-            str_version = '2.00'
+            StrA = 'A|%s|%s|\n' % ('2.00', '')
 
-        StrA = 'A|%s|%s|\n' % (str_version, '')
         StrFile += StrA
 
         StrRegB = {
@@ -89,19 +90,22 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             tz = pytz.timezone(user.partner_id.tz) or pytz.utc
 
             StrRegB['dhEmi'] = str(pytz.utc.localize(
-                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz)) or ''
+                datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz)).replace(' ', 'T') or ''
 
-            StrRegB['dhSaiEnt'] = str(pytz.utc.localize(
-                datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz)) or ''
+            dh_sai_ent = pytz.utc.localize(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
+
+            StrRegB['dhSaiEnt'] = str(dh_sai_ent).replace(' ', 'T') or ''
+
+            StrRegB['hSaiEnt'] = str(dh_sai_ent.time()) or ''
 
             StrRegB['idDest'] = inv.fiscal_position.id_dest or ''
             StrRegB['indFinal'] = inv.ind_final or ''
             StrRegB['indPres'] = inv.ind_pres or ''
 
             #TODO: Inserir os elementos na ordem correta. Verificar qual a ordem correta
-            StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
+            StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
                                                                              StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'],
-                                                                             StrRegB['tpNF'], StrRegB['idDest'], StrRegB['cMunFG'], StrRegB['TpImp'], StrRegB['TpEmis'],
+                                                                             StrRegB['hSaiEnt'], StrRegB['tpNF'], StrRegB['idDest'], StrRegB['cMunFG'], StrRegB['TpImp'], StrRegB['TpEmis'],
                                                                              StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'], StrRegB['indFinal'], StrRegB['indPres'],
                                                                              StrRegB['procEmi'], StrRegB['VerProc'], StrRegB['dhCont'], StrRegB['xJust'])
 
@@ -269,7 +273,13 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                    'email': inv.partner_id.email or '',
                    }
 
-        StrE = 'E|%s|%s|%s|%s|\n' % (StrRegE['xNome'], StrRegE['IE'], StrRegE['ISUF'], StrRegE['email'])
+        # Adicionado
+        if nfe_version == '310':
+            StrRegE['indIEDest'] = '9'
+            StrE = 'E|%s|%s|%s|%s|%s|\n' % (StrRegE['xNome'], StrRegE['indIEDest'], StrRegE['IE'], StrRegE['ISUF'], StrRegE['email'])
+
+        else:
+            StrE = 'E|%s|%s|%s|%s|\n' % (StrRegE['xNome'], StrRegE['IE'], StrRegE['ISUF'], StrRegE['email'])
 
         StrFile += StrE
 
@@ -388,12 +398,26 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegI['NCM'] = re.sub('[%s]' % re.escape(string.punctuation),
                 '', inv_line.fiscal_classification_id.name or '')
 
-            StrI = 'I|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegI['CProd'], StrRegI['CEAN'], StrRegI['XProd'], StrRegI['NCM'],
-                                                                                      StrRegI['EXTIPI'], StrRegI['CFOP'], StrRegI['UCom'], StrRegI['QCom'],
-                                                                                      StrRegI['VUnCom'], StrRegI['VProd'], StrRegI['CEANTrib'], StrRegI['UTrib'],
-                                                                                      StrRegI['QTrib'], StrRegI['VUnTrib'], StrRegI['VFrete'], StrRegI['VSeg'],
-                                                                                      StrRegI['VDesc'], StrRegI['vOutro'], StrRegI['indTot'], StrRegI['xPed'],
-                                                                                      StrRegI['nItemPed'])
+            if nfe_version == '310':
+
+                StrRegI['NVE'] = ''
+                StrRegI['nFCI'] = ''
+
+                StrI = 'I|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|s%|%s|\n' % (StrRegI['CProd'], StrRegI['CEAN'], StrRegI['XProd'], StrRegI['NCM'],
+                                                                                          StrRegI['NVE'], StrRegI['EXTIPI'], StrRegI['CFOP'], StrRegI['UCom'], StrRegI['QCom'],
+                                                                                          StrRegI['VUnCom'], StrRegI['VProd'], StrRegI['CEANTrib'], StrRegI['UTrib'],
+                                                                                          StrRegI['QTrib'], StrRegI['VUnTrib'], StrRegI['VFrete'], StrRegI['VSeg'],
+                                                                                          StrRegI['VDesc'], StrRegI['vOutro'], StrRegI['indTot'], StrRegI['xPed'],
+                                                                                          StrRegI['nItemPed'], StrRegI['nFCI'])
+
+            else:
+
+                StrI = 'I|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (StrRegI['CProd'], StrRegI['CEAN'], StrRegI['XProd'], StrRegI['NCM'],
+                                                                                          StrRegI['EXTIPI'], StrRegI['CFOP'], StrRegI['UCom'], StrRegI['QCom'],
+                                                                                          StrRegI['VUnCom'], StrRegI['VProd'], StrRegI['CEANTrib'], StrRegI['UTrib'],
+                                                                                          StrRegI['QTrib'], StrRegI['VUnTrib'], StrRegI['VFrete'], StrRegI['VSeg'],
+                                                                                          StrRegI['VDesc'], StrRegI['vOutro'], StrRegI['indTot'], StrRegI['xPed'],
+                                                                                          StrRegI['nItemPed'])
 
             StrFile += StrI
 

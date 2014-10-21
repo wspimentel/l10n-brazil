@@ -494,6 +494,7 @@ class AccountInvoice(orm.Model):
         result = txt.validate(cr, uid, ids, context)
         return result
 
+    #Adicionada
     def action_move_create(self, cr, uid, ids, *args):
 
         result = super(AccountInvoice, self).action_move_create(
@@ -511,6 +512,7 @@ class AccountInvoice(orm.Model):
 
         return result
 
+    #Adicionada
     def action_date_assign(self, cr, uid, ids, *args):
         for inv in self.browse(cr, uid, ids):
 
