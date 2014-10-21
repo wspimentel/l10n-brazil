@@ -91,14 +91,13 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegB['dhEmi'] = str(pytz.utc.localize(
                 datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')).astimezone(tz)).replace(' ', 'T') or ''
 
-            dh_sai_ent = pytz.utc.localize(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
+            StrRegB['dhSaiEnt'] = str(pytz.utc.localize(
+                datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz)).replace(' ', 'T') or ''
 
-            StrRegB['dhSaiEnt'] = str(dh_sai_ent).replace(' ', 'T') or ''
             StrRegB['hSaiEnt'] = ''
             StrRegB['idDest'] = inv.fiscal_position.id_dest or ''
             StrRegB['indFinal'] = inv.ind_final or ''
             StrRegB['indPres'] = inv.ind_pres or ''
-
             StrRegB['VerProc'] = '3.10.18'
 
             #TODO: Inserir os elementos na ordem correta. Verificar qual a ordem correta
@@ -288,12 +287,15 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
 
         # Adicionado
         if nfe_version == '310':
+
             StrRegE['indIEDest'] = '9'
+            StrRegE['IM'] = StrRegC['IM']
+
             StrE = 'E|%s|%s|%s|%s|%s|\n' % (
                 StrRegE['xNome'], StrRegE['indIEDest'], StrRegE['IE'], StrRegE['ISUF'], StrRegE['email'])
 
         else:
-            StrE = 'E|%s|%s|%s|%s|\n' % (StrRegE['xNome'], StrRegE['IE'], StrRegE['ISUF'], StrRegE['email'])
+            StrE = 'E|%s|%s|%s|%s|\n' % (StrRegE['xNome'], StrRegE['IE'], StrRegE['ISUF'], StrRegE['IM'], StrRegE['email'])
 
         StrFile += StrE
 
