@@ -30,4 +30,5 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         NFe = NFe200()
 
     nfes = NFe.get_xml(cr, uid, ids, nfe_environment, context)
+
     return nfes

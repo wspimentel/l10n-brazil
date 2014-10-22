@@ -100,13 +100,13 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegB['indPres'] = inv.ind_pres or ''
             StrRegB['VerProc'] = '3.10.18'
 
-            #TODO: Inserir os elementos na ordem correta. Verificar qual a ordem correta
+            #Modificado
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (
-                StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'],
-                StrRegB['mod'], StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'],
-                StrRegB['hSaiEnt'], StrRegB['tpNF'], StrRegB['idDest'], StrRegB['cMunFG'], StrRegB['TpImp'],
-                StrRegB['TpEmis'], StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'], StrRegB['indFinal'],
-                StrRegB['indPres'], StrRegB['procEmi'], StrRegB['VerProc'], StrRegB['dhCont'], StrRegB['xJust'])
+                StrRegB['cUF'], StrRegB['cNF'], StrRegB['NatOp'], StrRegB['indPag'], StrRegB['mod'],
+                StrRegB['serie'], StrRegB['nNF'], StrRegB['dhEmi'], StrRegB['dhSaiEnt'], StrRegB['hSaiEnt'],
+                StrRegB['tpNF'], StrRegB['idDest'], StrRegB['cMunFG'], StrRegB['TpImp'], StrRegB['TpEmis'],
+                StrRegB['cDV'], StrRegB['tpAmb'], StrRegB['finNFe'], StrRegB['indFinal'], StrRegB['indPres'],
+                StrRegB['procEmi'], StrRegB['VerProc'], StrRegB['dhCont'], StrRegB['xJust'])
 
 
         else:
