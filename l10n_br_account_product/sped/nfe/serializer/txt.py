@@ -62,6 +62,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             'mod': inv.fiscal_document_id.code,
             'serie': inv.document_serie_id.code,
             'nNF': inv.internal_number or '',
+            'hSaiEnt': '',
             'tpNF': '',
             'cMunFG': ('%s%s') % (
                 company_addr_default.state_id.ibge_code, company_addr_default.l10n_br_city_id.ibge_code),
@@ -94,7 +95,6 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegB['dhSaiEnt'] = str(pytz.utc.localize(
                 datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz)).replace(' ', 'T') or ''
 
-            StrRegB['hSaiEnt'] = ''
             StrRegB['idDest'] = inv.fiscal_position.id_dest or ''
             StrRegB['indFinal'] = inv.ind_final or ''
             StrRegB['indPres'] = inv.ind_pres or ''
@@ -112,7 +112,6 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         else:
             StrRegB['dEmi'] = inv.date_invoice or ''
             StrRegB['dSaiEnt'] = str(datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date()) or ''
-            StrRegB['hSaiEnt'] = ''
             StrRegB['VerProc'] = '2.2.26'
 
             StrB = 'B|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (
