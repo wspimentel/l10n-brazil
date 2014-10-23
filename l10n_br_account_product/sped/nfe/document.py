@@ -20,8 +20,6 @@
 import re
 import string
 from datetime import datetime
-import pytz
-from openerp import SUPERUSER_ID
 
 from openerp import pooler
 from openerp.osv import orm
@@ -779,10 +777,10 @@ class NFe200(FiscalDocument):
     def __init__(self):
         super(NFe200, self).__init__()
 
-        try:
-            from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200
-        except ImportError:
-            raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        # try:
+        #     from pysped.nfe.leiaute import NFe_200, Det_200, NFRef_200, Dup_200
+        # except ImportError:
+        #     raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
         self.nfe = None
         self.nfref = None
@@ -802,41 +800,41 @@ class NFe200(FiscalDocument):
             company = pool.get('res.partner').browse(
                 cr, uid, inv.company_id.partner_id.id, context)
 
-            self.nfe = self._get_NFe()
+            self.nfe = self.get_NFe()
 
-            self.nfe_identification(
+            self._nfe_identification(
                 cr, uid, ids, inv, company, nfe_environment, context)
 
-            self.in_out_adress(cr, uid, ids, inv, context)
+            self._in_out_adress(cr, uid, ids, inv, context)
 
             for inv_related in inv.fiscal_document_related_ids:
                 self.nfref = self._get_NFRef()
-                self.nfe_references(cr, uid, ids, inv_related)
+                self._nfe_references(cr, uid, ids, inv_related)
                 self.nfe.infNFe.ide.NFref.append(self.nfref)
 
-            self.emmiter(cr, uid, ids, inv, company, context)
-            self.receiver(cr, uid, ids, inv, company, nfe_environment, context)
+            self._emmiter(cr, uid, ids, inv, company, context)
+            self._receiver(cr, uid, ids, inv, company, nfe_environment, context)
 
             i = 0
             for inv_line in inv.invoice_line:
                 i += 1
                 self.det = self._get_Det()
-                self.details(cr, uid, ids, inv, inv_line, i, context)
+                self._details(cr, uid, ids, inv, inv_line, i, context)
                 self.nfe.infNFe.det.append(self.det)
 
             if inv.journal_id.revenue_expense:
                 for line in inv.move_line_receivable_id:
                     self.dup = self._get_Dup()
-                    self.encashment_data(cr, uid, ids, inv, line, context)
+                    self._encashment_data(cr, uid, ids, inv, line, context)
                     self.nfe.infNFe.cobr.dup.append(self.dup)
 
             try:
-                self.carrier_data(cr, uid, ids, inv, context)
+                self._carrier_data(cr, uid, ids, inv, context)
             except AttributeError:
                 pass
 
-            self.additional_information(cr, uid, ids, inv, context)
-            self.total(cr, uid, ids, inv, context)
+            self._additional_information(cr, uid, ids, inv, context)
+            self._total(cr, uid, ids, inv, context)
 
             # Gera Chave da NFe
             self.nfe.gera_nova_chave()
@@ -845,7 +843,7 @@ class NFe200(FiscalDocument):
         return nfes
 
 
-    def nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
+    def _nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
         # Identificação da NF-e
         #
@@ -871,7 +869,7 @@ class NFe200(FiscalDocument):
         else:
             self.nfe.infNFe.ide.tpNF.valor = '1'
 
-    def in_out_adress(self, cr, uid, ids, inv, context=None):
+    def _in_out_adress(self, cr, uid, ids, inv, context=None):
 
         #
         # Endereço de Entrega ou Retirada
@@ -898,12 +896,11 @@ class NFe200(FiscalDocument):
                     self.nfe.infNFe.entrega.UF.valor = inv.address_invoice_id.state_id.code or ''
 
 
-    def nfe_references(self, cr, uid, ids, inv_related, context=None):
+    def _nfe_references(self, cr, uid, ids, inv_related, context=None):
 
         #
         # Documentos referenciadas
         #
-        # self.nfref = self._get_NFRef()
 
         if inv_related.document_type == 'nf':
             self.nfref.refNF.cUF.valor = inv_related.state_id and inv_related.state_id.ibge_code or '',
@@ -937,9 +934,8 @@ class NFe200(FiscalDocument):
             self.nfref.refECF.nECF.valor = inv_related.internal_number
             self.nfref.refECF.nCOO.valor = inv_related.serie
 
-        # self.nfe.infNFe.ide.NFref.append(self.nfref)
 
-    def emmiter(self, cr, uid, ids, inv, company, context=None):
+    def _emmiter(self, cr, uid, ids, inv, company, context=None):
 
         #
         # Emitente
@@ -966,7 +962,8 @@ class NFe200(FiscalDocument):
         if inv.company_id.partner_id.inscr_mun:
             self.nfe.infNFe.emit.CNAE.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.cnae_main_id.code or '')
 
-    def receiver(self, cr, uid, ids, inv, company, nfe_environment, context=None):
+
+    def _receiver(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
         #
         # Destinatário
@@ -1015,12 +1012,11 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.dest.email.valor = inv.partner_id.email or ''
 
 
-    def details(self, cr, uid, ids, inv, inv_line, i, context=None):
+    def _details(self, cr, uid, ids, inv, inv_line, i, context=None):
 
         #
         # Detalhe
         #
-        # self.det = self._get_Det()
 
         self.det.nItem.valor = i
         self.det.prod.cProd.valor = inv_line.product_id.code or ''
@@ -1112,23 +1108,18 @@ class NFe200(FiscalDocument):
         self.det.imposto.COFINSST.vAliqProd.valor = ''
         self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
 
-        # self.nfe.infNFe.det.append(self.det)
 
-    def encashment_data(self, cr, uid, ids, inv, line, context=None):
+    def _encashment_data(self, cr, uid, ids, inv, line, context=None):
 
         #
         # Dados de Cobrança
         #
 
-        # self.dup = self._get_Dup()
-
         self.dup.nDup.valor = line.name
         self.dup.dVenc.valor = line.date_maturity or inv.date_due or inv.date_invoice
         self.dup.vDup.valor = str("%.2f" % line.debit)
 
-        # self.nfe.infNFe.cobr.dup.append(self.dup)
-
-    def carrier_data(self, cr, uid, ids, inv, context=None):
+    def _carrier_data(self, cr, uid, ids, inv, context=None):
 
         #
         # Dados da Transportadora e veiculo
@@ -1155,7 +1146,7 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
 
-    def additional_information(self, cr, uid, ids, inv, context=None):
+    def _additional_information(self, cr, uid, ids, inv, context=None):
 
         #
         # Informações adicionais
@@ -1163,7 +1154,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.infAdic.infAdFisco.valor = inv.fiscal_comment or ''
         self.nfe.infNFe.infAdic.infCpl.valor = inv.comment or ''
 
-    def total(self, cr, uid, ids, inv, context=None):
+    def _total(self, cr, uid, ids, inv, context=None):
 
         #
         # Totais
@@ -1183,7 +1174,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.total.ICMSTot.vOutro.valor = str("%.2f" % inv.amount_costs)
         self.nfe.infNFe.total.ICMSTot.vNF.valor = str("%.2f" % inv.amount_total)
 
-    def _get_NFe(self):
+    def get_NFe(self):
 
         try:
             from pysped.nfe.leiaute import NFe_200
@@ -1229,7 +1220,7 @@ class NFe200(FiscalDocument):
 
     def set_xml(self, nfe_string, context=None):
         """"""
-        nfe = self._get_NFe()
+        nfe = self.get_NFe()
         nfe.set_xml(nfe_string)
         return nfe
 
@@ -1240,10 +1231,13 @@ class NFe310(NFe200):
         super(NFe310, self).__init__()
 
 
-    def nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
+    def _nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
-        super(NFe310, self).nfe_identification(
+        super(NFe310, self)._nfe_identification(
             cr, uid, ids, inv, company, nfe_environment, context)
+
+        import pytz
+        from openerp import SUPERUSER_ID
 
         # Capturar a timezone do usuario
         user_pool = inv.pool.get('res.users')
@@ -1260,7 +1254,8 @@ class NFe310(NFe200):
         self.nfe.infNFe.ide.dhSaiEnt.valor = pytz.utc.localize(
             datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')).astimezone(tz) or ''
 
-    def _get_NFe(self):
+
+    def get_NFe(self):
 
         try:
             from pysped.nfe.leiaute import NFe_310
