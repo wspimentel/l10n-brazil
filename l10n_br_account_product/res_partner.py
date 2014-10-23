@@ -24,7 +24,7 @@ FISCAL_POSITION_COLUMNS = {
     'id_dest': fields.selection([('1', u'Operação interna'),
                                 ('2', u'Operação interestadual'),
                                 ('3', u'Operação com exterior')],
-                                u'Local de destino da operação', required=True,
+                                u'Local de destino da operação',
                                 help=u'Identificador de local de destino da operação.'),
 }
 
