@@ -833,6 +833,16 @@ class NFe200(FiscalDocument):
                 i += 1
                 self.det = self._get_Det()
                 self._details(cr, uid, ids, inv, inv_line, i, context)
+                for inv_di in inv_line.import_declaration_ids:
+                    self.di = self._get_DI()
+                    self._di(cr, uid, ids, inv, inv_line, inv_di, i, context)
+                    self.det.prod.DI.append(self.di)
+                    self.di = self._get_DI()
+                    for inv_di_line in inv_di.line_ids:
+                        self.di_line = self._get_Addition()
+                        self._adiction(cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context)
+                        self.di.adi.append(self.di_line)
+
                 self.nfe.infNFe.det.append(self.det)
 
             if inv.journal_id.revenue_expense:
@@ -1125,6 +1135,20 @@ class NFe200(FiscalDocument):
         self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
 
 
+    def _di(self, cr, uid, ids, inv, inv_line, inv_di, i, context=None):
+        self.di.nDI.valor = inv_di.name
+        self.di.dDI.valor = inv_di.date_registration or ''
+        self.di.xLocDesemb.valor = inv_di.location
+        self.di.UFDesemb.valor = inv_di.state_id.code or ''
+        self.di.dDesemb.valor = inv_di.date_release or ''
+        self.di.cExportador.valor = inv_di.exporting_code
+
+    def _addition(self, cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context=None):
+        self.di_line.nAdicao.valor = inv_di_line.name
+        self.di_line.nSeqAdic.valor = inv_di_line.sequence
+        self.di_line.cFabricante.valor = inv_di_line.manufacturer_code
+        self.di_line.vDescDI.valor = str("%.2f" % inv_di_line.amount_discount)
+
     def _encashment_data(self, cr, uid, ids, inv, line, context=None):
 
         #
@@ -1233,6 +1257,20 @@ class NFe200(FiscalDocument):
             raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
         return Det_200()
+
+    def _get_DI(self):
+        try:
+            from pysped.nfe.leiaute import DI_200
+        except ImportError:
+            raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        return DI_200()
+
+    def _get_Addition(self):
+        try:
+            from pysped.nfe.leiaute import Adi_200
+        except ImportError:
+            raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        return Adi_200()
 
 
     def _get_Vol(self):

@@ -19,8 +19,6 @@
 
 import time
 from datetime import datetime
-import re
-import string
 from unicodedata import normalize
 import pytz
 from openerp import SUPERUSER_ID
@@ -29,6 +27,8 @@ from openerp.osv import osv
 from openerp.tools.translate import _
 from openerp import netsvc
 import pooler
+
+from openerp.addons.l10n_br_base.tools.misc import punctuation_rm
 
 
 def nfe_export(cr, uid, ids, nfe_environment='1',
@@ -129,10 +129,10 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                 StrRegB14 = {
                     'cUF': '%s' % inv_related.state_id and inv_related.state_id.ibge_code or '',
                     'AAMM': datetime.strptime(inv_related.date, '%Y-%m-%d').strftime('%y%m') or '',
-                    'CNPJ': (re.sub('[%s]' % re.escape(string.punctuation), '', inv_related.cnpj_cpf or '')),
+                    'CNPJ': punctuation_rm(inv_related.cnpj_cpf),
                     'Mod': inv_related.fiscal_document_id and inv_related.fiscal_document_id.code or '',
                     'serie': inv_related.serie or '',
-                    'nNF': (re.sub('[%s]' % re.escape(string.punctuation), '', inv_related.internal_number or '')),
+                    'nNF': punctuation_rm(inv_related.internal_number),
                 }
 
                 StrB14 = 'B14|%s|%s|%s|%s|%s|%s|\n' % (StrRegB14['cUF'],
@@ -145,10 +145,10 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                 StrRegB20a = {
                     'cUF': '%s' % inv_related.state_id and inv_related.state_id.ibge_code or '',
                     'AAMM': datetime.strptime(inv_related.date, '%Y-%m-%d').strftime('%y%m') or '',
-                    'IE': (re.sub('[%s]' % re.escape(string.punctuation), '', inv_related.inscr_est or '')),
+                    'IE': punctuation_rm(inv_related.inscr_est),
                     'mod': inv_related.fiscal_document_id and inv_related.fiscal_document_id.code or '',
                     'serie': inv_related.serie or '',
-                    'nNF': (re.sub('[%s]' % re.escape(string.punctuation), '', inv_related.internal_number or '')),
+                    'nNF': punctuation_rm(inv_related.internal_number),
                 }
                 StrB20a = 'B20a|%s|%s|%s|%s|%s|%s|\n' % (StrRegB20a['cUF'],
                                                          StrRegB20a['AAMM'], StrRegB20a['IE'], StrRegB20a['mod'],
@@ -158,13 +158,13 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
 
                 if inv_related.cpfcnpj_type == 'cnpj':
                     StrRegB20d = {
-                        'CNPJ': (re.sub('[%s]' % re.escape(string.punctuation), '', inv_related.cnpj_cpf or ''))
+                        'CNPJ': punctuation_rm(inv_related.cnpj_cpf)
                     }
                     StrB20d = 'B20d|%s|\n' % StrRegB20d['CNPJ']
                     StrFile += StrB20d
                 else:
                     StrRegB20e = {
-                        'CPF': (re.sub('[%s]' % re.escape(string.punctuation), '', inv_related.cnpj_cpf or ''))
+                        'CPF': punctuation_rm(inv_related.cnpj_cpf)
                     }
                     StrB20e = 'B20e|%s|\n' % StrRegB20e['CPF']
                     StrFile += StrB20e
@@ -190,14 +190,14 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                 StrFile += StrB20j
 
         StrRegC = {
-            'XNome': normalize('NFKD', unicode(inv.company_id.partner_id.legal_name or '')).encode('ASCII', 'ignore'),
-            'XFant': normalize('NFKD', unicode(inv.company_id.partner_id.name or '')).encode('ASCII', 'ignore'),
-            'IE': re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.partner_id.inscr_est or ''),
-            'IEST': '',
-            'IM': re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.partner_id.inscr_mun or ''),
-            'CNAE': re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.cnae_main_id.code or ''),
-            'CRT': inv.company_id.fiscal_type or '',
-        }
+                   'XNome': normalize('NFKD',unicode(inv.company_id.partner_id.legal_name or '')).encode('ASCII','ignore'),
+                   'XFant': normalize('NFKD',unicode(inv.company_id.partner_id.name or '')).encode('ASCII','ignore'),
+                   'IE': punctuation_rm(inv.company_id.partner_id.inscr_est),
+                   'IEST': '',
+                   'IM': punctuation_rm(inv.company_id.partner_id.inscr_mun),
+                   'CNAE': punctuation_rm(inv.company_id.cnae_main_id.code),
+                   'CRT': inv.company_id.fiscal_type or '',
+                   }
 
         #TODO - Verificar, pois quando e informado do CNAE ele exige que a inscricao municipal, parece um bug do emissor da NFE
         if not inv.company_id.partner_id.inscr_mun:
@@ -209,11 +209,9 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         StrFile += StrC
 
         if inv.company_id.partner_id.is_company:
-            StrC02 = 'C02|%s|\n' % (
-                re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.partner_id.cnpj_cpf or ''))
+            StrC02 = 'C02|%s|\n' % (punctuation_rm(inv.company_id.partner_id.cnpj_cpf))
         else:
-            StrC02 = 'C02a|%s|\n' % (
-                re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.partner_id.cnpj_cpf or ''))
+            StrC02 = 'C02a|%s|\n' % (punctuation_rm(inv.company_id.partner_id.cnpj_cpf))
 
         StrFile += StrC02
 
@@ -231,12 +229,10 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             'XMun': normalize('NFKD', unicode(company_addr_default.l10n_br_city_id.name or '')).encode('ASCII',
                                                                                                        'ignore'),
             'UF': company_addr_default.state_id.code or '',
-            'CEP': re.sub('[%s]' % re.escape(string.punctuation), '',
-                          str(company_addr_default.zip or '').replace(' ', '')),
+            'CEP': punctuation_rm(company_addr_default.zip),
             'cPais': address_company_bc_code or '',
             'xPais': normalize('NFKD', unicode(company_addr_default.country_id.name or '')).encode('ASCII', 'ignore'),
-            'fone': re.sub('[%s]' % re.escape(string.punctuation), '',
-                           str(company_addr_default.phone or '').replace(' ', '')),
+            'fone': punctuation_rm(company_addr_default.phone or '').replace(' ', ''),
         }
 
         StrC05 = 'C05|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (
@@ -264,12 +260,11 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             partner_cep = ''
         else:
             address_invoice_state_code = inv.partner_id.state_id.code
-            address_invoice_city = normalize('NFKD', unicode(inv.partner_id.l10n_br_city_id.name or '')).encode('ASCII',
-                                                                                                                'ignore')
+            address_invoice_city = normalize('NFKD',
+                unicode(inv.partner_id.l10n_br_city_id.name or '')).encode('ASCII','ignore')
             address_invoice_city_code = ('%s%s') % (
                 inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code)
-            partner_cep = re.sub('[%s]' % re.escape(string.punctuation), '',
-                                 str(inv.partner_id.zip or '').replace(' ', ''))
+            partner_cep = punctuation_rm(inv.partner_id.zip)
 
         # Se o ambiente for de teste deve ser escrito na razão do destinatário
         if nfe_environment == '2':
@@ -279,14 +274,13 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
 
         StrRegE = {
             'xNome': xNome,
-            'IE': re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.inscr_est or ''),
+           'IE': punctuation_rm(inv.partner_id.inscr_est),
             'ISUF': '',
             'email': inv.partner_id.email or '',
         }
 
         # Adicionado
         if nfe_version == '310':
-
             StrRegE['indIEDest'] = '9'
             StrRegE['IM'] = StrRegC['IM']
 
@@ -299,17 +293,16 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         StrFile += StrE
 
         if inv.partner_id.is_company:
-            StrE0 = 'E02|%s|\n' % (re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or ''))
+            StrE0 = 'E02|%s|\n' % (punctuation_rm(inv.partner_id.cnpj_cpf))
         else:
-            StrE0 = 'E03|%s|\n' % (re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or ''))
+            StrE0 = 'E03|%s|\n' % (punctuation_rm(inv.partner_id.cnpj_cpf))
 
         StrFile += StrE0
 
         StrRegE05 = {
             'xLgr': normalize('NFKD', unicode(inv.partner_id.street or '')).encode('ASCII', 'ignore'),
             'nro': normalize('NFKD', unicode(inv.partner_id.number or '')).encode('ASCII', 'ignore'),
-            'xCpl': re.sub('[%s]' % re.escape(string.punctuation), '',
-                           normalize('NFKD', unicode(inv.partner_id.street2 or '')).encode('ASCII', 'ignore')),
+            'xCpl': punctuation_rm(normalize('NFKD',unicode(inv.partner_id.street2 or '' )).encode('ASCII','ignore')),
             'xBairro': normalize('NFKD', unicode(inv.partner_id.district or 'Sem Bairro')).encode('ASCII', 'ignore'),
             'cMun': address_invoice_city_code,
             'xMun': address_invoice_city,
@@ -336,11 +329,11 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                     'XLgr': normalize('NFKD', unicode(inv.partner_shipping_id.street or '', )).encode('ASCII',
                                                                                                       'ignore'),
                     'Nro': normalize('NFKD', unicode(inv.partner_shipping_id.number or '')).encode('ASCII', 'ignore'),
-                    'XCpl': re.sub('[%s]' % re.escape(string.punctuation), '',
-                                   normalize('NFKD', unicode(inv.partner_shipping_id.street2 or '')).encode('ASCII',
-                                                                                                            'ignore')),
-                    'XBairro': re.sub('[%s]' % re.escape(string.punctuation), '', normalize('NFKD', unicode(
-                        inv.partner_shipping_id.district or 'Sem Bairro')).encode('ASCII', 'ignore')),
+                    'XCpl': punctuation_rm(normalize('NFKD',unicode(inv.partner_shipping_id.street2 or
+                                                                    '' )).encode('ASCII','ignore')),
+                    'XBairro': punctuation_rm(normalize('NFKD',
+                                                        unicode(inv.partner_shipping_id.district or
+                                                                'Sem Bairro' )).encode('ASCII','ignore')),
                     'CMun': ('%s%s') % (
                         inv.partner_shipping_id.state_id.ibge_code, inv.partner_shipping_id.l10n_br_city_id.ibge_code),
                     'XMun': normalize('NFKD', unicode(inv.partner_shipping_id.l10n_br_city_id.name or '')).encode(
@@ -426,6 +419,9 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                               '', inv_line.fiscal_classification_id.name or '')
             }
 
+            StrRegI['NCM'] = punctuation_rm(
+                inv_line.fiscal_classification_id.name)
+
             if nfe_version == '310':
 
                 StrRegI['NVE'] = ''
@@ -438,9 +434,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                     StrRegI['UTrib'], StrRegI['QTrib'], StrRegI['VUnTrib'], StrRegI['VFrete'],
                     StrRegI['VSeg'], StrRegI['VDesc'], StrRegI['vOutro'], StrRegI['indTot'],
                     StrRegI['xPed'], StrRegI['nItemPed'], StrRegI['nFCI'])
-
             else:
-
                 StrI = 'I|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (
                     StrRegI['CProd'], StrRegI['CEAN'], StrRegI['XProd'], StrRegI['NCM'],
                     StrRegI['EXTIPI'], StrRegI['CFOP'], StrRegI['UCom'], StrRegI['QCom'],
@@ -450,6 +444,46 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                     StrRegI['nItemPed'])
 
             StrFile += StrI
+
+            for inv_di in inv_line.import_declaration_ids:
+
+                StrRegI18 = {
+                    'NDI': inv_di.name,
+                    'DDI': inv_di.date_registration or '',
+                    'XLocDesemb': inv_di.location,
+                    'UFDesemb': inv_di.state_id.code or '',
+                    'DDesemb': inv_di.date_release or '',
+                    'CExportador': inv_di.exporting_code,
+                }
+
+                StrI18 = 'I18|%s|%s|%s|%s|%s|%s|\n' % (
+                    StrRegI18['NDI'],
+                    StrRegI18['DDI'],
+                    StrRegI18['XLocDesemb'],
+                    StrRegI18['UFDesemb'],
+                    StrRegI18['DDesemb'],
+                    StrRegI18['CExportador'],
+                )
+
+                StrFile += StrI18
+
+                for inv_di_line in inv_di.line_ids:
+
+                    StrRegI25 = {
+                        'NAdicao': inv_di_line.name,
+                        'NSeqAdic': inv_di_line.sequence,
+                        'CFabricante': inv_di_line.manufacturer_code,
+                        'VDescDI': str("%.2f" % inv_di_line.amount_discount),
+                    }
+
+                    StrI25 = 'I25|%s|%s|%s|%s|\n' % (
+                        StrRegI25['NAdicao'],
+                        StrRegI25['NSeqAdic'],
+                        StrRegI25['CFabricante'],
+                        StrRegI25['VDescDI'],
+                    )
+
+                    StrFile += StrI25
 
             icms_cst = inv_line.icms_cst_id and inv_line.icms_cst_id.code or ''
             ipi_cst = inv_line.ipi_cst_id and inv_line.ipi_cst_id.code or ''
@@ -821,8 +855,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                     'VAliq': str("%.2f" % inv_line.issqn_percent),
                     'VISSQN': str("%.2f" % inv_line.issqn_value),
                     'CMunFG': ('%s%s') % (inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code),
-                    'CListServ': re.sub('[%s]' % re.escape(string.punctuation), '',
-                                        inv_line.service_type_id.code or ''),
+                    'CListServ': punctuation_rm(inv_line.service_type_id.code),
                     'cSitTrib': inv_line.issqn_type
                 }
 
@@ -838,7 +871,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrQ = 'Q|\n'
             StrFile += StrQ
 
-            if pis_cst in ('01') and inv_line.pis_percent > 0:
+            if pis_cst in ('01', '02') and inv_line.pis_percent > 0:
                 StrRegQ02 = {
                     'CST': pis_cst,
                     'VBC': str("%.2f" % inv_line.pis_base),
@@ -878,7 +911,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
 
             StrFile += StrQ
 
-            if cofins_cst in ('01') and inv_line.cofins_percent > 0:
+            if cofins_cst in ('01', '02') and inv_line.cofins_percent > 0:
                 StrRegS02 = {
                     'CST': cofins_cst,
                     'VBC': str("%.2f" % inv_line.cofins_base),
@@ -991,11 +1024,9 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                         'ASCII', 'ignore')
 
                 if inv.carrier_id.partner_id.is_company:
-                    StrX0 = 'X04|%s|\n' % (
-                        re.sub('[%s]' % re.escape(string.punctuation), '', inv.carrier_id.partner_id.cnpj_cpf or ''))
+                    StrX0 = 'X04|%s|\n' %  (punctuation_rm(inv.carrier_id.partner_id.cnpj_cpf))
                 else:
-                    StrX0 = 'X05|%s|\n' % (
-                        re.sub('[%s]' % re.escape(string.punctuation), '', inv.carrier_id.partner_id.cnpj_cpf or ''))
+                    StrX0 = 'X05|%s|\n' %  (punctuation_rm(inv.carrier_id.partner_id.cnpj_cpf))
         except AttributeError:
             pass
         StrX03 = 'X03|%s|%s|%s|%s|%s|\n' % (
