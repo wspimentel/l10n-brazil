@@ -724,6 +724,19 @@ from openerp.addons.l10n_br_account.sped.document import FiscalDocument
 #                 pass
 #
 #             #
+#             # Campos do Transporte da NF-e Bloco 381
+#             #
+#
+#             vol = Vol_200()
+#             vol.qVol.valor = inv.number_of_packages
+#             vol.esp.valor = inv.kind_of_packages or ''
+#             vol.marca.valor = inv.brand_of_packages or ''
+#             vol.nVol.valor = inv.notation_of_packages or ''
+#             vol.pesoL.valor = str("%.2f" % inv.weight)
+#             vol.pesoB.valor = str("%.2f" % inv.weight_net)
+#             nfe.infNFe.transp.vol.append(vol)
+#
+#             #
 #             # Informações adicionais
 #             #
 #             nfe.infNFe.infAdic.infAdFisco.valor = inv.fiscal_comment or ''
@@ -832,6 +845,9 @@ class NFe200(FiscalDocument):
                 self._carrier_data(cr, uid, ids, inv, context)
             except AttributeError:
                 pass
+
+            self.vol = self._get_Vol()
+            self._weight_data(cr, uid, ids, inv, context=None)
 
             self._additional_information(cr, uid, ids, inv, context)
             self._total(cr, uid, ids, inv, context)
@@ -1146,6 +1162,23 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
 
+    def _weight_data(self, cr, uid, ids, inv, context=None):
+
+                    #
+            # Campos do Transporte da NF-e Bloco 381
+            #
+
+            vol = Vol_200()
+            self.vol.qVol.valor = inv.number_of_packages
+            self.vol.esp.valor = inv.kind_of_packages or ''
+            self.vol.marca.valor = inv.brand_of_packages or ''
+            self.vol.nVol.valor = inv.notation_of_packages or ''
+            self.vol.pesoL.valor = str("%.2f" % inv.weight)
+            self.vol.pesoB.valor = str("%.2f" % inv.weight_net)
+
+            self.nfe.infNFe.transp.vol.append(vol)
+#
+
     def _additional_information(self, cr, uid, ids, inv, context=None):
 
         #
@@ -1200,6 +1233,14 @@ class NFe200(FiscalDocument):
             raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
         return Det_200()
+
+
+    def _get_Vol(self):
+        try:
+            from pysped.nfe.leiaute import Vol_200
+        except ImportError:
+            raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        return Vol_200()
 
     def _get_Dup(self):
 
