@@ -858,6 +858,7 @@ class NFe200(FiscalDocument):
 
             self.vol = self._get_Vol()
             self._weight_data(cr, uid, ids, inv, context=None)
+            self.nfe.infNFe.transp.vol.append(self.vol)
 
             self._additional_information(cr, uid, ids, inv, context)
             self._total(cr, uid, ids, inv, context)
@@ -1095,9 +1096,17 @@ class NFe200(FiscalDocument):
 
             # IPI
             self.det.imposto.IPI.CST.valor = inv_line.ipi_cst_id.code
-            self.det.imposto.IPI.vBC.valor = str("%.2f" % inv_line.ipi_base)
-            self.det.imposto.IPI.pIPI.valor = str("%.2f" % inv_line.ipi_percent)
+            if inv_line.ipi_type == 'percent' or '':
+                self.det.imposto.IPI.vBC.valor = str("%.2f" % inv_line.ipi_base)
+                self.det.imposto.IPI.pIPI.valor = str("%.2f" % inv_line.ipi_percent)
+            if inv_line.ipi_type == 'quantity':
+                pesol = 0
+                if inv_line.product_id:
+                    pesol = inv_line.product_id.weight_net
+                    self.det.imposto.IPI.qUnid.valor = str("%.2f" % inv_line.quantity * pesol)
+                    self.det.imposto.IPI.vUnid.valor = str("%.2f" % inv_line.ipi_percent)
             self.det.imposto.IPI.vIPI.valor = str("%.2f" % inv_line.ipi_value)
+
         else:
             #ISSQN
             self.det.imposto.ISSQN.vBC.valor = str("%.2f" % inv_line.issqn_base)
@@ -1187,21 +1196,15 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
 
     def _weight_data(self, cr, uid, ids, inv, context=None):
-
-                    #
-            # Campos do Transporte da NF-e Bloco 381
-            #
-
-            vol = Vol_200()
-            self.vol.qVol.valor = inv.number_of_packages
-            self.vol.esp.valor = inv.kind_of_packages or ''
-            self.vol.marca.valor = inv.brand_of_packages or ''
-            self.vol.nVol.valor = inv.notation_of_packages or ''
-            self.vol.pesoL.valor = str("%.2f" % inv.weight)
-            self.vol.pesoB.valor = str("%.2f" % inv.weight_net)
-
-            self.nfe.infNFe.transp.vol.append(vol)
-#
+        #
+        # Campos do Transporte da NF-e Bloco 381
+        #
+        self.vol.qVol.valor = inv.number_of_packages
+        self.vol.esp.valor = inv.kind_of_packages or ''
+        self.vol.marca.valor = inv.brand_of_packages or ''
+        self.vol.nVol.valor = inv.notation_of_packages or ''
+        self.vol.pesoL.valor = str("%.2f" % inv.weight)
+        self.vol.pesoB.valor = str("%.2f" % inv.weight_net)
 
     def _additional_information(self, cr, uid, ids, inv, context=None):
 
