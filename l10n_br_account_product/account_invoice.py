@@ -933,9 +933,18 @@ class AccountInvoiceLine(orm.Model):
 
         tax_obj = self.pool.get('account.tax')
 
-        if not values.get('product_id') or not values.get('quantity') \
-        or not values.get('fiscal_position'):
-            return {}
+        if not values.get('product_id') or not values.get('quantity') or not values.get('fiscal_position'):
+            if not context.get('invoice_line_id'):
+                return {}
+            elif context.get('invoice_line_id'):
+                old = self.read(cr, uid, context.get('invoice_line_id'))[0]
+                old['product_id'] = old['product_id'][0]
+                old['fiscal_position'] = old['fiscal_position'][0]
+                old['company_id'] = old['company_id'][0]
+                old['invoice_line_tax_id'] = [[6, 0, old['invoice_line_tax_id']]]
+                values = dict( old.items() + values.items())
+
+
 
         result = {
             'product_type': 'product',
@@ -954,9 +963,12 @@ class AccountInvoiceLine(orm.Model):
 
                 partner_id = inv.get('partner_id', [False])[0]
                 company_id = inv.get('company_id', [False])[0]
-
-        taxes = tax_obj.browse(
-            cr, uid, values.get('invoice_line_tax_id')[0][2])
+        try:
+            taxes = tax_obj.browse(
+                cr, uid, values.get('invoice_line_tax_id')[0][2])
+        except:
+            taxes = tax_obj.browse(
+                cr, uid, values.get('invoice_line_tax_id'))
         fiscal_position = self.pool.get('account.fiscal.position').browse(
             cr, uid, values.get('fiscal_position'))
 
@@ -1009,6 +1021,7 @@ class AccountInvoiceLine(orm.Model):
     def write(self, cr, uid, ids, vals, context=None):
         if not context:
             context = {}
+        context.update({'invoice_line_id': ids})
         vals.update(self._validate_taxes(cr, uid, vals, context))
         return super(AccountInvoiceLine, self).write(
             cr, uid, ids, vals, context=context)
