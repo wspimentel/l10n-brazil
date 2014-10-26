@@ -833,11 +833,14 @@ class NFe200(FiscalDocument):
                 i += 1
                 self.det = self._get_Det()
                 self._details(cr, uid, ids, inv, inv_line, i, context)
+
                 for inv_di in inv_line.import_declaration_ids:
+
                     self.di = self._get_DI()
                     self._di(cr, uid, ids, inv, inv_line, inv_di, i, context)
                     self.det.prod.DI.append(self.di)
                     self.di = self._get_DI()
+
                     for inv_di_line in inv_di.line_ids:
                         self.di_line = self._get_Addition()
                         self._adiction(cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context)
@@ -1291,7 +1294,6 @@ class NFe200(FiscalDocument):
             raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
         return Dup_200()
-
 
     def get_xml(self, cr, uid, ids, nfe_environment, context=None):
         """"""
