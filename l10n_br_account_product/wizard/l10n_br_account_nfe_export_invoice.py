@@ -146,10 +146,12 @@ class L10n_brAccountNfeExportInvoice(orm.TransientModel):
             company = company_pool.browse(cr, uid, inv.company_id.id)
 
             # Verificamos a versoa da NFe
-            if company.nfe_version == '3.10':
-                str_nfe_version = '310'
-            else:
-                str_nfe_version = '200'
+            # if company.nfe_version == '3.10':
+            #     str_nfe_version = '310'
+            # else:
+            #     str_nfe_version = '200'
+
+            str_nfe_version = company.nfe_version
 
             nfes = func(
                 cr, uid, export_inv_ids, data['nfe_environment'],

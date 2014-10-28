@@ -32,7 +32,7 @@ from openerp.addons.l10n_br_base.tools.misc import punctuation_rm
 
 
 def nfe_export(cr, uid, ids, nfe_environment='1',
-               nfe_version='200', context=False):
+               nfe_version='2.00', context=False):
     # StrFile = ''
 
     StrNF = 'NOTA FISCAL|%s|\n' % len(ids)
@@ -47,10 +47,12 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         company_addr_default = \
             pool.get('res.partner').browse(cr, uid, [company_addr['default']], context={'lang': 'pt_BR'})[0]
 
-        if nfe_version == '310':
-            StrA = 'A|%s|%s|\n' % ('3.10', '')
-        else:
-            StrA = 'A|%s|%s|\n' % ('2.00', '')
+        # if nfe_version == '310':
+        #     StrA = 'A|%s|%s|\n' % ('3.10', '')
+        # else:
+        #     StrA = 'A|%s|%s|\n' % ('2.00', '')
+
+        StrA = 'A|%s|%s|\n' % (nfe_version, '')
 
         StrFile += StrA
 
@@ -82,7 +84,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         else:
             StrRegB['tpNF'] = '1'
 
-        if nfe_version == '310':
+        if nfe_version == '3.10':
 
             # Capturar a timezone do usuario
             user_pool = inv.pool.get('res.users')
@@ -280,7 +282,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         }
 
         # Adicionado
-        if nfe_version == '310':
+        if nfe_version == '3.10':
             StrRegE['indIEDest'] = '9'
             StrRegE['IM'] = StrRegC['IM']
 
@@ -425,7 +427,7 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             StrRegI['NCM'] = punctuation_rm(
                 inv_line.fiscal_classification_id.name)
 
-            if nfe_version == '310':
+            if nfe_version == '3.10':
 
                 StrRegI['NVE'] = ''
                 StrRegI['nFCI'] = ''
