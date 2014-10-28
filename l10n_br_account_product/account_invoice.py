@@ -940,7 +940,7 @@ class AccountInvoiceLine(orm.Model):
                 old = self.read(cr, uid, context.get('invoice_line_id'))[0]
                 old['product_id'] = old['product_id'][0]
                 old['fiscal_position'] = old['fiscal_position'][0]
-                old['company_id'] = old['company_id'][0]
+                # old['company_id'] = old['company_id'][0]
                 old['invoice_line_tax_id'] = [[6, 0, old['invoice_line_tax_id']]]
                 values = dict( old.items() + values.items())
 
