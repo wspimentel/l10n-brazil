@@ -515,6 +515,7 @@ class AccountInvoice(orm.Model):
 
     _defaults = {
         'ind_final': '0',
+        'ind_pres': '0',
         'fiscal_category_id': _default_fiscal_category,
         'fiscal_document_id': _default_fiscal_document,
         'document_serie_id': _default_fiscal_document_serie,
