@@ -310,8 +310,9 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
             'CEP': partner_cep,
             'cPais': partner_bc_code,
             'xPais': normalize('NFKD', unicode(inv.partner_id.country_id.name or '')).encode('ASCII', 'ignore'),
-            'fone': re.sub('[%s]' % re.escape(string.punctuation), '',
-                           str(inv.partner_id.phone or '').replace(' ', '')),
+            # 'fone': re.sub('[%s]' % re.escape(string.punctuation), '',
+            #                str(inv.partner_id.phone or '').replace(' ', '')),
+            'fone': punctuation_rm(inv.partner_id.phone or '').replace(' ', ''),
         }
 
         StrE05 = 'E05|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|\n' % (
@@ -348,11 +349,13 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                 StrFile += StrG
 
                 if inv.partner_id.is_company:
-                    StrG0 = 'G02|%s|\n' % (
-                        re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or ''))
+                    # StrG0 = 'G02|%s|\n' % (
+                    #     re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or ''))
+                    StrG0 = 'G02|%s|\n' % punctuation_rm(inv.partner_id.cnpj_cpf)
                 else:
-                    StrG0 = 'G02a|%s|\n' % (
-                        re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or ''))
+                    # StrG0 = 'G02a|%s|\n' % (
+                    #     re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or ''))
+                    StrG0 = 'G02a|%s|\n' % punctuation_rm(inv.partner_id.cnpj_cpf)
 
                 StrFile += StrG0
 
@@ -415,8 +418,8 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
                 'indTot': '1',
                 'xPed': '',
                 'nItemPed': '',
-                'NCM': re.sub('[%s]' % re.escape(string.punctuation),
-                              '', inv_line.fiscal_classification_id.name or '')
+                # 'NCM': re.sub('[%s]' % re.escape(string.punctuation),
+                #               '', inv_line.fiscal_classification_id.name or '')
             }
 
             StrRegI['NCM'] = punctuation_rm(
