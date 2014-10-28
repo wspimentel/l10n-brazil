@@ -15,7 +15,7 @@
 					<field name="date_hour_invoice" string="Data Emissão"/>
                     <field name="date_in_out" string="Data de Entrada/Saida"/>
 				</field>
-                <field name="date_invoice" position="attributes">
+                <field name="date_invoice" position="replace">
 					<field name="date_invoice" invisible="1"/>
 				</field>
 				<notebook position="inside">

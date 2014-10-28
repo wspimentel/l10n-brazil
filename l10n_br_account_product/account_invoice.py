@@ -551,6 +551,7 @@ class AccountInvoice(orm.Model):
                 self.write(cr, uid, [inv.id], res['value'])
         return True
 
+
 class AccountInvoiceLine(orm.Model):
     _inherit = 'account.invoice.line'
 
