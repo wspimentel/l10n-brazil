@@ -98,6 +98,20 @@ class SaleOrder(orm.Model):
         return result
 
     _columns = {
+
+        'ind_pres': fields.selection([
+            ('0', u'Não se aplica'),
+            ('1', u'Operação presencial'),
+            ('2', u'Operação não presencial, pela Internet'),
+            ('3', u'Operação não presencial, Teleatendimento'),
+            ('4', u'NFC-e em operação com entrega em domicílio'),
+            ('9', u'Operação não presencial, outros'),
+        ], u'Tipo de operação', readonly=True,
+            states={'draft': [('readonly', False)]}, required=False,
+            help=u'Indicador de presença do comprador no \
+                \nestabelecimento comercial no momento \
+                \nda operação.'),
+
         'fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category', 'Categoria Fiscal',
             domain="""[('type', '=', 'output'), ('journal_type', '=', 'sale'),
@@ -181,6 +195,7 @@ class SaleOrder(orm.Model):
         return result
 
     _defaults = {
+        'ind_pres': '0',
         'fiscal_category_id': _default_fiscal_category,
     }
 
