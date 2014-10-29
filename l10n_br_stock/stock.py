@@ -47,6 +47,20 @@ class StockPicking(orm.Model):
         user.company_id.stock_fiscal_category_id.id or False
 
     _columns = {
+
+        'ind_pres': fields.selection([
+            ('0', u'Não se aplica'),
+            ('1', u'Operação presencial'),
+            ('2', u'Operação não presencial, pela Internet'),
+            ('3', u'Operação não presencial, Teleatendimento'),
+            ('4', u'NFC-e em operação com entrega em domicílio'),
+            ('9', u'Operação não presencial, outros'),
+        ], u'Tipo de operação', readonly=True,
+            states={'draft': [('readonly', False)]}, required=False,
+            help=u'Indicador de presença do comprador no \
+                \nestabelecimento comercial no momento \
+                \nda operação.'),
+
         'fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category', 'Categoria Fiscal',
             readonly=True, domain="[('state', '=', 'approved')]",
@@ -57,6 +71,7 @@ class StockPicking(orm.Model):
             readonly=True, states={'draft': [('readonly', False)]})
     }
     _defaults = {
+        'ind_pres': '0',
         'fiscal_category_id': _default_fiscal_category
     }
 
@@ -233,6 +248,20 @@ class StockPickingOut(StockPicking):
         user.company_id.stock_out_fiscal_category_id.id or False
 
     _columns = {
+
+        'ind_pres': fields.selection([
+            ('0', u'Não se aplica'),
+            ('1', u'Operação presencial'),
+            ('2', u'Operação não presencial, pela Internet'),
+            ('3', u'Operação não presencial, Teleatendimento'),
+            ('4', u'NFC-e em operação com entrega em domicílio'),
+            ('9', u'Operação não presencial, outros'),
+        ], u'Tipo de operação', readonly=True,
+            states={'draft': [('readonly', False)]}, required=False,
+            help=u'Indicador de presença do comprador no \
+                \nestabelecimento comercial no momento \
+                \nda operação.'),
+
         'fiscal_category_id': fields.many2one(
             'l10n_br_account.fiscal.category', 'Categoria Fiscal',
             domain="""[('journal_type', 'in', ('purchase_refund', 'sale')),
@@ -243,6 +272,7 @@ class StockPickingOut(StockPicking):
             domain="[('fiscal_category_id','=',fiscal_category_id)]")
     }
     _defaults = {
+        'ind_pres': '0',
         'invoice_state': 'none',
         'fiscal_category_id': _default_fiscal_category,
     }

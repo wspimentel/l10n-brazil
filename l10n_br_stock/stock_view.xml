@@ -52,6 +52,7 @@
 				<field name="stock_journal_id" position="after">
 					<field name="fiscal_category_id" on_change="onchange_fiscal_category_id(partner_id, company_id, fiscal_category_id, context)" attrs="{'invisible': [('invoice_state', '!=', '2binvoiced')], 'required':[('invoice_state', '=', '2binvoiced')]}" />
 					<field name="fiscal_position" domain="[('fiscal_category_id', '=', fiscal_category_id)]" attrs="{'invisible': [('invoice_state', '!=', '2binvoiced')], 'required': [('invoice_state', '=', '2binvoiced')]}" />
+                    <field name="ind_pres" string="Tipo de operação"/>
 				</field>
 
 				
