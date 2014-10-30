@@ -30,5 +30,46 @@
 			</field>
 		</record>
 
+        <!--Recalcular valores no invoice-->
+        <record id="view_l10n_br_delivery_delivery_values_form" model="ir.ui.view">
+            <field name="name">l10n_br_delivery.delivery_values.form</field>
+            <field name="model">account.invoice.delivery_values</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Transport Values Form" version="7.0">
+                    <group>
+                        <field name="amount_freight_value" readonly="False" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="amount_insurance_value" readonly="False" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="amount_costs_value" readonly="False" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <button string="Recalcular Valores" name="values_set" type="object"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_l10n_br_delivery_delivery_values">
+            <field name="name">Novos Valores do Transporte</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.invoice.delivery_values</field>
+            <field name="view_mode">form</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_l10n_br_delivery_delivery_values_form"/>
+            <field name="target">new</field>
+        </record>
+        <record id="l10n_br_delivery_invoice_form" model="ir.ui.view">
+            <field name="name">l10n_br_delivery.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="l10n_br_account_product.l10n_br_account_product_invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="notation_of_packages" position="after">
+                    <div>
+                        <group>
+                            <button string="Recalcular Valores" name="%(action_l10n_br_delivery_delivery_values)d" type="action"/>
+                        </group>
+                    </div>
+                </field>
+            </field>
+        </record>
+
+
 	</data>
 </openerp>

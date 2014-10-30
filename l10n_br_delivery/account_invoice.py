@@ -20,6 +20,8 @@
 from openerp.osv import orm, fields
 from openerp.tools.translate import _
 
+def  calc_price_ratio(price_gross, amount_calc, amount_total):
+    return price_gross * amount_calc / amount_total
 
 class AccountInvoice(orm.Model):
     _inherit = 'account.invoice'
@@ -70,3 +72,43 @@ class AccountInvoice(orm.Model):
                 _(u"Validação da Nota fiscal:\n '%s'") % (strErro))
 
         return result
+
+
+class AccountInvoiceDeliveryValues(orm.Model):
+
+    _name = 'account.invoice.delivery_values'
+
+    _columns = {
+       'amount_freight_value': fields.float('Frete'),
+       'amount_insurance_value': fields.float('Seguro'),
+       'amount_costs_value': fields.float('Outros Custos'),
+    }
+
+    def values_set(self, cr, uid, ids, context=None):
+
+        invoice_pool = self.pool.get('account.invoice')
+        invoice_line_pool = self.pool.get('account.invoice.line')
+        delivery = self.browse(cr, uid, ids[0], context)
+
+        if context.get('active_id', False):
+            invoice_data = invoice_pool.read(cr, uid, context.get('active_id'), ['invoice_line', 'amount_gross'])
+
+        invoice_pool.write(cr, uid, invoice_data['id'], {'amount_freight': delivery.amount_freight_value,
+                                                         'amount_insurance': delivery.amount_insurance_value,
+                                                         'amount_costs': delivery.amount_costs_value,
+                                                         }, context=context)
+
+        for line_id in invoice_data['invoice_line']:
+            line = invoice_line_pool.browse(cr, uid, line_id, context)
+            invoice_line_pool.write(cr, uid, line_id,
+                                    {'freight_value': calc_price_ratio(
+                                        line.price_gross, delivery.amount_freight_value, invoice_data['amount_gross']),
+                                     'insurance_value': calc_price_ratio(
+                                        line.price_gross, delivery.amount_insurance_value, invoice_data['amount_gross']),
+                                     'other_costs_value': calc_price_ratio(
+                                        line.price_gross, delivery.amount_costs_value, invoice_data['amount_gross']),
+                                     }, context=context)
+
+
+        return True
+
