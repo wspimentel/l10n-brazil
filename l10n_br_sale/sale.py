@@ -306,6 +306,8 @@ class SaleOrder(orm.Model):
         result['comment'] = " - ".join(comment)
         result['fiscal_comment'] = " - ".join(fiscal_comment)
         result['fiscal_category_id'] = fiscal_category_id
+
+        result['ind_pres'] = order.ind_pres or False
         return result
 
 

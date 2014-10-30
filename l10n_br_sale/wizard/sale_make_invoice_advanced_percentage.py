@@ -110,4 +110,6 @@ class SaleAdvancePaymentInvoice(orm.Model):
                 res[1]['invoice_line'] = list_invoice
                 res[1]['comment'] = invoice_dict['name']
 
+                res[1]['ind_pres'] = sale.ind_pres or False
+
         return result
