@@ -127,7 +127,7 @@ class AccountInvoice(orm.Model):
             ('0', u'Não'),
             ('1', u'Consumidor final')
         ], u'Operação com Consumidor final', readonly=True,
-            states={'draft': [('readonly', False)]}, required=True,
+            states={'draft': [('readonly', False)]}, required=False,
             help=u'Indica operação com Consumidor final.'),
 
         'ind_pres': fields.selection([
@@ -138,7 +138,7 @@ class AccountInvoice(orm.Model):
             ('4', u'NFC-e em operação com entrega em domicílio'),
             ('9', u'Operação não presencial, outros'),
         ], u'Tipo de operação', readonly=True,
-            states={'draft': [('readonly', False)]}, required=True,
+            states={'draft': [('readonly', False)]}, required=False,
             help=u'Indicador de presença do comprador no \
                 \nestabelecimento comercial no momento \
                 \nda operação.'),
