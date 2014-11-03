@@ -545,8 +545,10 @@ class AccountInvoice(orm.Model):
         for inv in self.browse(cr, uid, ids):
             if inv.date_hour_invoice:
                 aux = datetime.datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S').date()
-                inv.date_invoice = aux
+                inv.date_invoice = str(aux)
+
             res = self.onchange_payment_term_date_invoice(cr, uid, inv.id, inv.payment_term.id, inv.date_invoice)
+
             if res and res['value']:
                 self.write(cr, uid, [inv.id], res['value'])
         return True
