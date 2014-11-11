@@ -1,0 +1,50 @@
+<openerp>
+    <data>
+
+            <!--Recalcular valores no invoice-->
+        <record id="view_l10n_br_account_product_costs_ratio_form" model="ir.ui.view">
+            <field name="name">Custos de Transporte</field>
+            <field name="model">l10n_br_account_product.invoice.costs_ratio</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Novos custos" version="7.0">
+                    <group string="Insira os novos custos e clique em Recalcular...">
+                        <field name="amount_freight_value" readonly="False" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="amount_insurance_value" readonly="False" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="amount_costs_value" readonly="False" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <footer class="oe_left">
+                            <button string="Recalcular" name="values_set" type="object"/>
+                        </footer>
+                        <footer class="oe_right">
+						    <button special="cancel" string="Close" type="object"/>
+					    </footer>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="action_l10n_br_account_product_costs_ratio">
+            <field name="name">Custos de Transporte</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">l10n_br_account_product.invoice.costs_ratio</field>
+            <field name="view_mode">form</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="view_l10n_br_account_product_costs_ratio_form"/>
+            <field name="target">new</field>
+        </record>
+        <record id="l10n_br_account_product_costs_ratio_invoice_form" model="ir.ui.view">
+            <field name="name">l10n_br_delivery.invoice.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="l10n_br_account_product.l10n_br_account_product_invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="notation_of_packages" position="after">
+                    <div>
+                        <group>
+                            <button string="Recalcular Custos" name="%(action_l10n_br_account_product_costs_ratio)d" type="action"/>
+                        </group>
+                    </div>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
