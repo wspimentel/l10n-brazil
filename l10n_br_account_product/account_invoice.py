@@ -1047,4 +1047,37 @@ class AccountInvoiceTax(orm.Model):
             t['amount'] = cur_obj.round(cr, uid, cur, t['amount'])
             t['base_amount'] = cur_obj.round(cr, uid, cur, t['base_amount'])
             t['tax_amount'] = cur_obj.round(cr, uid, cur, t['tax_amount'])
+
+
+        if inv.amount_freight:
+            tax_grouped['amount_freight'] = {
+                     'invoice_id': inv.id,
+                     'name': 'Frete',
+                     'account_id': inv.company_id.account_freight_id.id,
+                     'amount': inv.amount_freight,
+                     'base': inv.amount_freight,
+                     'manual': True,
+                     'company_id': inv.company_id.id,
+                     }
+        if inv.amount_costs:
+            tax_grouped['amount_costs'] = {
+                     'invoice_id': inv.id,
+                     'name': 'Seguro',
+                     'account_id': inv.company_id.account_other_costs.id,
+                     'amount': inv.amount_costs,
+                     'base': inv.amount_costs,
+                     'manual': True,
+                     'company_id': inv.company_id.id,
+                     }
+        if inv.amount_insurance:        
+            tax_grouped['amount_insurance'] = {
+                     'invoice_id': inv.id,
+                     'name': 'Seguro',
+                     'account_id': inv.company_id.account_insurance_id.id,
+                     'amount': inv.amount_insurance,
+                     'base': inv.amount_insurance,
+                     'manual': True,
+                     'company_id': inv.company_id.id,
+                     }
+        
         return tax_grouped
