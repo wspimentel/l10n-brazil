@@ -118,6 +118,9 @@ class AccountInvoice(orm.Model):
         return list(result.keys())
 
     _columns = {
+        'nfe_version': fields.selection(
+            [('1.10', '1.10'), ('2.00', '2.00'), ('3.10', '3.10')], u'Versão NFe', required=True),
+
         'date_hour_invoice': fields.datetime(
             u'Data e hora de emissão', readonly=True,
             states={'draft': [('readonly', False)]},
@@ -512,8 +515,29 @@ class AccountInvoice(orm.Model):
 
         return fiscal_document_serie
 
+    def _get_nfe_version(self, cr, uid, context=None):
+
+        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
+        company = self.pool.get('res.company').browse(
+            cr, uid, user.company_id.id, context=context)
+
+        return company.nfe_version
+
+    # def onchange_fiscal_document_id(self, cr, uid, ids, fiscal_document_id,
+    #                                 company_id, issuer, fiscal_type,
+    #                                 context=None):
+    #
+    #     res = super(AccountInvoice, self).onchange_fiscal_document_id(cr, uid, ids, fiscal_document_id, company_id, issuer, fiscal_type, context)
+    #
+    #     obj_fiscal_doc = self.browse(cr, uid, fiscal_document_id, context)
+    #
+    #     if obj_fiscal_doc.code == 55:
+    #         res['value']['nfe_version'] = self._get_nfe_version(cr, uid, context)
+    #
+    #     return res
 
     _defaults = {
+        'nfe_version': _get_nfe_version,
         'ind_final': '0',
         'ind_pres': '0',
         'fiscal_category_id': _default_fiscal_category,

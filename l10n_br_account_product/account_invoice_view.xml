@@ -59,6 +59,7 @@
 									<field name="nfe_status" />
 									<field name="nfe_export_date" />
 									<field name="nfe_date" />
+                                    <field name="nfe_version"/>
 								</group>
 								<group>
 									<field name="nfe_purpose" required="1"/>
