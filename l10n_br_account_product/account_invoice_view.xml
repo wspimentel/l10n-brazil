@@ -125,8 +125,8 @@
 					<field name="cfop_id" />
 				</xpath>
                 <xpath expr="//field[@name='fiscal_position']" position="after">
-                    <field name="ind_final" string="Operação com Consumidor final"/>
-                    <field name="ind_pres" string="Tipo de operação"/>
+                    <field name="ind_final" string="Operação com Consumidor final" attrs="{'required': [('nfe_version', '>', '3.00')]}"/>
+                    <field name="ind_pres" string="Tipo de operação" attrs="{'required': [('nfe_version', '>', '3.00')]}"/>
                 </xpath>
 			</field>
 		</record>

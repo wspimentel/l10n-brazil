@@ -119,7 +119,9 @@ class AccountInvoice(orm.Model):
 
     _columns = {
         'nfe_version': fields.selection(
-            [('1.10', '1.10'), ('2.00', '2.00'), ('3.10', '3.10')], u'Versão NFe', required=True),
+            [('1.10', '1.10'), ('2.00', '2.00'), ('3.10', '3.10')],
+            u'Versão NFe', readonly=True,
+            states={'draft': [('readonly', False)]}, required=True),
 
         'date_hour_invoice': fields.datetime(
             u'Data e hora de emissão', readonly=True,
