@@ -151,7 +151,8 @@ class L10n_brAccountNfeExportInvoice(orm.TransientModel):
             # else:
             #     str_nfe_version = '200'
 
-            str_nfe_version = company.nfe_version
+            # str_nfe_version = company.nfe_version
+            str_nfe_version = inv.nfe_version
 
             nfes = func(
                 cr, uid, export_inv_ids, data['nfe_environment'],
