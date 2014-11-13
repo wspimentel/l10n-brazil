@@ -525,19 +525,6 @@ class AccountInvoice(orm.Model):
 
         return company.nfe_version
 
-    # def onchange_fiscal_document_id(self, cr, uid, ids, fiscal_document_id,
-    #                                 company_id, issuer, fiscal_type,
-    #                                 context=None):
-    #
-    #     res = super(AccountInvoice, self).onchange_fiscal_document_id(cr, uid, ids, fiscal_document_id, company_id, issuer, fiscal_type, context)
-    #
-    #     obj_fiscal_doc = self.browse(cr, uid, fiscal_document_id, context)
-    #
-    #     if obj_fiscal_doc.code == 55:
-    #         res['value']['nfe_version'] = self._get_nfe_version(cr, uid, context)
-    #
-    #     return res
-
     _defaults = {
         'nfe_version': _get_nfe_version,
         'ind_final': '0',
@@ -558,12 +545,23 @@ class AccountInvoice(orm.Model):
     def action_move_create(self, cr, uid, ids, *args):
         result = super(AccountInvoice, self).action_move_create(
             cr, uid, ids, *args)
+
+        user = self.pool.get('res.users').browse(cr, uid, uid)
+        obj_company = self.pool.get('res.company')
+        company_id = obj_company.browse(cr, uid, user.company_id.id).id
+
         for invoice in self.browse(cr, uid, ids):
             date_time_now = fields.datetime.now()
+
             if not invoice.date_hour_invoice:
                 self.write(cr, uid, [invoice.id], {'date_hour_invoice': date_time_now})
+
             if not invoice.date_in_out:
                 self.write(cr, uid, [invoice.id], {'date_in_out': date_time_now})
+
+            # Copiamos a versao da nfe da invoice para nfe_version de res_company
+            obj_company.write(cr, uid, [company_id], {'nfe_version': invoice.nfe_version})
+
         return result
 
     def action_date_assign(self, cr, uid, ids, *args):
