@@ -267,10 +267,10 @@
 										<field name="product_id" on_change="product_id_change(product_id, uos_id, quantity, name, parent.type, parent.partner_id, fiscal_position, price_unit, parent.currency_id, context, parent.company_id, parent.fiscal_category_id, parent.fiscal_position)"/>
 										<label for="quantity"/>
 										<div>
-											<field name="quantity" class="oe_inline"/>
+											<field name="quantity" class="oe_inline" on_change="product_id_change(product_id, uos_id, quantity, name, parent.type, parent.partner_id, fiscal_position, price_unit, parent.currency_id, context, parent.company_id, parent.fiscal_category_id, parent.fiscal_position)"/>
 											<field name="uos_id" class="oe_inline" groups="product.group_uom" on_change="uos_id_change(product_id, uos_id, quantity, name, parent.type, parent.partner_id, parent.fiscal_position, price_unit, parent.currency_id, context, parent.company_id, fiscal_category_id)"/>
 										</div>
-										<field name="price_unit"/>
+										<field name="price_unit" on_change="product_id_change(product_id, uos_id, quantity, name, parent.type, parent.partner_id, fiscal_position, price_unit, parent.currency_id, context, parent.company_id, parent.fiscal_category_id, parent.fiscal_position)"/>
 										<field name="discount" groups="sale.group_discount_per_so_line"/>
 										<field name="freight_value"/>
 										<field name="insurance_value"/>
