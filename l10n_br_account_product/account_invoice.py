@@ -18,6 +18,7 @@
 ###############################################################################
 
 import time
+from types import TupleType
 
 from openerp.osv import orm, fields
 from openerp.addons import decimal_precision as dp
@@ -896,10 +897,11 @@ class AccountInvoiceLine(orm.Model):
                 return {}
             else:
                 old = self.read(cr, uid, context.get('invoice_line_id'))[0]
-                old['product_id'] = old['product_id'][0]
-                old['fiscal_position'] = old['fiscal_position'][0]
+                for aux in old:
+                    if type(old[aux]) == TupleType:
+                        old[aux] = old[aux][0]
                 old['invoice_line_tax_id'] = [[6, 0, old['invoice_line_tax_id']]]
-                values = dict( old.items() + values.items())
+                values = dict(old.items() + values.items())
 
         result = {
             'product_type': 'product',
