@@ -896,7 +896,11 @@ class AccountInvoiceLine(orm.Model):
             if not context.get('invoice_line_id'):
                 return {}
             else:
-                old = self.read(cr, uid, context.get('invoice_line_id'))[0]
+                invoice_line_id = context.get('invoice_line_id')
+                if isinstance(invoice_line_id, (int, long)):
+                    invoice_line_id = [invoice_line_id]
+
+                old = self.read(cr, uid, invoice_line_id )[0]
                 for aux in old:
                     if type(old[aux]) == TupleType:
                         old[aux] = old[aux][0]
