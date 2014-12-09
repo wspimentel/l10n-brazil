@@ -47,11 +47,6 @@ def nfe_export(cr, uid, ids, nfe_environment='1',
         company_addr_default = \
             pool.get('res.partner').browse(cr, uid, [company_addr['default']], context={'lang': 'pt_BR'})[0]
 
-        # if nfe_version == '310':
-        #     StrA = 'A|%s|%s|\n' % ('3.10', '')
-        # else:
-        #     StrA = 'A|%s|%s|\n' % ('2.00', '')
-
         StrA = 'A|%s|%s|\n' % (nfe_version, '')
 
         StrFile += StrA

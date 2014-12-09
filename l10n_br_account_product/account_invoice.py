@@ -19,7 +19,6 @@
 
 import time
 import datetime
-import pytz
 from openerp import SUPERUSER_ID
 
 from openerp.osv import orm, fields
@@ -517,16 +516,15 @@ class AccountInvoice(orm.Model):
 
         return fiscal_document_serie
 
-    def _get_nfe_version(self, cr, uid, context=None):
-
+    def _default_nfe_version(self, cr, uid, context=None):
         user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
-        company = self.pool.get('res.company').browse(
-            cr, uid, user.company_id.id, context=context)
-
-        return company.nfe_version
+        nfe_version = self.pool.get('res.company').read(
+            cr, uid, user.company_id.id, ['nfe_version'],
+            context=context)['nfe_version']
+        return nfe_version or False
 
     _defaults = {
-        'nfe_version': _get_nfe_version,
+        'nfe_version': _default_nfe_version,
         'ind_final': '0',
         'ind_pres': '0',
         'fiscal_category_id': _default_fiscal_category,
@@ -558,9 +556,6 @@ class AccountInvoice(orm.Model):
 
             if not invoice.date_in_out:
                 self.write(cr, uid, [invoice.id], {'date_in_out': date_time_now})
-
-            # Copiamos a versao da nfe da invoice para nfe_version de res_company
-            obj_company.write(cr, uid, [company_id], {'nfe_version': invoice.nfe_version})
 
         return result
 
