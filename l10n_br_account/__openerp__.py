@@ -50,9 +50,9 @@
     'demo': [
         # 'demo/account.account.csv',
         # 'demo/account_tax_code.xml',
-        'demo/account_financial_demo.xml',
-        'demo/account_fiscal_demo.xml',
-        'demo/base_demo.xml',
+        # 'demo/account_financial_demo.xml',
+        # 'demo/account_fiscal_demo.xml',
+        # 'demo/base_demo.xml',
     ],
     'test': [],
     'installable': True,
