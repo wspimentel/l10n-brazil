@@ -54,6 +54,9 @@ class NFe200(FiscalDocument):
             self._nfe_identification(
                 cr, uid, ids, inv, company, nfe_environment, context)
 
+            self._nfe_operation(
+                cr, uid, ids, inv, company, nfe_environment, context)
+
             self._in_out_adress(cr, uid, ids, inv, context)
 
             for inv_related in inv.fiscal_document_related_ids:
@@ -117,7 +120,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.ide.cNF.valor = ''
         self.nfe.infNFe.ide.natOp.valor = inv.cfop_ids[0].small_name or ''
         self.nfe.infNFe.ide.indPag.valor = inv.payment_term and inv.payment_term.indPag or '0'
-        self.nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
+        self.nfe.infNFe.ide.mod.valor = inv.fiscal_document_id.code or ''
         self.nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
         self.nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
         self.nfe.infNFe.ide.dEmi.valor = inv.date_invoice or ''
@@ -128,7 +131,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.ide.tpAmb.valor = nfe_environment
         self.nfe.infNFe.ide.finNFe.valor = inv.nfe_purpose
         self.nfe.infNFe.ide.procEmi.valor = 0
-        self.nfe.infNFe.ide.verProc.valor = 'OpenERP Brasil v7'
+        self.nfe.infNFe.ide.verProc.valor = 'OpenERP Brasil v8'
 
         if inv.cfop_ids[0].type in ("input"):
             self.nfe.infNFe.ide.tpNF.valor = '0'
@@ -547,9 +550,9 @@ class NFe200(FiscalDocument):
 
 class NFe310(NFe200):
 
+
     def __init__(self):
         super(NFe310, self).__init__()
-
 
     def _nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
@@ -597,3 +600,305 @@ class NFe310(NFe200):
             raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
         return Dup_310()
+
+class NFCe310(NFe310):
+
+    def __init__(self):
+        super(NFCe310, self).__init__()
+        self.total_icms = 0.00
+
+    def _total(self, cr, uid, ids, inv, context=None):
+
+        #
+        # Totais
+        #
+        self.nfe.infNFe.total.ICMSTot.vBC.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vICMS.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vBCST.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vST.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vProd.valor = str("%.2f" % inv.amount_total)
+        self.nfe.infNFe.total.ICMSTot.vFrete.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vSeg.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vDesc.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vII.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vIPI.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vPIS.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vCOFINS.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vOutro.valor = str("%.2f" % 0.00)
+        self.nfe.infNFe.total.ICMSTot.vNF.valor = str("%.2f" % inv.amount_total)
+
+    def _details(self, cr, uid, ids, inv, inv_line, i, context=None):
+
+        #
+        # Detalhe
+        #
+
+        self.det.nItem.valor = i
+        self.det.prod.cProd.valor = inv_line.product_id.code or ''
+        self.det.prod.cEAN.valor = inv_line.product_id.ean13 or ''
+        self.det.prod.xProd.valor = inv_line.product_id.name or ''
+        self.det.prod.NCM.valor = re.sub('[%s]' % re.escape(
+            string.punctuation), '', inv_line.product_id.ncm_id.name or '')
+        self.det.prod.EXTIPI.valor = ''
+        self.det.prod.CFOP.valor = '5102'
+        self.det.prod.uCom.valor = inv_line.product_id.uos_id.name or ''
+        self.det.prod.qCom.valor = str("%.4f" % inv_line.qty)
+        self.det.prod.vUnCom.valor = str("%.7f" % (inv_line.price_unit))
+        self.det.prod.vProd.valor = str("%.2f" % inv_line.price_subtotal_incl)
+        self.det.prod.cEANTrib.valor = inv_line.product_id.ean13 or ''
+        self.det.prod.uTrib.valor = self.det.prod.uCom.valor
+        self.det.prod.qTrib.valor = self.det.prod.qCom.valor
+        self.det.prod.vUnTrib.valor = self.det.prod.vUnCom.valor
+        # self.det.prod.vFrete.valor = str("%.2f" % inv_line.freight_value)
+        # self.det.prod.vSeg.valor = str("%.2f" % inv_line.insurance_value)
+        # self.det.prod.vDesc.valor = str("%.2f" % inv_line.discount_value)
+        # self.det.prod.vOutro.valor = str("%.2f" % inv_line.other_costs_value)
+        #
+        # Produto entra no total da NF-e
+        #
+        self.det.prod.indTot.valor = 1
+
+        # if inv_line.icms_cst_id.code > 100:
+        #     self.det.imposto.ICMS.CSOSN.valor = inv_line.icms_cst_id.code
+        #     self.det.imposto.ICMS.pCredSN.valor = str("%.2f" % inv_line.icms_percent)
+        #     self.det.imposto.ICMS.vCredICMSSN.valor = str("%.2f" % inv_line.icms_value)
+
+        self.det.imposto.ICMS.CST.valor = '41'
+        #self.det.imposto.ICMS.modBC.valor = '3'
+        #self.det.imposto.ICMS.vBC.valor = str("%.2f" %
+        # inv_line.price_subtotal_incl)
+        # self.det.imposto.ICMS.pRedBC.valor = str("%.2f" % inv_line.icms_percent_reduction)
+
+
+        #self.det.imposto.ICMS.pICMS.valor = str("%.2f" % icms)
+        #self.det.imposto.ICMS.vICMS.valor = str("%.2f" % icms_value)
+
+        #self.total_icms += icms_value
+
+        # # ICMS ST
+        # self.det.imposto.ICMS.modBCST.valor = inv_line.icms_st_base_type
+        # self.det.imposto.ICMS.pMVAST.valor = str("%.2f" % inv_line.icms_st_mva)
+        # self.det.imposto.ICMS.pRedBCST.valor = str("%.2f" % inv_line.icms_st_percent_reduction)
+        # self.det.imposto.ICMS.vBCST.valor = str("%.2f" % inv_line.icms_st_base)
+        # self.det.imposto.ICMS.pICMSST.valor = str("%.2f" % inv_line.icms_st_percent)
+        # self.det.imposto.ICMS.vICMSST.valor = str("%.2f" % inv_line.icms_st_value)
+
+        # # IPI
+        # self.det.imposto.IPI.CST.valor = inv_line.ipi_cst_id.code
+        # if inv_line.ipi_type == 'percent' or '':
+        #     self.det.imposto.IPI.vBC.valor = str("%.2f" % inv_line.ipi_base)
+        #     self.det.imposto.IPI.pIPI.valor = str("%.2f" % inv_line.ipi_percent)
+        # if inv_line.ipi_type == 'quantity':
+        #     pesol = 0
+        #     if inv_line.product_id:
+        #         pesol = inv_line.product_id.weight_net
+        #         self.det.imposto.IPI.qUnid.valor = str("%.2f" % inv_line.quantity * pesol)
+        #         self.det.imposto.IPI.vUnid.valor = str("%.2f" % inv_line.ipi_percent)
+        # self.det.imposto.IPI.vIPI.valor = str("%.2f" % inv_line.ipi_value)
+
+
+
+        # # PIS
+        # self.det.imposto.PIS.CST.valor = inv_line.pis_cst_id.code
+        # self.det.imposto.PIS.vBC.valor = str("%.2f" % inv_line.pis_base)
+        # self.det.imposto.PIS.pPIS.valor = str("%.2f" % inv_line.pis_percent)
+        # self.det.imposto.PIS.vPIS.valor = str("%.2f" % inv_line.pis_value)
+        #
+        # # PISST
+        # self.det.imposto.PISST.vBC.valor = str("%.2f" % inv_line.pis_st_base)
+        # self.det.imposto.PISST.pPIS.valor = str("%.2f" % inv_line.pis_st_percent)
+        # self.det.imposto.PISST.qBCProd.valor = ''
+        # self.det.imposto.PISST.vAliqProd.valor = ''
+        # self.det.imposto.PISST.vPIS.valor = str("%.2f" % inv_line.pis_st_value)
+        #
+        # # COFINS
+        # self.det.imposto.COFINS.CST.valor = inv_line.cofins_cst_id.code
+        # self.det.imposto.COFINS.vBC.valor = str("%.2f" % inv_line.cofins_base)
+        # self.det.imposto.COFINS.pCOFINS.valor = str("%.2f" % inv_line.cofins_percent)
+        # self.det.imposto.COFINS.vCOFINS.valor = str("%.2f" % inv_line.cofins_value)
+        #
+        # # COFINSST
+        # self.det.imposto.COFINSST.vBC.valor = str("%.2f" % inv_line.cofins_st_base)
+        # self.det.imposto.COFINSST.pCOFINS.valor = str("%.2f" % inv_line.cofins_st_percent)
+        # self.det.imposto.COFINSST.qBCProd.valor = ''
+        # self.det.imposto.COFINSST.vAliqProd.valor = ''
+        # self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
+
+    def _receiver(self, cr, uid, ids, inv, company, nfe_environment, context=None):
+        if not inv.partner_id:
+            return
+        #
+        # Destinatário
+        #
+        partner_bc_code = ''
+        address_invoice_state_code = ''
+        address_invoice_city = ''
+        partner_cep = ''
+
+        if inv.partner_id.country_id.bc_code:
+            partner_bc_code = inv.partner_id.country_id.bc_code[1:]
+
+        if inv.partner_id.country_id.id != company.country_id.id:
+            address_invoice_state_code = 'EX'
+            address_invoice_city = 'Exterior'
+            partner_cep = ''
+        else:
+            address_invoice_state_code = inv.partner_id.state_id.code
+            address_invoice_city = inv.partner_id.l10n_br_city_id.name or ''
+            partner_cep = re.sub('[%s]' % re.escape(string.punctuation), '', str(inv.partner_id.zip or '').replace(' ',''))
+
+        # Se o ambiente for de teste deve ser
+        # escrito na razão do destinatário
+        if nfe_environment == '2':
+            self.nfe.infNFe.dest.xNome.valor = 'NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL'
+        else:
+            self.nfe.infNFe.dest.xNome.valor = inv.partner_id.legal_name or ''
+
+        if inv.partner_id.is_company:
+            self.nfe.infNFe.dest.CNPJ.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or '')
+            self.nfe.infNFe.dest.IE.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.inscr_est or '')
+        else:
+            self.nfe.infNFe.dest.CPF.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.partner_id.cnpj_cpf or '')
+
+        self.nfe.infNFe.dest.enderDest.xLgr.valor = inv.partner_id.street or ''
+        self.nfe.infNFe.dest.enderDest.nro.valor = inv.partner_id.number or ''
+        self.nfe.infNFe.dest.enderDest.xCpl.valor = inv.partner_id.street2 or ''
+        self.nfe.infNFe.dest.enderDest.xBairro.valor = inv.partner_id.district or 'Sem Bairro'
+        self.nfe.infNFe.dest.enderDest.cMun.valor = '%s%s' % (inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code)
+        self.nfe.infNFe.dest.enderDest.xMun.valor = address_invoice_city
+        self.nfe.infNFe.dest.enderDest.UF.valor = address_invoice_state_code
+        self.nfe.infNFe.dest.enderDest.CEP.valor = partner_cep
+        self.nfe.infNFe.dest.enderDest.cPais.valor = partner_bc_code
+        self.nfe.infNFe.dest.enderDest.xPais.valor = inv.partner_id.country_id.name or ''
+        self.nfe.infNFe.dest.enderDest.fone.valor = re.sub('[%s]' % re.escape(string.punctuation), '', str(inv.partner_id.phone or '').replace(' ',''))
+        self.nfe.infNFe.dest.email.valor = inv.partner_id.email or ''
+
+
+    def _nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
+
+        # Identificação da NF-e
+        #
+        self.nfe.infNFe.ide.cUF.valor = company.state_id and company.state_id.ibge_code or ''
+        self.nfe.infNFe.ide.cNF.valor = ''
+        self.nfe.infNFe.ide.indPag.valor = '0'
+        self.nfe.infNFe.ide.serie.valor = 20
+        self.nfe.infNFe.ide.nNF.valor = inv.id or ''
+        self.nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
+        self.nfe.infNFe.ide.dhEmi.valor = datetime.strptime(inv.date_order,
+                                                            '%Y-%m-%d %H:%M:%S')
+#        self.nfe.infNFe.ide.dhSaiEnt.valor = datetime.strptime(
+# inv.date_order, '%Y-%m-%d %H:%M:%S')
+
+    def _nfe_operation(self, cr, uid, ids, inv, company, nfe_environment,
+                       context=None):
+        # Dados da operação
+        self.nfe.infNFe.ide.natOp.valor = 'Venda'
+        self.nfe.infNFe.ide.mod.valor = '65'
+        self.nfe.infNFe.ide.tpImp.valor = '4'  # (1 - Retrato; 2 - Paisagem)
+        self.nfe.infNFe.ide.indPres.valor = '1'
+        self.nfe.infNFe.ide.indFinal.valor = '1'
+        self.nfe.infNFe.ide.tpNF.valor = '1'
+        self.nfe.infNFe.ide.idDest.valor = '1'
+        self.nfe.infNFe.ide.verProc.valor = 'Odoo v8'
+        self.nfe.infNFe.ide.tpAmb.valor = nfe_environment
+        self.nfe.infNFe.ide.finNFe.valor = 1
+        self.nfe.infNFe.ide.procEmi.valor = 0
+        self.nfe.infNFe.ide.tpEmis.valor = 1
+
+    def get_NFe(self):
+
+        try:
+            from pysped.nfe.leiaute import NFCe_310
+        except ImportError:
+            raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+
+        return NFCe_310()
+
+    def _get_NFRef(self):
+
+        try:
+            from pysped.nfe.leiaute import NFCe_310
+        except ImportError:
+            raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+
+        return NFCe_310()
+
+    def _serializer(self, cr, uid, ids, nfe_environment, context=None):
+
+        pool = pooler.get_pool(cr.dbname)
+        nfes = []
+
+        if not context:
+            context = {'lang': 'pt_BR'}
+
+        for order in pool.get('pos.order').browse(cr, uid, ids, context):
+
+            company = pool.get('res.partner').browse(
+                cr, uid, order.company_id.partner_id.id, context)
+
+            self.nfe = self.get_NFe()
+
+            self._nfe_operation(
+                cr, uid, ids, order, company, nfe_environment, context)
+
+            self._nfe_identification(
+                cr, uid, ids, order, company, nfe_environment, context)
+
+         #   self._in_out_adress(cr, uid, ids, order, context)
+
+            # for inv_related in order.fiscal_document_related_ids:
+            #     self.nfref = self._get_NFRef()
+            #     self._nfe_references(cr, uid, ids, inv_related)
+            #     self.nfe.infNFe.ide.NFref.append(self.nfref)
+
+            self._emmiter(cr, uid, ids, order, company, context)
+            self._receiver(cr, uid, ids, order, company, nfe_environment, context)
+
+            i = 0
+            for lines in order.lines:
+                i += 1
+                self.det = self._get_Det()
+                self._details(cr, uid, ids, order, lines, i, context)
+
+                # for inv_di in lines.import_declaration_ids:
+                #
+                #     self.di = self._get_DI()
+                #     self._di(cr, uid, ids, inv, inv_line, inv_di, i, context)
+                #     self.det.prod.DI.append(self.di)
+                #     self.di = self._get_DI()
+                #
+                #     for inv_di_line in inv_di.line_ids:
+                #         self.di_line = self._get_Addition()
+                #         self._adiction(cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context)
+                #         self.di.adi.append(self.di_line)
+                #
+                self.nfe.infNFe.det.append(self.det)
+
+            if order.sale_journal.revenue_expense:
+                pass
+                # for line in inv.move_line_receivable_id:
+                #     self.dup = self._get_Dup()
+                #     self._encashment_data(cr, uid, ids, inv, line, context)
+                #     self.nfe.infNFe.cobr.dup.append(self.dup)
+
+            # try:
+            #     self._carrier_data(cr, uid, ids, inv, context)
+            # except AttributeError:
+            #     pass
+            #
+            # self.vol = self._get_Vol()
+            # self._weight_data(cr, uid, ids, inv, context=None)
+            # self.nfe.infNFe.transp.vol.append(self.vol)
+
+            # self._additional_information(cr, uid, ids, inv, context)
+            self._total(cr, uid, ids, order, context)
+
+            # Gera Chave da NFe
+            self.nfe.gera_nova_chave()
+            nfes.append(self.nfe)
+
+        return nfes
+
+    def get_nfce(self, cr, uid, ids, nfe_environment, context=None):
+        """"""
+        return self._serializer(cr, uid, ids, nfe_environment, context)
