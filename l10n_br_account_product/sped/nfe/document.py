@@ -20,6 +20,8 @@
 import re
 import string
 from datetime import datetime
+import tempfile
+
 
 from openerp import pooler
 from openerp.osv import orm
@@ -542,6 +544,30 @@ class NFe200(FiscalDocument):
         """"""
         nfe = self.get_NFe()
         nfe.set_xml(nfe_string)
+        return nfe
+
+    def set_txt(self, nfe_string, context=None):
+        """"""
+        raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não "
+                                            u"suporta a importaçao "
+                                            u"de TXT"))
+        #nfe = self.get_NFe()
+        #nfe.set_txt(nfe_string)
+        #return nfe
+
+    def parse_edoc(self, filebuffer, ftype):
+        import base64
+        filebuffer = base64.b64decode(filebuffer)
+
+        edoc_file = tempfile.NamedTemporaryFile()
+        edoc_file.write(filebuffer)
+        edoc_file.flush()
+
+#        with open(edoc_file.name, 'rU') as fobj:
+        if ftype == '.xml':
+            nfe = self.set_xml(edoc_file.name)
+        if ftype == '.txt':
+            nfe = self.set_txt(edoc_file.name)
         return nfe
 
 
