@@ -678,7 +678,7 @@ class NFe200(FiscalDocument):
 
         if inv.carrier_id:
             if inv.carrier_id.partner_id.is_company:
-                self.nfe.infNFe.transp.transporta.CNPJ.valor = \
+                self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor = \
                     re.sub('[%s]' % re.escape(string.punctuation), '', inv.carrier_id.partner_id.cnpj_cpf or '')
             else:
                 self.nfe.infNFe.transp.transporta.CPF.valor = \
@@ -694,6 +694,39 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.placa.valor = inv.vehicle_id.plate or ''
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
+
+    def _get_carrier_data(self, cr, uid, ids, context=None):
+
+        res = {}
+
+        if self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor:
+            cnpj_cpf = self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor
+
+        elif self.nfe.infNFe.transp.transporta.CPF.valor:
+            cnpj_cpf = self.nfe.infNFe.transp.transporta.CPF.valor
+
+        carrier_ids = self.pool.get('delivery.carrier').search(
+            cr, uid, [('partner_id.cnpj_cpf', '=', cnpj_cpf)])
+
+        if carrier_ids:
+            # Ao encontrarmos o carrier com o partner especificado, basta
+            # retornarmos seu id que o restantes dos dados vem junto
+            res.update({'carrier_id': carrier_ids[0]})
+        else:
+            res.update({'carrier_id': False})
+
+        # Realizaremos a busca do veiculo pelo numero da placa
+        placa = self.nfe.infNFe.transp.veicTransp.placa.valor
+
+        vehicle_ids = self.pool.get('l10n_br_delivery.carrier.vehicle').search(
+            cr, uid, [('plate', '=', placa)])
+
+        if vehicle_ids:
+            res.update({'vehicle_id': vehicle_ids[0]})
+        else:
+            res.update({'vehicle_id': False})
+
+        return res
 
     def _weight_data(self, cr, uid, ids, inv, context=None):
         #
