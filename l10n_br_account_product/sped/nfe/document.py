@@ -110,6 +110,111 @@ class NFe200(FiscalDocument):
 
         return nfes
 
+    def _deserializer(self, cr, uid, nfe, context):
+        if not context:
+            context = {'lang': 'pt_BR'}
+        if nfe.infNFe.ide.tpNF.valor == 0:
+            action = ('account', 'action_invoice_tree1')
+        elif nfe.infNFe.ide.tpNF.valor == 1:
+            action = ('account', 'action_invoice_tree2')
+
+        pool = pooler.get_pool(cr.dbname)
+        invoice_obj = pool.get('account.invoice')
+
+        invoice_vals = {
+            'nfe_access_key': False,
+            'comment': u'',
+            'vendor_serie': False,
+            'check_total': 101.8,
+            'number_of_packages': 0,
+            # 'partner_bank_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac750>,
+            'supplier_invoice_number': False,
+            'ind_final': u'0',
+            'icms_base_other': 0.0,
+            'amount_gross': 101.8,
+            # 'carrier_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac790>,
+            'ipi_base': 0.0,
+            'amount_freight': 0.0,
+            # 'fiscal_category_id': browse_record(l10n_br_account.fiscal.category,21),
+            'fiscal_type': u'product',
+            'issuer': u'1',
+            'user_id': 16,
+            'reference': u'EPC00420',
+            # 'payment_mode_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac910>,
+            'company_id': 1,
+            'amount_tax': 0.0,
+            # 'move_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac990>,
+            'cofins_base': 0.0,
+            'type': u'in_invoice',
+            'sent': False,
+            # 'incoterm': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac9d0>,
+            'internal_number': False,
+            'account_id': 96,
+            'pis_value': 0.0,
+            'notation_of_packages': False,
+            'nfe_export_date': False,
+            'number': False,
+            'date_invoice': False,
+            #'period_id': <openerp.osv.orm.browse_null object at
+            # 0x7f9ebd9aca90>,
+            'icms_st_value': 0.0,
+            'fiscal_document_electronic': True,
+            'origin': u'EPC00420',
+            'amount_total': 101.8,
+            'amount_discount': 0.0,
+            'name': u'EPC00420',
+            # 'partner_shipping_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acad0>,
+            'ipi_base_other': 0.0,
+            # 'payment_term': browse_record(account.payment.term, 6),
+            'amount_insurance': 0.0,
+            'carrier_name': False,
+            # 'commercial_partner_id': browse_record(res.partner, 899),
+            'ii_value': 0.0,
+            'date_due': False,
+            'weight': 0.0,
+            'currency_id': 7,
+            'nfe_purpose': u'1',
+            # 'vehicle_state_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acb10>,
+            'partner_id': 899,
+            'id': 74,
+            # 'vehicle_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acd10>,
+            'amount_costs': 0.0,
+            'amount_untaxed': 101.8,
+            'document_serie_id': 2,
+            'brand_of_packages': False,
+            'reference_type': u'none',
+            'journal_id': 22,
+            'ind_pres': u'0',
+            'state': u'draft',
+            # 'vehicle_l10n_br_city_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8110>,
+            'nfe_date': False,
+            'cofins_value': 0.0,
+            'reconciled': False,
+            'pis_base': 0.0,
+            'kind_of_packages': False,
+            'date_in_out': False,
+            'weight_net': 0.0,
+            'residual': 0.0,
+            'move_name': False,
+            # 'section_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8150>,
+            # 'fiscal_position': browse_record(account.fiscal.position, 29),
+            # 'agent_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8190>,
+            'ipi_value': 0.0,
+            'vehicle_plate': False,
+            'icms_st_base': 0.0,
+            'nfe_status': False,
+            'nfe_version': u'3.10',
+            'icms_base': 0.0,
+            'date_hour_invoice': False,
+            'fiscal_comment': False,
+            'icms_value': 0.0,
+            'nfe_protocol_number': False,
+            # 'fiscal_document_id': browse_record(l10n_br_account.fiscal.document,32)
+        }
+
+        invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
+
+        return invoice_id, action
 
     def _nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
@@ -119,6 +224,35 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.ide.cNF.valor = ''
         self.nfe.infNFe.ide.natOp.valor = inv.cfop_ids[0].small_name or ''
         self.nfe.infNFe.ide.indPag.valor = inv.payment_term and inv.payment_term.indPag or '0'
+        self.nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
+        self.nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
+        self.nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
+        self.nfe.infNFe.ide.dEmi.valor = inv.date_invoice or ''
+        self.nfe.infNFe.ide.dSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date() or ''
+        self.nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
+        self.nfe.infNFe.ide.tpImp.valor = 1  # (1 - Retrato; 2 - Paisagem)
+        self.nfe.infNFe.ide.tpEmis.valor = 1
+        self.nfe.infNFe.ide.tpAmb.valor = nfe_environment
+        self.nfe.infNFe.ide.finNFe.valor = inv.nfe_purpose
+        self.nfe.infNFe.ide.procEmi.valor = 0
+        self.nfe.infNFe.ide.verProc.valor = 'OpenERP Brasil v7'
+
+        if inv.cfop_ids[0].type in ("input"):
+            self.nfe.infNFe.ide.tpNF.valor = '0'
+        else:
+            self.nfe.infNFe.ide.tpNF.valor = '1'
+
+    def _get_nfe_identification(self, cr, uid, nfe ,context=None):
+
+        # Identificação da NF-e
+        #
+
+        #self.nfe.infNFe.ide.cUF.valor = company.state_id and
+        # company.state_id.ibge_code or ''
+        #self.nfe.infNFe.ide.cNF.valor = ''
+        #self.nfe.infNFe.ide.natOp.valor = inv.cfop_ids[0].small_name or ''
+        # TODO: Campo importante para o SPED:
+        # self.nfe.infNFe.ide.indPag.valor = inv.payment_term and inv.payment_term.indPag or '0'
         self.nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
         self.nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
         self.nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
@@ -385,111 +519,111 @@ class NFe200(FiscalDocument):
         self.det.imposto.COFINSST.vAliqProd.valor = ''
         self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
 
-    def _get_details(self, cr, uid, ids, inv, inv_line, i, context=None):
-        details = {
-        #
-        # Detalhe
-        #
-
-        # self.det.nItem.valor = i
-        # self.det.prod.cProd.valor = inv_line.product_id.code or ''
-        # self.det.prod.cEAN.valor = inv_line.product_id.ean13 or ''
-        # self.det.prod.xProd.valor = inv_line.product_id.name or ''
-        # self.det.prod.NCM.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.fiscal_classification_id.name or '')[:8]
-        # TODO self.det.prod.EXTIPI.valor = ''
-        # self.det.prod.CFOP.valor = inv_line.cfop_id.code
-        # self.det.prod.uCom.valor = inv_line.uos_id.name or ''
-        'quantity': self.det.prod.qCom.valor,
-        'price_unit': self.det.prod.vUnCom.valor,
-        'price_gross': self.det.prod.vProd.valor,
-        # self.det.prod.cEANTrib.valor = inv_line.product_id.ean13 or ''
-        # self.det.prod.uTrib.valor = self.det.prod.uCom.valor
-        # self.det.prod.qTrib.valor = self.det.prod.qCom.valor
-        # self.det.prod.vUnTrib.valor = self.det.prod.vUnCom.valor
-        'freight_value': self.det.prod.vFrete.valor,
-        'insurance_value': self.det.prod.vSeg.valor,
-        'discount_value': self.det.prod.vDesc.valor,
-        'other_costs_value': self.det.prod.vOutro.valor,
-        #
-        # Produto entra no total da NF-e
-        #
-        # self.det.prod.indTot.valor = 1
-
-        if inv_line.product_type == 'product':
-            #
-            # Impostos
-            #
-            # ICMS
-            'icms_origin': self.det.imposto.ICMS.orig.valor,
-            if inv_line.icms_cst_id.code > 100:
-                # self.det.imposto.ICMS.CSOSN.valor = inv_line.icms_cst_id.code
-                'icms_percent': self.det.imposto.ICMS.pCredSN.valor,
-                'icms_value': self.det.imposto.ICMS.vCredICMSSN.valor,
-
-            # self.det.imposto.ICMS.CST.valor = inv_line.icms_cst_id.code
-            'icms_base_type': self.det.imposto.ICMS.modBC.valor,
-            'icms_base': self.det.imposto.ICMS.vBC.valor,
-            'icms_percent_reduction': self.det.imposto.ICMS.pRedBC.valor,
-            'icms_percent': self.det.imposto.ICMS.pICMS.valor,
-            'icms_value': self.det.imposto.ICMS.vICMS.valor,
-
-            # ICMS ST
-            'icms_st_base_type': self.det.imposto.ICMS.modBCST.valor,
-            'icms_st_mva': self.det.imposto.ICMS.pMVAST.valor,
-            'icms_st_percent_reduction': self.det.imposto.ICMS.pRedBCST.valor,
-            'icms_st_base': self.det.imposto.ICMS.vBCST.valor,
-            'icms_st_percent': self.det.imposto.ICMS.pICMSST.valor,
-            'icms_st_value': self.det.imposto.ICMS.vICMSST.valor,
-
-            # IPI
-            self.det.imposto.IPI.CST.valor = inv_line.ipi_cst_id.code
-            if inv_line.ipi_type == 'percent' or '':
-                'ipi_base': self.det.imposto.IPI.vBC.valor,
-                'ipi_percent': self.det.imposto.IPI.pIPI.valor,
-            if inv_line.ipi_type == 'quantity':
-                pesol = 0
-                if inv_line.product_id:
-                    pesol = inv_line.product_id.weight_net
-                    # self.det.imposto.IPI.qUnid.valor = str("%.2f" % inv_line.quantity * pesol)
-                    'ipi_percent': self.det.imposto.IPI.vUnid.valor,
-            'ipi_value': self.det.imposto.IPI.vIPI.valor,
-
-        else:
-            #ISSQN
-            'issqn_base': self.det.imposto.ISSQN.vBC.valor,
-            'issqn_value': self.det.imposto.ISSQN.vISSQN.valor,
-            # self.det.imposto.ISSQN.cMunFG.valor = ('%s%s') % (inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code)
-            # self.det.imposto.ISSQN.cListServ.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.service_type_id.code or '')
-            'issqn_type': self.det.imposto.ISSQN.cSitTrib.valor,
-
-
-        # PIS
-        # self.det.imposto.PIS.CST.valor = inv_line.pis_cst_id.code
-        'pis_base': self.det.imposto.PIS.vBC.valor,
-        'pis_percent': self.det.imposto.PIS.pPIS.valor,
-        'pis_value': self.det.imposto.PIS.vPIS.valor,
-
-        # PISST
-        'pis_st_base': self.det.imposto.PISST.vBC.valor,
-        'pis_st_percent': self.det.imposto.PISST.pPIS.valor,
-        # self.det.imposto.PISST.qBCProd.valor = ''
-        # self.det.imposto.PISST.vAliqProd.valor = ''
-        'pis_st_value': self.det.imposto.PISST.vPIS.valor,
-
-        # COFINS
-        # self.det.imposto.COFINS.CST.valor = inv_line.cofins_cst_id.code
-        'cofins_base': self.det.imposto.COFINS.vBC.valor,
-        'cofins_percent': self.det.imposto.COFINS.pCOFINS.valor,
-        'cofins_value': self.det.imposto.COFINS.vCOFINS.valor,
-
-        # COFINSST
-        'cofins_st_base': self.det.imposto.COFINSST.vBC.valor
-        'cofins_st_percent': self.det.imposto.COFINSST.pCOFINS.valor
-        # self.det.imposto.COFINSST.qBCProd.valor = ''
-        # self.det.imposto.COFINSST.vAliqProd.valor = ''
-        'cofins_st_value': self.det.imposto.COFINSST.vCOFINS.valor,
-        }
-        return details
+    # def _get_details(self, cr, uid, ids, inv, inv_line, i, context=None):
+    #     details = {
+    #     #
+    #     # Detalhe
+    #     #
+    #
+    #     # self.det.nItem.valor = i
+    #     # self.det.prod.cProd.valor = inv_line.product_id.code or ''
+    #     # self.det.prod.cEAN.valor = inv_line.product_id.ean13 or ''
+    #     # self.det.prod.xProd.valor = inv_line.product_id.name or ''
+    #     # self.det.prod.NCM.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.fiscal_classification_id.name or '')[:8]
+    #     # TODO self.det.prod.EXTIPI.valor = ''
+    #     # self.det.prod.CFOP.valor = inv_line.cfop_id.code
+    #     # self.det.prod.uCom.valor = inv_line.uos_id.name or ''
+    #     'quantity': self.det.prod.qCom.valor,
+    #     'price_unit': self.det.prod.vUnCom.valor,
+    #     'price_gross': self.det.prod.vProd.valor,
+    #     # self.det.prod.cEANTrib.valor = inv_line.product_id.ean13 or ''
+    #     # self.det.prod.uTrib.valor = self.det.prod.uCom.valor
+    #     # self.det.prod.qTrib.valor = self.det.prod.qCom.valor
+    #     # self.det.prod.vUnTrib.valor = self.det.prod.vUnCom.valor
+    #     'freight_value': self.det.prod.vFrete.valor,
+    #     'insurance_value': self.det.prod.vSeg.valor,
+    #     'discount_value': self.det.prod.vDesc.valor,
+    #     'other_costs_value': self.det.prod.vOutro.valor,
+    #     #
+    #     # Produto entra no total da NF-e
+    #     #
+    #     # self.det.prod.indTot.valor = 1
+    #
+    #     if inv_line.product_type == 'product':
+    #         #
+    #         # Impostos
+    #         #
+    #         # ICMS
+    #         'icms_origin': self.det.imposto.ICMS.orig.valor,
+    #         if inv_line.icms_cst_id.code > 100:
+    #             # self.det.imposto.ICMS.CSOSN.valor = inv_line.icms_cst_id.code
+    #             'icms_percent': self.det.imposto.ICMS.pCredSN.valor,
+    #             'icms_value': self.det.imposto.ICMS.vCredICMSSN.valor,
+    #
+    #         # self.det.imposto.ICMS.CST.valor = inv_line.icms_cst_id.code
+    #         'icms_base_type': self.det.imposto.ICMS.modBC.valor,
+    #         'icms_base': self.det.imposto.ICMS.vBC.valor,
+    #         'icms_percent_reduction': self.det.imposto.ICMS.pRedBC.valor,
+    #         'icms_percent': self.det.imposto.ICMS.pICMS.valor,
+    #         'icms_value': self.det.imposto.ICMS.vICMS.valor,
+    #
+    #         # ICMS ST
+    #         'icms_st_base_type': self.det.imposto.ICMS.modBCST.valor,
+    #         'icms_st_mva': self.det.imposto.ICMS.pMVAST.valor,
+    #         'icms_st_percent_reduction': self.det.imposto.ICMS.pRedBCST.valor,
+    #         'icms_st_base': self.det.imposto.ICMS.vBCST.valor,
+    #         'icms_st_percent': self.det.imposto.ICMS.pICMSST.valor,
+    #         'icms_st_value': self.det.imposto.ICMS.vICMSST.valor,
+    #
+    #         # IPI
+    #         self.det.imposto.IPI.CST.valor = inv_line.ipi_cst_id.code
+    #         if inv_line.ipi_type == 'percent' or '':
+    #             'ipi_base': self.det.imposto.IPI.vBC.valor,
+    #             'ipi_percent': self.det.imposto.IPI.pIPI.valor,
+    #         if inv_line.ipi_type == 'quantity':
+    #             pesol = 0
+    #             if inv_line.product_id:
+    #                 pesol = inv_line.product_id.weight_net
+    #                 # self.det.imposto.IPI.qUnid.valor = str("%.2f" % inv_line.quantity * pesol)
+    #                 'ipi_percent': self.det.imposto.IPI.vUnid.valor,
+    #         'ipi_value': self.det.imposto.IPI.vIPI.valor,
+    #
+    #     else:
+    #         #ISSQN
+    #         'issqn_base': self.det.imposto.ISSQN.vBC.valor,
+    #         'issqn_value': self.det.imposto.ISSQN.vISSQN.valor,
+    #         # self.det.imposto.ISSQN.cMunFG.valor = ('%s%s') % (inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code)
+    #         # self.det.imposto.ISSQN.cListServ.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.service_type_id.code or '')
+    #         'issqn_type': self.det.imposto.ISSQN.cSitTrib.valor,
+    #
+    #
+    #     # PIS
+    #     # self.det.imposto.PIS.CST.valor = inv_line.pis_cst_id.code
+    #     'pis_base': self.det.imposto.PIS.vBC.valor,
+    #     'pis_percent': self.det.imposto.PIS.pPIS.valor,
+    #     'pis_value': self.det.imposto.PIS.vPIS.valor,
+    #
+    #     # PISST
+    #     'pis_st_base': self.det.imposto.PISST.vBC.valor,
+    #     'pis_st_percent': self.det.imposto.PISST.pPIS.valor,
+    #     # self.det.imposto.PISST.qBCProd.valor = ''
+    #     # self.det.imposto.PISST.vAliqProd.valor = ''
+    #     'pis_st_value': self.det.imposto.PISST.vPIS.valor,
+    #
+    #     # COFINS
+    #     # self.det.imposto.COFINS.CST.valor = inv_line.cofins_cst_id.code
+    #     'cofins_base': self.det.imposto.COFINS.vBC.valor,
+    #     'cofins_percent': self.det.imposto.COFINS.pCOFINS.valor,
+    #     'cofins_value': self.det.imposto.COFINS.vCOFINS.valor,
+    #
+    #     # COFINSST
+    #     'cofins_st_base': self.det.imposto.COFINSST.vBC.valor
+    #     'cofins_st_percent': self.det.imposto.COFINSST.pCOFINS.valor
+    #     # self.det.imposto.COFINSST.qBCProd.valor = ''
+    #     # self.det.imposto.COFINSST.vAliqProd.valor = ''
+    #     'cofins_st_value': self.det.imposto.COFINSST.vCOFINS.valor,
+    #     }
+    #     return details
 
     def _di(self, cr, uid, ids, inv, inv_line, inv_di, i, context=None):
         self.di.nDI.valor = inv_di.name
@@ -509,6 +643,7 @@ class NFe200(FiscalDocument):
         'exporting_code': self.di.cExportador.valor,
         }
         return di
+
     def _addition(self, cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context=None):
         self.di_line.nAdicao.valor = inv_di_line.name
         self.di_line.nSeqAdic.valor = inv_di_line.sequence
@@ -543,7 +678,7 @@ class NFe200(FiscalDocument):
 
         if inv.carrier_id:
             if inv.carrier_id.partner_id.is_company:
-                self.nfe.infNFe.transp.transporta.CNPJ.valor = \
+                self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor = \
                     re.sub('[%s]' % re.escape(string.punctuation), '', inv.carrier_id.partner_id.cnpj_cpf or '')
             else:
                 self.nfe.infNFe.transp.transporta.CPF.valor = \
@@ -559,6 +694,39 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.placa.valor = inv.vehicle_id.plate or ''
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
+
+    def _get_carrier_data(self, cr, uid, ids, context=None):
+
+        res = {}
+
+        if self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor:
+            cnpj_cpf = self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor
+
+        elif self.nfe.infNFe.transp.transporta.CPF.valor:
+            cnpj_cpf = self.nfe.infNFe.transp.transporta.CPF.valor
+
+        carrier_ids = self.pool.get('delivery.carrier').search(
+            cr, uid, [('partner_id.cnpj_cpf', '=', cnpj_cpf)])
+
+        if carrier_ids:
+            # Ao encontrarmos o carrier com o partner especificado, basta
+            # retornarmos seu id que o restantes dos dados vem junto
+            res.update({'carrier_id': carrier_ids[0]})
+        else:
+            res.update({'carrier_id': False})
+
+        # Realizaremos a busca do veiculo pelo numero da placa
+        placa = self.nfe.infNFe.transp.veicTransp.placa.valor
+
+        vehicle_ids = self.pool.get('l10n_br_delivery.carrier.vehicle').search(
+            cr, uid, [('plate', '=', placa)])
+
+        if vehicle_ids:
+            res.update({'vehicle_id': vehicle_ids[0]})
+        else:
+            res.update({'vehicle_id': False})
+
+        return res
 
     def _weight_data(self, cr, uid, ids, inv, context=None):
         #
@@ -603,7 +771,6 @@ class NFe200(FiscalDocument):
         'comment': self.nfe.infNFe.infAdic.infCpl.valor,
         }
         return additional_information
-
 
     def _total(self, cr, uid, ids, inv, context=None):
 
@@ -727,27 +894,41 @@ class NFe200(FiscalDocument):
         #nfe.set_txt(nfe_string)
         #return nfe
 
-    def parse_edoc(self, filebuffer, ftype):
+    def _parse_edoc(self, filebuffer, ftype):
+
         import base64
         filebuffer = base64.b64decode(filebuffer)
-
         edoc_file = tempfile.NamedTemporaryFile()
         edoc_file.write(filebuffer)
         edoc_file.flush()
+        edocs = []
+        if ftype == '.zip':
+            raise orm.except_orm(_(u'Erro!'), _(u"Importação de zip em "
+                                                u"desenvolvimento"))
+            #TODO: Unzip and return a list of edoc
+        elif ftype == '.xml':
+            edocs.append(self.set_xml(edoc_file.name))
+        elif ftype == '.txt':
+            edocs.append(self.set_txt(edoc_file.name))
+        return edocs
 
-#        with open(edoc_file.name, 'rU') as fobj:
-        if ftype == '.xml':
-            nfe = self.set_xml(edoc_file.name)
-        if ftype == '.txt':
-            nfe = self.set_txt(edoc_file.name)
-        return nfe
+    def import_edoc(self, cr, uid, filebuffer, ftype, context):
+
+        edocs = self._parse_edoc(filebuffer, ftype)
+        result = []
+        for edoc in edocs:
+            docid, docaction = self._deserializer(cr, uid, edoc, context)
+            result.append({
+                'id': docid,
+                'action': docaction
+            })
+        return result
 
 
 class NFe310(NFe200):
 
     def __init__(self):
         super(NFe310, self).__init__()
-
 
     def _nfe_identification(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
