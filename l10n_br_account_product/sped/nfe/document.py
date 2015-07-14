@@ -385,6 +385,111 @@ class NFe200(FiscalDocument):
         self.det.imposto.COFINSST.vAliqProd.valor = ''
         self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
 
+    def _get_details(self, cr, uid, ids, inv, inv_line, i, context=None):
+        details = {
+        #
+        # Detalhe
+        #
+
+        # self.det.nItem.valor = i
+        # self.det.prod.cProd.valor = inv_line.product_id.code or ''
+        # self.det.prod.cEAN.valor = inv_line.product_id.ean13 or ''
+        # self.det.prod.xProd.valor = inv_line.product_id.name or ''
+        # self.det.prod.NCM.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.fiscal_classification_id.name or '')[:8]
+        # TODO self.det.prod.EXTIPI.valor = ''
+        # self.det.prod.CFOP.valor = inv_line.cfop_id.code
+        # self.det.prod.uCom.valor = inv_line.uos_id.name or ''
+        'quantity': self.det.prod.qCom.valor,
+        'price_unit': self.det.prod.vUnCom.valor,
+        'price_gross': self.det.prod.vProd.valor,
+        # self.det.prod.cEANTrib.valor = inv_line.product_id.ean13 or ''
+        # self.det.prod.uTrib.valor = self.det.prod.uCom.valor
+        # self.det.prod.qTrib.valor = self.det.prod.qCom.valor
+        # self.det.prod.vUnTrib.valor = self.det.prod.vUnCom.valor
+        'freight_value': self.det.prod.vFrete.valor,
+        'insurance_value': self.det.prod.vSeg.valor,
+        'discount_value': self.det.prod.vDesc.valor,
+        'other_costs_value': self.det.prod.vOutro.valor,
+        #
+        # Produto entra no total da NF-e
+        #
+        # self.det.prod.indTot.valor = 1
+
+        if inv_line.product_type == 'product':
+            #
+            # Impostos
+            #
+            # ICMS
+            'icms_origin': self.det.imposto.ICMS.orig.valor,
+            if inv_line.icms_cst_id.code > 100:
+                # self.det.imposto.ICMS.CSOSN.valor = inv_line.icms_cst_id.code
+                'icms_percent': self.det.imposto.ICMS.pCredSN.valor,
+                'icms_value': self.det.imposto.ICMS.vCredICMSSN.valor,
+
+            # self.det.imposto.ICMS.CST.valor = inv_line.icms_cst_id.code
+            'icms_base_type': self.det.imposto.ICMS.modBC.valor,
+            'icms_base': self.det.imposto.ICMS.vBC.valor,
+            'icms_percent_reduction': self.det.imposto.ICMS.pRedBC.valor,
+            'icms_percent': self.det.imposto.ICMS.pICMS.valor,
+            'icms_value': self.det.imposto.ICMS.vICMS.valor,
+
+            # ICMS ST
+            'icms_st_base_type': self.det.imposto.ICMS.modBCST.valor,
+            'icms_st_mva': self.det.imposto.ICMS.pMVAST.valor,
+            'icms_st_percent_reduction': self.det.imposto.ICMS.pRedBCST.valor,
+            'icms_st_base': self.det.imposto.ICMS.vBCST.valor,
+            'icms_st_percent': self.det.imposto.ICMS.pICMSST.valor,
+            'icms_st_value': self.det.imposto.ICMS.vICMSST.valor,
+
+            # IPI
+            self.det.imposto.IPI.CST.valor = inv_line.ipi_cst_id.code
+            if inv_line.ipi_type == 'percent' or '':
+                'ipi_base': self.det.imposto.IPI.vBC.valor,
+                'ipi_percent': self.det.imposto.IPI.pIPI.valor,
+            if inv_line.ipi_type == 'quantity':
+                pesol = 0
+                if inv_line.product_id:
+                    pesol = inv_line.product_id.weight_net
+                    # self.det.imposto.IPI.qUnid.valor = str("%.2f" % inv_line.quantity * pesol)
+                    'ipi_percent': self.det.imposto.IPI.vUnid.valor,
+            'ipi_value': self.det.imposto.IPI.vIPI.valor,
+
+        else:
+            #ISSQN
+            'issqn_base': self.det.imposto.ISSQN.vBC.valor,
+            'issqn_value': self.det.imposto.ISSQN.vISSQN.valor,
+            # self.det.imposto.ISSQN.cMunFG.valor = ('%s%s') % (inv.partner_id.state_id.ibge_code, inv.partner_id.l10n_br_city_id.ibge_code)
+            # self.det.imposto.ISSQN.cListServ.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.service_type_id.code or '')
+            'issqn_type': self.det.imposto.ISSQN.cSitTrib.valor,
+
+
+        # PIS
+        # self.det.imposto.PIS.CST.valor = inv_line.pis_cst_id.code
+        'pis_base': self.det.imposto.PIS.vBC.valor,
+        'pis_percent': self.det.imposto.PIS.pPIS.valor,
+        'pis_value': self.det.imposto.PIS.vPIS.valor,
+
+        # PISST
+        'pis_st_base': self.det.imposto.PISST.vBC.valor,
+        'pis_st_percent': self.det.imposto.PISST.pPIS.valor,
+        # self.det.imposto.PISST.qBCProd.valor = ''
+        # self.det.imposto.PISST.vAliqProd.valor = ''
+        'pis_st_value': self.det.imposto.PISST.vPIS.valor,
+
+        # COFINS
+        # self.det.imposto.COFINS.CST.valor = inv_line.cofins_cst_id.code
+        'cofins_base': self.det.imposto.COFINS.vBC.valor,
+        'cofins_percent': self.det.imposto.COFINS.pCOFINS.valor,
+        'cofins_value': self.det.imposto.COFINS.vCOFINS.valor,
+
+        # COFINSST
+        'cofins_st_base': self.det.imposto.COFINSST.vBC.valor
+        'cofins_st_percent': self.det.imposto.COFINSST.pCOFINS.valor
+        # self.det.imposto.COFINSST.qBCProd.valor = ''
+        # self.det.imposto.COFINSST.vAliqProd.valor = ''
+        'cofins_st_value': self.det.imposto.COFINSST.vCOFINS.valor,
+        }
+        return details
 
     def _di(self, cr, uid, ids, inv, inv_line, inv_di, i, context=None):
         self.di.nDI.valor = inv_di.name
@@ -394,11 +499,30 @@ class NFe200(FiscalDocument):
         self.di.dDesemb.valor = inv_di.date_release or ''
         self.di.cExportador.valor = inv_di.exporting_code
 
+    def _get_di(self, cr, uid, ids, inv, inv_line, inv_di, i, context=None):
+        di = {
+        'name': self.di.nDI.valor,
+        'date_registration': self.di.dDI.valor,
+        'location': self.di.xLocDesemb.valor,
+        # self.di.UFDesemb.valor = inv_di.state_id.code or ''
+        'date_release': self.di.dDesemb.valor,
+        'exporting_code': self.di.cExportador.valor,
+        }
+        return di
     def _addition(self, cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context=None):
         self.di_line.nAdicao.valor = inv_di_line.name
         self.di_line.nSeqAdic.valor = inv_di_line.sequence
         self.di_line.cFabricante.valor = inv_di_line.manufacturer_code
         self.di_line.vDescDI.valor = str("%.2f" % inv_di_line.amount_discount)
+
+    def _get_addition(self, cr, uid, ids, inv, inv_line, inv_di, inv_di_line, i, context=None):
+        addition = {
+        'name': self.di_line.nAdicao.valor,
+        'sequence': self.di_line.nSeqAdic.valor,
+        'manufacturer_code': self.di_line.cFabricante.valor,
+        'amount_discount': self.di_line.vDescDI.valor,
+        }
+        return addition
 
     def _encashment_data(self, cr, uid, ids, inv, line, context=None):
 
@@ -447,6 +571,20 @@ class NFe200(FiscalDocument):
         self.vol.pesoL.valor = str("%.2f" % inv.weight)
         self.vol.pesoB.valor = str("%.2f" % inv.weight_net)
 
+    def _get_weight_data(self, cr, uid, ids, inv, context=None):
+        #
+        # Campos do Transporte da NF-e Bloco 381
+        #
+        weight_data = {
+        'number_of_packages': self.vol.qVol.valor,
+        'kind_of_packages': self.vol.esp.valor,
+        'brand_of_packages': self.vol.marca.valor,
+        'notation_of_packages': self.vol.nVol.valor,
+        'weight': self.vol.pesoL.valor,
+        'weight_net': self.vol.pesoB.valor,
+        }
+        return weight_data
+
     def _additional_information(self, cr, uid, ids, inv, context=None):
 
         #
@@ -454,6 +592,18 @@ class NFe200(FiscalDocument):
         #
         self.nfe.infNFe.infAdic.infAdFisco.valor = inv.fiscal_comment or ''
         self.nfe.infNFe.infAdic.infCpl.valor = inv.comment or ''
+
+    def _get_additional_information(self, cr, uid, ids, inv, context=None):
+
+        #
+        # Informações adicionais
+        #
+        additional_information = {
+        'fiscal_comment': self.nfe.infNFe.infAdic.infAdFisco.valor,
+        'comment': self.nfe.infNFe.infAdic.infCpl.valor,
+        }
+        return additional_information
+
 
     def _total(self, cr, uid, ids, inv, context=None):
 
@@ -474,6 +624,28 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.total.ICMSTot.vCOFINS.valor = str("%.2f" % inv.cofins_value)
         self.nfe.infNFe.total.ICMSTot.vOutro.valor = str("%.2f" % inv.amount_costs)
         self.nfe.infNFe.total.ICMSTot.vNF.valor = str("%.2f" % inv.amount_total)
+
+    def _get_total(self, cr, uid, context=None):
+        #
+        # Totais
+        #
+        total = {
+            'icms_base': self.nfe.infNFe.total.ICMSTot.vBC.valor,
+            'icms_value': self.nfe.infNFe.total.ICMSTot.vICMS.valor,
+            'icms_st_base': self.nfe.infNFe.total.ICMSTot.vBCST.valor,
+            'icms_st_value': self.nfe.infNFe.total.ICMSTot.vST.valor,
+            'amount_gross': self.nfe.infNFe.total.ICMSTot.vProd.valor,
+            'amount_freight': self.nfe.infNFe.total.ICMSTot.vFrete.valor,
+            'amount_insurance': self.nfe.infNFe.total.ICMSTot.vSeg.valor,
+            'amount_discount': self.nfe.infNFe.total.ICMSTot.vDesc.valor,
+            'ii_value': self.nfe.infNFe.total.ICMSTot.vII.valor,
+            'ipi_value': self.nfe.infNFe.total.ICMSTot.vIPI.valor,
+            'pis_value': self.nfe.infNFe.total.ICMSTot.vPIS.valor,
+            'cofins_value': self.nfe.infNFe.total.ICMSTot.vCOFINS.valor,
+            'amount_costs': self.nfe.infNFe.total.ICMSTot.vOutro.valor,
+            'amount_total': self.nfe.infNFe.total.ICMSTot.vNF.valor,
+        }
+        return total
 
     def get_NFe(self):
 
