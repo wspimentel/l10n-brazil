@@ -699,6 +699,7 @@ class NFe200(FiscalDocument):
 
         res = {}
 
+        # Realizamos a importacao da transportadora
         if self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor:
             cnpj_cpf = self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor
 
@@ -708,23 +709,16 @@ class NFe200(FiscalDocument):
         carrier_ids = self.pool.get('delivery.carrier').search(
             cr, uid, [('partner_id.cnpj_cpf', '=', cnpj_cpf)])
 
-        if carrier_ids:
-            # Ao encontrarmos o carrier com o partner especificado, basta
-            # retornarmos seu id que o restantes dos dados vem junto
-            res.update({'carrier_id': carrier_ids[0]})
-        else:
-            res.update({'carrier_id': False})
-
-        # Realizaremos a busca do veiculo pelo numero da placa
+        # Realizamos a busca do veiculo pelo numero da placa
         placa = self.nfe.infNFe.transp.veicTransp.placa.valor
 
         vehicle_ids = self.pool.get('l10n_br_delivery.carrier.vehicle').search(
             cr, uid, [('plate', '=', placa)])
 
-        if vehicle_ids:
-            res.update({'vehicle_id': vehicle_ids[0]})
-        else:
-            res.update({'vehicle_id': False})
+        # Ao encontrarmos o carrier com o partner especificado, basta
+        # retornarmos seu id que o restantes dos dados vem junto
+        res['carrier_id'] = carrier_ids[0] if carrier_ids else False
+        res['vehicle_id'] = vehicle_ids[0] if vehicle_ids else False
 
         return res
 
