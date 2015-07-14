@@ -16,3 +16,12 @@
 #You should have received a copy of the GNU Affero General Public License     #
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.        #
 ###############################################################################
+
+
+
+
+def get_fiscal_document(cr, uid, code):
+
+    asdsadsad
+
+    return id
