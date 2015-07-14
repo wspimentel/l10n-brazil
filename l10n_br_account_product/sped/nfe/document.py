@@ -243,6 +243,7 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.ide.tpNF.valor = '1'
 
     def _get_nfe_identification(self, cr, uid, nfe ,context=None):
+        print
 
         # Identificação da NF-e
         #
@@ -253,23 +254,23 @@ class NFe200(FiscalDocument):
         #self.nfe.infNFe.ide.natOp.valor = inv.cfop_ids[0].small_name or ''
         # TODO: Campo importante para o SPED:
         # self.nfe.infNFe.ide.indPag.valor = inv.payment_term and inv.payment_term.indPag or '0'
-        self.nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
-        self.nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
-        self.nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
-        self.nfe.infNFe.ide.dEmi.valor = inv.date_invoice or ''
-        self.nfe.infNFe.ide.dSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date() or ''
-        self.nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
-        self.nfe.infNFe.ide.tpImp.valor = 1  # (1 - Retrato; 2 - Paisagem)
-        self.nfe.infNFe.ide.tpEmis.valor = 1
-        self.nfe.infNFe.ide.tpAmb.valor = nfe_environment
-        self.nfe.infNFe.ide.finNFe.valor = inv.nfe_purpose
-        self.nfe.infNFe.ide.procEmi.valor = 0
-        self.nfe.infNFe.ide.verProc.valor = 'OpenERP Brasil v7'
-
-        if inv.cfop_ids[0].type in ("input"):
-            self.nfe.infNFe.ide.tpNF.valor = '0'
-        else:
-            self.nfe.infNFe.ide.tpNF.valor = '1'
+        # self.nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
+        # self.nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
+        # self.nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
+        # self.nfe.infNFe.ide.dEmi.valor = inv.date_invoice or ''
+        # self.nfe.infNFe.ide.dSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date() or ''
+        # self.nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
+        # self.nfe.infNFe.ide.tpImp.valor = 1  # (1 - Retrato; 2 - Paisagem)
+        # self.nfe.infNFe.ide.tpEmis.valor = 1
+        # self.nfe.infNFe.ide.tpAmb.valor = nfe_environment
+        # self.nfe.infNFe.ide.finNFe.valor = inv.nfe_purpose
+        # self.nfe.infNFe.ide.procEmi.valor = 0
+        # self.nfe.infNFe.ide.verProc.valor = 'OpenERP Brasil v7'
+        #
+        # if inv.cfop_ids[0].type in ("input"):
+        #     self.nfe.infNFe.ide.tpNF.valor = '0'
+        # else:
+        #     self.nfe.infNFe.ide.tpNF.valor = '1'
 
     def _in_out_adress(self, cr, uid, ids, inv, context=None):
 
@@ -297,6 +298,9 @@ class NFe200(FiscalDocument):
                     self.nfe.infNFe.entrega.xMun.valor = inv.partner_shipping_id.l10n_br_city_id.name or ''
                     self.nfe.infNFe.entrega.UF.valor = inv.partner_shipping_id.state_id.code or ''
 
+    # def _get_in_out_adress(self, cr, uid, ids, context=None):
+    #
+    #     if self.nfe.infNFe.ide.tpNF.valor == '0':
 
     def _nfe_references(self, cr, uid, ids, inv_related, context=None):
 
@@ -413,7 +417,6 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.dest.enderDest.fone.valor = re.sub('[%s]' % re.escape(string.punctuation), '', str(inv.partner_id.phone or '').replace(' ',''))
         self.nfe.infNFe.dest.email.valor = inv.partner_id.email or ''
 
-
     def _details(self, cr, uid, ids, inv, inv_line, i, context=None):
 
         #
@@ -518,6 +521,52 @@ class NFe200(FiscalDocument):
         self.det.imposto.COFINSST.qBCProd.valor = ''
         self.det.imposto.COFINSST.vAliqProd.valor = ''
         self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
+
+    def _get_details(self, cr, uid, ids, i, context=None):
+
+        #
+        # Detalhe
+        #
+        inv_line = {}
+
+        pool = self.pool.get('product.product')
+        product_ids = pool.search(
+            cr, uid, [('code', '=', self.det.prod.cProd.valor)])
+
+        inv_line['product_id'] = product_ids[0] if product_ids else False
+
+        pool = self.pool.get('account.product.fiscal.classification')
+        fiscal_classification_ids = pool.search(cr, uid, [])
+
+        # Verificar se a busca pela classificacao fiscal nao sera custosa
+        for fc_ids in fiscal_classification_ids:
+            obj_fc = pool.browse(cr, uid, fc_ids)
+            aux = re.sub('[%s]' % re.escape(string.punctuation), '',
+                         obj_fc.name or '')[:8]
+
+            if self.det.prod.NCM.valor == aux:
+                inv_line['fiscal_classification'] = fc_ids
+
+        pool = self.pool.get('l10n_br_account_product.cfop')
+        cfop_ids = pool.search(
+            cr, uid, [('code', '=', self.det.prod.CFOP.valor)])
+
+        inv_line['cfop_id'] = cfop_ids[0] if cfop_ids else False
+
+        pool = self.pool.get('product.uom')
+        cfop_ids = pool.search(
+            cr, uid, [('name', '=', self.det.prod.uCom.valor)])
+
+        inv_line['uos_id'] = cfop_ids[0] if cfop_ids else False
+        inv_line['quantity'] = float(self.det.prod.qCom.valor)
+        inv_line['price_unit'] = float(self.det.prod.vUnCom.valor)
+        inv_line['price_gross'] = float(self.det.prod.vProd.valor)
+
+        inv_line['freight_value'] = float(self.det.prod.vFrete.valor)
+        inv_line['insurance_value'] = float(self.det.prod.vSeg.valor)
+        inv_line['discount_value'] = float(self.det.prod.vDesc.valor)
+        inv_line['other_costs_value'] = float(self.det.prod.vOutro.valor)
+
 
     # def _get_details(self, cr, uid, ids, inv, inv_line, i, context=None):
     #     details = {
@@ -695,6 +744,23 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
 
+    @staticmethod
+    def _mask_cnpj_cpf(is_company, cnpj_cpf):
+
+        if cnpj_cpf:
+            val = re.sub('[^0-9]', '', cnpj_cpf)
+
+            if is_company and len(val) == 14:
+                cnpj_cpf = "%s.%s.%s/%s-%s" % (val[0:2], val[2:5], val[5:8],
+                                               val[8:12], val[12:14])
+            elif not is_company and len(val) == 11:
+                cnpj_cpf = "%s.%s.%s-%s" % (val[0:3], val[3:6], val[6:9],
+                                            val[9:11])
+
+            return cnpj_cpf
+
+        return ''
+
     def _get_carrier_data(self, cr, uid, ids, context=None):
 
         res = {}
@@ -702,9 +768,11 @@ class NFe200(FiscalDocument):
         # Realizamos a importacao da transportadora
         if self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor:
             cnpj_cpf = self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor
+            cnpj_cpf = self._mask_cnpj_cpf(True, cnpj_cpf)
 
         elif self.nfe.infNFe.transp.transporta.CPF.valor:
             cnpj_cpf = self.nfe.infNFe.transp.transporta.CPF.valor
+            cnpj_cpf = self._mask_cnpj_cpf(False, cnpj_cpf)
 
         carrier_ids = self.pool.get('delivery.carrier').search(
             cr, uid, [('partner_id.cnpj_cpf', '=', cnpj_cpf)])
@@ -888,7 +956,7 @@ class NFe200(FiscalDocument):
         #nfe.set_txt(nfe_string)
         #return nfe
 
-    def _parse_edoc(self, filebuffer, ftype):
+    def parse_edoc(self, filebuffer, ftype):
 
         import base64
         filebuffer = base64.b64decode(filebuffer)
