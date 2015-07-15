@@ -121,6 +121,9 @@ class NFe200(FiscalDocument):
         pool = pooler.get_pool(cr.dbname)
         invoice_obj = pool.get('account.invoice')
 
+        carrier_date = self._get_carrier_data(cr, uid, pool, nfe,
+                                              context=context)
+
         invoice_vals = {
             'nfe_access_key': False,
             'comment': u'',
@@ -132,6 +135,8 @@ class NFe200(FiscalDocument):
             'ind_final': u'0',
             'icms_base_other': 0.0,
             'amount_gross': 101.8,
+            'carrier_id': carrier_date['carrier_id'],
+            'vehicle_id': carrier_date['vehicle_id'],
             # 'carrier_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac790>,
             'ipi_base': 0.0,
             'amount_freight': 0.0,
@@ -727,7 +732,7 @@ class NFe200(FiscalDocument):
 
         if inv.carrier_id:
             if inv.carrier_id.partner_id.is_company:
-                self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor = \
+                self.nfe.infNFe.transp.transporta.CNPJ.valor = \
                     re.sub('[%s]' % re.escape(string.punctuation), '', inv.carrier_id.partner_id.cnpj_cpf or '')
             else:
                 self.nfe.infNFe.transp.transporta.CPF.valor = \
@@ -761,26 +766,33 @@ class NFe200(FiscalDocument):
 
         return ''
 
-    def _get_carrier_data(self, cr, uid, ids, context=None):
+    def _get_carrier_data(self, cr, uid, pool, nfe, context=None):
 
         res = {}
 
+        if not nfe:
+            res['carrier_id'] = False
+            res['vehicle_id'] = False
+            return res
+
+        cnpj_cpf = ''
+
         # Realizamos a importacao da transportadora
-        if self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor:
-            cnpj_cpf = self.nfe.infNFe.transp.euro.invoice.formtransporta.CNPJ.valor
+        if nfe.infNFe.transp.transporta.CNPJ.valor:
+            cnpj_cpf = nfe.infNFe.transp.transporta.CNPJ.valor
             cnpj_cpf = self._mask_cnpj_cpf(True, cnpj_cpf)
 
-        elif self.nfe.infNFe.transp.transporta.CPF.valor:
-            cnpj_cpf = self.nfe.infNFe.transp.transporta.CPF.valor
+        elif nfe.infNFe.transp.transporta.CPF.valor:
+            cnpj_cpf = nfe.infNFe.transp.transporta.CPF.valor
             cnpj_cpf = self._mask_cnpj_cpf(False, cnpj_cpf)
 
-        carrier_ids = self.pool.get('delivery.carrier').search(
+        carrier_ids = pool.get('delivery.carrier').search(
             cr, uid, [('partner_id.cnpj_cpf', '=', cnpj_cpf)])
 
         # Realizamos a busca do veiculo pelo numero da placa
-        placa = self.nfe.infNFe.transp.veicTransp.placa.valor
+        placa = nfe.infNFe.transp.veicTransp.placa.valor
 
-        vehicle_ids = self.pool.get('l10n_br_delivery.carrier.vehicle').search(
+        vehicle_ids = pool.get('l10n_br_delivery.carrier.vehicle').search(
             cr, uid, [('plate', '=', placa)])
 
         # Ao encontrarmos o carrier com o partner especificado, basta
@@ -959,7 +971,7 @@ class NFe200(FiscalDocument):
     def parse_edoc(self, filebuffer, ftype):
 
         import base64
-        filebuffer = base64.b64decode(filebuffer)
+        filebuffer = base64.standard_b64decode(filebuffer)
         edoc_file = tempfile.NamedTemporaryFile()
         edoc_file.write(filebuffer)
         edoc_file.flush()
