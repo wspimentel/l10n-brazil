@@ -345,12 +345,83 @@ class NFe200(FiscalDocument):
             self.nfref.refECF.nECF.valor = inv_related.internal_number
             self.nfref.refECF.nCOO.valor = inv_related.serie
 
+    def _get_nfe_references(self, cr, uid, ids, inv_related, pool, context=None):
+
+        #
+        # Documentos referenciadas
+        #
+        nfe_reference = {}
+        state_obj = pool.get('res.country.state')
+        fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
+        if self.nfref.refNF:
+            state_id = state_obj.search(cr, uid, [
+                ('ibge_code', '=', self.nfref.refNF.cUF.valor)])[0]
+            fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
+                ('code', '=', self.nfref.refNF.mod.valor)])[0]
+            nfe_reference.update({
+                'inv_related': {
+                    'document_type': 'nf',
+                    'state_id': state_id,
+                    'date': self.nfref.refNF.AAMM.valor,
+                    'cnpj_cpf': self.nfref.refNF.CNPJ.valor,
+                    'fiscal_document_id': fiscal_doc_id,
+                    'serie': self.nfref.refNF.serie.valor,
+                    'internal_number': self.nfref.refNF.nNF.valor,
+                }
+            })
+        elif self.nfref.refNFP:
+            state_id = state_obj.search(cr, uid, [
+                ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])[0]
+            fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
+                ('code', '=', self.nfref.refNFP.mod.valor)])[0]
+            cnpj_cpf = (self.nfref.refNFP.CNPJ.valor or
+                        self.nfref.refNFP.CPF.valor)
+            nfe_reference.update({
+                'inv_related': {
+                    'document_type': 'nfrural',
+                    'state_id': state_id,
+                    'date': self.nfref.refNFP.AAMM.valor,
+                    'inscr_est': self.nfref.refNFP.IE.valor,
+                    'fiscal_document_id': fiscal_doc_id,
+                    'serie': self.nfref.refNFP.serie.valor,
+                    'internal_number': self.nfref.refNFP.nNF.valor,
+                    'cnpj_cpf': cnpj_cpf,
+                }
+            })
+        elif self.nfref.refNFe.valor:
+            nfe_reference.update({
+                'inv_related': {
+                    'document_type': 'nfe',
+                    'access_key': self.nfref.refNFe.valor,
+                }
+            })
+        elif self.nfref.refCTe.valor:
+            nfe_reference.update({
+                'inv_related': {
+                    'document_type': 'cte',
+                    'access_key': self.nfref.refCTe.valor,
+                }
+            })
+        elif self.nfref.refECF:
+            fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
+                ('code', '=', self.nfref.refECF.mod.valor)])[0]
+            nfe_reference.update({
+                'inv_related': {
+                    'document_type': 'cf',
+                    'fiscal_document_id': fiscal_doc_id,
+                    'serie': self.nfref.refNF.serie.valor,
+                    'internal_number': self.nfref.refNF.nNF.valor,
+                }
+            })
+
+        return nfe_reference
 
     def _emmiter(self, cr, uid, ids, inv, company, context=None):
 
         #
         # Emitente
         #
+
         self.nfe.infNFe.emit.CNPJ.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.partner_id.cnpj_cpf or '')
         self.nfe.infNFe.emit.xNome.valor = inv.company_id.partner_id.legal_name
         self.nfe.infNFe.emit.xFant.valor = inv.company_id.partner_id.name
@@ -373,6 +444,29 @@ class NFe200(FiscalDocument):
         if inv.company_id.partner_id.inscr_mun:
             self.nfe.infNFe.emit.CNAE.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.cnae_main_id.code or '')
 
+    def _get_emmiter(self, cr, uid, ids, inv, company, pool, context=None):
+
+        #
+        # Emitente
+        #
+        emmiter = {}
+
+        partner_obj = pool.get('res.partner')
+        cnpj = self.nfe.infNFe.emit.CNPJ.valor
+        if cnpj:
+            emitter_partner_id = partner_obj.search(cr, uid, [
+                ('cnpj_cpf', '=', cnpj)])[0]
+
+        if emitter_partner_id:
+            emmiter.update({
+                'emitter_partner_id': emitter_partner_id,
+            })
+        else:
+            emmiter.update({
+                'emitter_partner_id': False,
+            })
+
+        return emmiter
 
     def _receiver(self, cr, uid, ids, inv, company, nfe_environment, context=None):
 
@@ -422,11 +516,35 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.dest.enderDest.fone.valor = re.sub('[%s]' % re.escape(string.punctuation), '', str(inv.partner_id.phone or '').replace(' ',''))
         self.nfe.infNFe.dest.email.valor = inv.partner_id.email or ''
 
+    def _get_receiver(self, cr, uid, ids, inv, company, nfe_environment, pool, context=None):
+
+        #
+        # Destinatário
+        #
+        receiver = {}
+
+        if self.nfe.infNFe.dest.CNPJ.valor:
+            cnpj_cpf = self.nfe.infNFe.dest.CNPJ.valor
+
+        elif self.nfe.infNFe.dest.CPF.valor:
+            cnpj_cpf = self.nfe.infNFe.dest.CPF.valor
+
+        receiver_partner_id = pool.get('res.partner').search(
+            cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])[0]
+
+        if receiver_partner_id:
+            receiver.update({'receiver_partner_id': receiver_partner_id})
+        else:
+            receiver.update({'receiver_partner_id': False})
+
+        return receiver
+
     def _details(self, cr, uid, ids, inv, inv_line, i, context=None):
 
         #
         # Detalhe
         #
+
 
         self.det.nItem.valor = i
         self.det.prod.cProd.valor = inv_line.product_id.code or ''
@@ -722,6 +840,25 @@ class NFe200(FiscalDocument):
         self.dup.nDup.valor = line.name
         self.dup.dVenc.valor = line.date_maturity or inv.date_due or inv.date_invoice
         self.dup.vDup.valor = str("%.2f" % line.debit)
+
+    def _get_encashment_data(self, cr, uid, ids, inv, line, context=None):
+
+        #
+        # Dados de Cobrança
+        #
+        encashment_data = {
+            'line': {
+                'name': self.dup.nDup.valor,
+                'date_maturity': self.dup.dVenc.valor,
+                'debit': self.dup.vDup.valor,
+            },
+            'inv': {
+                'date_due': self.dup.dVenc.valor,
+                # 'date_invoice':
+            }
+        }
+
+        return encashment_data
 
     def _carrier_data(self, cr, uid, ids, inv, context=None):
 
