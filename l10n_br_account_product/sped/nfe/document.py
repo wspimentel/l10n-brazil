@@ -335,14 +335,14 @@ class NFe200(FiscalDocument):
             self.nfref.refECF.nECF.valor = inv_related.internal_number
             self.nfref.refECF.nCOO.valor = inv_related.serie
 
-    def _get_nfe_references(self, cr, uid, ids, inv_related, context=None):
+    def _get_nfe_references(self, cr, uid, ids, inv_related, pool, context=None):
 
         #
         # Documentos referenciadas
         #
         nfe_reference = {}
-        state_obj = self.pool.get('res.country.state')
-        fiscal_doc_obj = self.pool.get('l10n_br_account.fiscal.document')
+        state_obj = pool.get('res.country.state')
+        fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
         if self.nfref.refNF:
             state_id = state_obj.search(cr, uid, [
                 ('ibge_code', '=', self.nfref.refNF.cUF.valor)])[0]
@@ -434,21 +434,20 @@ class NFe200(FiscalDocument):
         if inv.company_id.partner_id.inscr_mun:
             self.nfe.infNFe.emit.CNAE.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.cnae_main_id.code or '')
 
-    def _get_emmiter(self, cr, uid, ids, inv, company, context=None):
+    def _get_emmiter(self, cr, uid, ids, inv, company, pool, context=None):
 
         #
         # Emitente
         #
         emmiter = {}
 
-        partner_obj = self.pool.get('res.partner')
+        partner_obj = pool.get('res.partner')
         cnpj = self.nfe.infNFe.emit.CNPJ.valor
         if cnpj:
             emitter_partner_id = partner_obj.search(cr, uid, [
                 ('cnpj_cpf', '=', cnpj)])[0]
 
         if emitter_partner_id:
-
             emmiter.update({
                 'emitter_partner_id': emitter_partner_id,
             })
@@ -507,7 +506,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.dest.enderDest.fone.valor = re.sub('[%s]' % re.escape(string.punctuation), '', str(inv.partner_id.phone or '').replace(' ',''))
         self.nfe.infNFe.dest.email.valor = inv.partner_id.email or ''
 
-    def _get_receiver(self, cr, uid, ids, inv, company, nfe_environment, context=None):
+    def _get_receiver(self, cr, uid, ids, inv, company, nfe_environment, pool, context=None):
 
         #
         # Destinatário
@@ -520,7 +519,7 @@ class NFe200(FiscalDocument):
         elif self.nfe.infNFe.dest.CPF.valor:
             cnpj_cpf = self.nfe.infNFe.dest.CPF.valor
 
-        receiver_partner_id = self.pool.get('res.partner').search(
+        receiver_partner_id = pool.get('res.partner').search(
             cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])[0]
 
         if receiver_partner_id:
@@ -831,7 +830,7 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
 
-    def _get_carrier_data(self, cr, uid, ids, context=None):
+    def _get_carrier_data(self, cr, uid, ids, pool, context=None):
 
         res = {}
 
@@ -841,7 +840,7 @@ class NFe200(FiscalDocument):
         elif self.nfe.infNFe.transp.transporta.CPF.valor:
             cnpj_cpf = self.nfe.infNFe.transp.transporta.CPF.valor
 
-        carrier_ids = self.pool.get('delivery.carrier').search(
+        carrier_ids = pool.get('delivery.carrier').search(
             cr, uid, [('partner_id.cnpj_cpf', '=', cnpj_cpf)])
 
         if carrier_ids:
@@ -854,7 +853,7 @@ class NFe200(FiscalDocument):
         # Realizaremos a busca do veiculo pelo numero da placa
         placa = self.nfe.infNFe.transp.veicTransp.placa.valor
 
-        vehicle_ids = self.pool.get('l10n_br_delivery.carrier.vehicle').search(
+        vehicle_ids = pool.get('l10n_br_delivery.carrier.vehicle').search(
             cr, uid, [('plate', '=', placa)])
 
         if vehicle_ids:
