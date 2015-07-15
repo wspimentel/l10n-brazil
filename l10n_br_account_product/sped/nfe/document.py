@@ -121,8 +121,9 @@ class NFe200(FiscalDocument):
         pool = pooler.get_pool(cr.dbname)
         invoice_obj = pool.get('account.invoice')
 
-        carrier_date = self._get_carrier_data(cr, uid, pool, nfe,
+        carrier_data = self._get_carrier_data(cr, uid, pool, nfe,
                                               context=context)
+        in_out_data = self._get_in_out_adress(cr, uid, pool, nfe, context=context)
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -135,9 +136,8 @@ class NFe200(FiscalDocument):
             'ind_final': u'0',
             'icms_base_other': 0.0,
             'amount_gross': 101.8,
-            'carrier_id': carrier_date['carrier_id'],
-            'vehicle_id': carrier_date['vehicle_id'],
-            # 'carrier_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac790>,
+            'carrier_id': carrier_data['carrier_id'],
+            'vehicle_id': carrier_data['vehicle_id'],
             'ipi_base': 0.0,
             'amount_freight': 0.0,
             # 'fiscal_category_id': browse_record(l10n_br_account.fiscal.category,21),
@@ -168,7 +168,7 @@ class NFe200(FiscalDocument):
             'amount_total': 101.8,
             'amount_discount': 0.0,
             'name': u'EPC00420',
-            # 'partner_shipping_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acad0>,
+            'partner_shipping_id': in_out_data['partner_shipping_id'],
             'ipi_base_other': 0.0,
             # 'payment_term': browse_record(account.payment.term, 6),
             'amount_insurance': 0.0,
@@ -303,9 +303,23 @@ class NFe200(FiscalDocument):
                     self.nfe.infNFe.entrega.xMun.valor = inv.partner_shipping_id.l10n_br_city_id.name or ''
                     self.nfe.infNFe.entrega.UF.valor = inv.partner_shipping_id.state_id.code or ''
 
-    # def _get_in_out_adress(self, cr, uid, ids, context=None):
-    #
-    #     if self.nfe.infNFe.ide.tpNF.valor == '0':
+    def _get_in_out_adress(self, cr, uid, pool, nfe, context=None):
+
+        if nfe.infNFe.ide.tpNF.valor == '0':
+            cnpj = self._mask_cnpj_cpf(True, nfe.infNFe.retirada.CNPJ.valor)
+        else:
+            print  nfe.infNFe.entrega.CNPJ.valor
+            cnpj = self._mask_cnpj_cpf(True, nfe.infNFe.entrega.CNPJ.valor)
+
+        print cnpj
+
+        partner_ids = pool.get('res.partner').search(
+            cr, uid, [('cnpj_cpf', '=', cnpj)])
+
+        print partner_ids
+
+        res = partner_ids[0] if partner_ids else False
+        return {'partner_shipping_id': res}
 
     def _nfe_references(self, cr, uid, ids, inv_related, context=None):
 
@@ -544,7 +558,6 @@ class NFe200(FiscalDocument):
         #
         # Detalhe
         #
-
 
         self.det.nItem.valor = i
         self.det.prod.cProd.valor = inv_line.product_id.code or ''
