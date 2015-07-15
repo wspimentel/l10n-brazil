@@ -976,7 +976,7 @@ class NFe200(FiscalDocument):
 
     def import_edoc(self, cr, uid, filebuffer, ftype, context):
 
-        edocs = self._parse_edoc(filebuffer, ftype)
+        edocs = self.parse_edoc(filebuffer, ftype)
         result = []
         for edoc in edocs:
             docid, docaction = self._deserializer(cr, uid, edoc, context)
