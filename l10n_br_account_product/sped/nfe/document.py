@@ -125,6 +125,7 @@ class NFe200(FiscalDocument):
                                               context=context)
         in_out_data = self._get_in_out_adress(cr, uid, pool, nfe,
                                               context=context)
+        receiver = self._get_receiver(cr, uid, pool, nfe, context=context)
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -181,7 +182,7 @@ class NFe200(FiscalDocument):
             'currency_id': 7,
             'nfe_purpose': u'1',
             # 'vehicle_state_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acb10>,
-            'partner_id': 899,
+            'partner_id': receiver['partner_id'],
             'id': 74,
             # 'vehicle_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acd10>,
             'amount_costs': 0.0,
