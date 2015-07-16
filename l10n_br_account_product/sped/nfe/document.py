@@ -118,12 +118,24 @@ class NFe200(FiscalDocument):
         elif nfe.infNFe.ide.tpNF.valor == 1:
             action = ('account', 'action_invoice_tree2')
 
+        self.nfe = nfe
+        self.nfref = self._get_NFRef()
+
         pool = pooler.get_pool(cr.dbname)
         invoice_obj = pool.get('account.invoice')
 
         carrier_data = self._get_carrier_data(cr, uid, pool, nfe,
                                               context=context)
         in_out_data = self._get_in_out_adress(cr, uid, pool, nfe, context=context)
+
+        try:
+            nfe_references = self._get_nfe_references(
+                cr, uid, pool, nfe, context=context)
+            fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
+            fiscal_doc_id = fiscal_doc_obj.create(
+                cr, uid, nfe_references, context=context)
+        except AttributeError:
+                pass
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -359,7 +371,7 @@ class NFe200(FiscalDocument):
             self.nfref.refECF.nECF.valor = inv_related.internal_number
             self.nfref.refECF.nCOO.valor = inv_related.serie
 
-    def _get_nfe_references(self, cr, uid, ids, inv_related, pool, context=None):
+    def _get_nfe_references(self, cr, uid, pool, nfe, context=None):
 
         #
         # Documentos referenciadas
@@ -369,34 +381,34 @@ class NFe200(FiscalDocument):
         fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
         if self.nfref.refNF:
             state_id = state_obj.search(cr, uid, [
-                ('ibge_code', '=', self.nfref.refNF.cUF.valor)])[0]
+                ('ibge_code', '=', self.nfref.refNF.cUF.valor)])
             fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
-                ('code', '=', self.nfref.refNF.mod.valor)])[0]
+                ('code', '=', self.nfref.refNF.mod.valor)])
             nfe_reference.update({
                 'inv_related': {
                     'document_type': 'nf',
-                    'state_id': state_id,
+                    'state_id': state_id[0],
                     'date': self.nfref.refNF.AAMM.valor,
                     'cnpj_cpf': self.nfref.refNF.CNPJ.valor,
-                    'fiscal_document_id': fiscal_doc_id,
+                    'fiscal_document_id': fiscal_doc_id[0],
                     'serie': self.nfref.refNF.serie.valor,
                     'internal_number': self.nfref.refNF.nNF.valor,
                 }
             })
         elif self.nfref.refNFP:
             state_id = state_obj.search(cr, uid, [
-                ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])[0]
+                ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])
             fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
-                ('code', '=', self.nfref.refNFP.mod.valor)])[0]
+                ('code', '=', self.nfref.refNFP.mod.valor)])
             cnpj_cpf = (self.nfref.refNFP.CNPJ.valor or
                         self.nfref.refNFP.CPF.valor)
             nfe_reference.update({
                 'inv_related': {
                     'document_type': 'nfrural',
-                    'state_id': state_id,
+                    'state_id': state_id[0],
                     'date': self.nfref.refNFP.AAMM.valor,
                     'inscr_est': self.nfref.refNFP.IE.valor,
-                    'fiscal_document_id': fiscal_doc_id,
+                    'fiscal_document_id': fiscal_doc_id[0],
                     'serie': self.nfref.refNFP.serie.valor,
                     'internal_number': self.nfref.refNFP.nNF.valor,
                     'cnpj_cpf': cnpj_cpf,
@@ -418,11 +430,11 @@ class NFe200(FiscalDocument):
             })
         elif self.nfref.refECF:
             fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
-                ('code', '=', self.nfref.refECF.mod.valor)])[0]
+                ('code', '=', self.nfref.refECF.mod.valor)])
             nfe_reference.update({
                 'inv_related': {
                     'document_type': 'cf',
-                    'fiscal_document_id': fiscal_doc_id,
+                    'fiscal_document_id': fiscal_doc_id[0],
                     'serie': self.nfref.refNF.serie.valor,
                     'internal_number': self.nfref.refNF.nNF.valor,
                 }
@@ -469,11 +481,11 @@ class NFe200(FiscalDocument):
         cnpj = self.nfe.infNFe.emit.CNPJ.valor
         if cnpj:
             emitter_partner_id = partner_obj.search(cr, uid, [
-                ('cnpj_cpf', '=', cnpj)])[0]
+                ('cnpj_cpf', '=', cnpj)])
 
         if emitter_partner_id:
             emmiter.update({
-                'emitter_partner_id': emitter_partner_id,
+                'emitter_partner_id': emitter_partner_id[0],
             })
         else:
             emmiter.update({
@@ -544,10 +556,10 @@ class NFe200(FiscalDocument):
             cnpj_cpf = self.nfe.infNFe.dest.CPF.valor
 
         receiver_partner_id = pool.get('res.partner').search(
-            cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])[0]
+            cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])
 
         if receiver_partner_id:
-            receiver.update({'receiver_partner_id': receiver_partner_id})
+            receiver.update({'receiver_partner_id': receiver_partner_id[0]})
         else:
             receiver.update({'receiver_partner_id': False})
 
