@@ -124,20 +124,14 @@ class NFe200(FiscalDocument):
         pool = pooler.get_pool(cr.dbname)
         invoice_obj = pool.get('account.invoice')
 
-        carrier_data = self._get_carrier_data(cr, uid, pool, nfe,
-                                              context=context)
-        in_out_data = self._get_in_out_adress(cr, uid, pool, nfe,
-                                              context=context)
-        receiver = self._get_receiver(cr, uid, pool, nfe, context=context)
-
-        try:
-            nfe_references = self._get_nfe_references(
-                cr, uid, pool, nfe, context=context)
-            fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
-            fiscal_doc_id = fiscal_doc_obj.create(
-                cr, uid, nfe_references, context=context)
-        except AttributeError:
-                pass
+        # try:
+        #     nfe_references = self._get_nfe_references(
+        #         cr, uid, pool, nfe, context=context)
+        #     fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
+        #     fiscal_doc_id = fiscal_doc_obj.create(
+        #         cr, uid, nfe_references, context=context)
+        # except AttributeError:
+        #         pass
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -150,8 +144,8 @@ class NFe200(FiscalDocument):
             'ind_final': u'0',
             'icms_base_other': 0.0,
             'amount_gross': 101.8,
-            'carrier_id': carrier_data['carrier_id'],
-            'vehicle_id': carrier_data['vehicle_id'],
+            # 'carrier_id': carrier_data['carrier_id'],
+            # 'vehicle_id': carrier_data['vehicle_id'],
             'ipi_base': 0.0,
             'amount_freight': 0.0,
             # 'fiscal_category_id': browse_record(l10n_br_account.fiscal.category,21),
@@ -182,7 +176,7 @@ class NFe200(FiscalDocument):
             'amount_total': 101.8,
             'amount_discount': 0.0,
             'name': u'EPC00420',
-            'partner_shipping_id': in_out_data['partner_shipping_id'],
+            # 'partner_shipping_id': in_out_data['partner_shipping_id'],
             'ipi_base_other': 0.0,
             # 'payment_term': browse_record(account.payment.term, 6),
             'amount_insurance': 0.0,
@@ -194,7 +188,7 @@ class NFe200(FiscalDocument):
             'currency_id': 7,
             'nfe_purpose': u'1',
             # 'vehicle_state_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acb10>,
-            'partner_id': receiver['partner_id'],
+            'partner_id': 899,
             'id': 74,
             # 'vehicle_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acd10>,
             'amount_costs': 0.0,
@@ -231,6 +225,19 @@ class NFe200(FiscalDocument):
             # 'fiscal_document_id': browse_record(l10n_br_account.fiscal.document,32)
         }
 
+        carrier_data = self._get_carrier_data(cr, uid, pool, nfe,
+                                              context=context)
+        in_out_data = self._get_in_out_adress(cr, uid, pool, nfe,
+                                              context=context)
+        receiver = self._get_receiver(cr, uid, pool, nfe, context=context)
+        nfe_identification = self._get_nfe_identification(cr, uid, pool, nfe,
+                                                          context=context)
+
+        invoice_vals.update(carrier_data)
+        invoice_vals.update(in_out_data)
+        invoice_vals.update(receiver)
+        invoice_vals.update(nfe_identification)
+
         invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
 
         return invoice_id, action
@@ -261,35 +268,37 @@ class NFe200(FiscalDocument):
         else:
             self.nfe.infNFe.ide.tpNF.valor = '1'
 
-    def _get_nfe_identification(self, cr, uid, nfe ,context=None):
-        print
+    def _get_nfe_identification(self, cr, uid, pool, nfe, context=None):
 
         # Identificação da NF-e
         #
+        res = {}
 
-        #self.nfe.infNFe.ide.cUF.valor = company.state_id and
-        # company.state_id.ibge_code or ''
-        #self.nfe.infNFe.ide.cNF.valor = ''
-        #self.nfe.infNFe.ide.natOp.valor = inv.cfop_ids[0].small_name or ''
+        fiscal_doc_ids = pool.get('l10n_br_account.fiscal.document').search(
+            cr, uid, [('code', '=', self.nfe.infNFe.ide.mod.valor)])
+
+        res['fiscal_document_id'] = \
+            fiscal_doc_ids[0] if fiscal_doc_ids else False
+
+        document_serie_ids = pool.get('l10n_br_account.document.serie').search(
+            cr, uid, [('code', '=', self.nfe.infNFe.ide.serie.valor)])
+
+        res['document_serie_id'] = \
+            document_serie_ids[0] if document_serie_ids else False
+
+        res['internal_number'] = self.nfe.infNFe.ide.nNF.valor
+        res['date_invoice'] = self.nfe.infNFe.ide.dEmi.valor
+        res['date_in_out'] = self.nfe.infNFe.ide.dSaiEnt.valor
+        res['nfe_purpose'] = str(self.nfe.infNFe.ide.finNFe.valor)
+
         # TODO: Campo importante para o SPED:
-        # self.nfe.infNFe.ide.indPag.valor = inv.payment_term and inv.payment_term.indPag or '0'
-        # self.nfe.infNFe.ide.mod.valor  = inv.fiscal_document_id.code or ''
-        # self.nfe.infNFe.ide.serie.valor = inv.document_serie_id.code or ''
-        # self.nfe.infNFe.ide.nNF.valor = inv.internal_number or ''
-        # self.nfe.infNFe.ide.dEmi.valor = inv.date_invoice or ''
-        # self.nfe.infNFe.ide.dSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S').date() or ''
-        # self.nfe.infNFe.ide.cMunFG.valor = ('%s%s') % (company.state_id.ibge_code, company.l10n_br_city_id.ibge_code)
-        # self.nfe.infNFe.ide.tpImp.valor = 1  # (1 - Retrato; 2 - Paisagem)
-        # self.nfe.infNFe.ide.tpEmis.valor = 1
+        # self.nfe.infNFe.ide.indPag.valor =
+        # inv.payment_term and inv.payment_term.indPag or '0'
+        # TODO: Adicionar campo nfe_enviroment na invoice assim como foi feito
+        # TODO: com a versão da nfe
         # self.nfe.infNFe.ide.tpAmb.valor = nfe_environment
-        # self.nfe.infNFe.ide.finNFe.valor = inv.nfe_purpose
-        # self.nfe.infNFe.ide.procEmi.valor = 0
-        # self.nfe.infNFe.ide.verProc.valor = 'OpenERP Brasil v7'
-        #
-        # if inv.cfop_ids[0].type in ("input"):
-        #     self.nfe.infNFe.ide.tpNF.valor = '0'
-        # else:
-        #     self.nfe.infNFe.ide.tpNF.valor = '1'
+
+        return res
 
     def _in_out_adress(self, cr, uid, ids, inv, context=None):
 
@@ -638,7 +647,6 @@ class NFe200(FiscalDocument):
             self.det.imposto.ISSQN.cListServ.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv_line.service_type_id.code or '')
             self.det.imposto.ISSQN.cSitTrib.valor = inv_line.issqn_type
 
-
         # PIS
         self.det.imposto.PIS.CST.valor = inv_line.pis_cst_id.code
         self.det.imposto.PIS.vBC.valor = str("%.2f" % inv_line.pis_base)
@@ -906,21 +914,6 @@ class NFe200(FiscalDocument):
             self.nfe.infNFe.transp.veicTransp.UF.valor = inv.vehicle_id.plate.state_id.code or ''
             self.nfe.infNFe.transp.veicTransp.RNTC.valor = inv.vehicle_id.rntc_code or ''
 
-    @staticmethod
-    def _mask_cnpj_cpf(is_company, cnpj_cpf):
-
-        if cnpj_cpf:
-            val = re.sub('[^0-9]', '', cnpj_cpf)
-
-            if is_company and len(val) == 14:
-                cnpj_cpf = "%s.%s.%s/%s-%s" % (val[0:2], val[2:5], val[5:8],
-                                               val[8:12], val[12:14])
-            elif not is_company and len(val) == 11:
-                cnpj_cpf = "%s.%s.%s-%s" % (val[0:3], val[3:6], val[6:9],
-                                            val[9:11])
-
-        return cnpj_cpf
-
     def _get_carrier_data(self, cr, uid, pool, nfe, context=None):
 
         res = {}
@@ -1153,6 +1146,21 @@ class NFe200(FiscalDocument):
             })
         return result
 
+    @staticmethod
+    def _mask_cnpj_cpf(is_company, cnpj_cpf):
+
+        if cnpj_cpf:
+            val = re.sub('[^0-9]', '', cnpj_cpf)
+
+            if is_company and len(val) == 14:
+                cnpj_cpf = "%s.%s.%s/%s-%s" % (val[0:2], val[2:5], val[5:8],
+                                               val[8:12], val[12:14])
+            elif not is_company and len(val) == 11:
+                cnpj_cpf = "%s.%s.%s-%s" % (val[0:3], val[3:6], val[6:9],
+                                            val[9:11])
+
+        return cnpj_cpf
+
 
 class NFe310(NFe200):
 
@@ -1169,6 +1177,20 @@ class NFe310(NFe200):
         self.nfe.infNFe.ide.indPres.valor = inv.ind_pres or ''
         self.nfe.infNFe.ide.dhEmi.valor = datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')
         self.nfe.infNFe.ide.dhSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')
+
+    def _get_nfe_identification(self, cr, uid, pool, nfe, context=None):
+
+        res = super(NFe310, self)._get_nfe_identification(
+            cr, uid, pool, nfe, context)
+
+        res['ind_final'] = self.nfe.infNFe.ide.indFinal.valor
+        res['ind_pres'] = self.nfe.infNFe.ide.indPres.valor
+        res['date_hour_invoice'] = self.nfe.infNFe.ide.dhEmi.valor
+        res['date_in_out'] = self.nfe.infNFe.ide.dhSaiEnt.valor
+        # TODO: Encontrar uma maneira de importar a posicao fiscal
+        # self.nfe.infNFe.ide.idDest.valor = inv.fiscal_position.id_dest or ''
+
+        return res
 
     def get_NFe(self):
 
