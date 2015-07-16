@@ -119,7 +119,10 @@ class NFe200(FiscalDocument):
             action = ('account', 'action_invoice_tree2')
 
         self.nfe = nfe
-        self.nfref = self._get_NFRef()
+        nfref = self._get_NFRef()
+        nfref.xml = nfe.xml
+        self.nfref = nfref
+
 
         pool = pooler.get_pool(cr.dbname)
         invoice_obj = pool.get('account.invoice')
@@ -133,11 +136,10 @@ class NFe200(FiscalDocument):
         try:
             nfe_references = self._get_nfe_references(
                 cr, uid, pool, nfe, context=context)
-            fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
-            fiscal_doc_id = fiscal_doc_obj.create(
-                cr, uid, nfe_references, context=context)
+            fiscal_doc_obj = pool.get('l10n_br_account_product.document.related')
+            fiscal_doc_id = fiscal_doc_obj.create(cr, uid, nfe_references)
         except AttributeError:
-                pass
+            pass
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -228,7 +230,7 @@ class NFe200(FiscalDocument):
             'fiscal_comment': False,
             'icms_value': 0.0,
             'nfe_protocol_number': False,
-            # 'fiscal_document_id': browse_record(l10n_br_account.fiscal.document,32)
+            'fiscal_document_id': fiscal_doc_id or False,
         }
 
         invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
@@ -375,27 +377,25 @@ class NFe200(FiscalDocument):
         #
         nfe_reference = {}
         state_obj = pool.get('res.country.state')
-        fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
-        if self.nfref.refNF:
+        fiscal_doc_obj = pool.get('l10n_br_account_product.document.related')
+        if self.nfref.refNF.CNPJ.valor:
             state_ids = state_obj.search(cr, uid, [
                 ('ibge_code', '=', self.nfref.refNF.cUF.valor)])
             fiscal_doc_ids = fiscal_doc_obj.search(cr, uid, [
                 ('code', '=', self.nfref.refNF.mod.valor)])
 
             nfe_reference.update({
-                'inv_related': {
-                    'document_type': 'nf',
-                    'state_id': state_ids[0] if state_ids else False,
-                    'date': self.nfref.refNF.AAMM.valor,
-                    'cnpj_cpf': self.nfref.refNF.CNPJ.valor,
-                    'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
-                    else False,
-                    'serie': self.nfref.refNF.serie.valor,
-                    'internal_number': self.nfref.refNF.nNF.valor,
-                }
+                'document_type': 'nf',
+                'state_id': state_ids[0] if state_ids else False,
+                'date': self.nfref.refNF.AAMM.valor or False,
+                'cnpj_cpf': self.nfref.refNF.CNPJ.valor or False,
+                'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
+                else False,
+                'serie': self.nfref.refNF.serie.valor or False,
+                'internal_number': self.nfref.refNF.nNF.valor or False,
             })
 
-        elif self.nfref.refNFP:
+        elif self.nfref.refNFP.CNPJ.valor:
 
             state_ids = state_obj.search(cr, uid, [
                 ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])
@@ -405,43 +405,35 @@ class NFe200(FiscalDocument):
                         self.nfref.refNFP.CPF.valor)
 
             nfe_reference.update({
-                'inv_related': {
-                    'document_type': 'nfrural',
-                    'state_id': state_ids[0] if state_ids else False,
-                    'date': self.nfref.refNFP.AAMM.valor,
-                    'inscr_est': self.nfref.refNFP.IE.valor,
-                    'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
-                    else False,
-                    'serie': self.nfref.refNFP.serie.valor,
-                    'internal_number': self.nfref.refNFP.nNF.valor,
-                    'cnpj_cpf': cnpj_cpf,
-                }
+                'document_type': 'nfrural',
+                'state_id': state_ids[0] if state_ids else False,
+                'date': self.nfref.refNFP.AAMM.valor,
+                'inscr_est': self.nfref.refNFP.IE.valor,
+                'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
+                else False,
+                'serie': self.nfref.refNFP.serie.valor,
+                'internal_number': self.nfref.refNFP.nNF.valor,
+                'cnpj_cpf': cnpj_cpf,
             })
         elif self.nfref.refNFe.valor:
             nfe_reference.update({
-                'inv_related': {
-                    'document_type': 'nfe',
-                    'access_key': self.nfref.refNFe.valor,
-                }
+                'document_type': 'nfe',
+                'access_key': self.nfref.refNFe.valor,
             })
         elif self.nfref.refCTe.valor:
             nfe_reference.update({
-                'inv_related': {
-                    'document_type': 'cte',
-                    'access_key': self.nfref.refCTe.valor,
-                }
+                'document_type': 'cte',
+                'access_key': self.nfref.refCTe.valor,
             })
         elif self.nfref.refECF:
             fiscal_doc_ids = fiscal_doc_obj.search(cr, uid, [
                 ('code', '=', self.nfref.refECF.mod.valor)])
             nfe_reference.update({
-                'inv_related': {
-                    'document_type': 'cf',
-                    'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
-                    else False,
-                    'serie': self.nfref.refNF.serie.valor,
-                    'internal_number': self.nfref.refNF.nNF.valor,
-                }
+                'document_type': 'cf',
+                'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
+                else False,
+                'serie': self.nfref.refNF.serie.valor,
+                'internal_number': self.nfref.refNF.nNF.valor,
             })
 
         return nfe_reference
