@@ -123,7 +123,8 @@ class NFe200(FiscalDocument):
 
         carrier_data = self._get_carrier_data(cr, uid, pool, nfe,
                                               context=context)
-        in_out_data = self._get_in_out_adress(cr, uid, pool, nfe, context=context)
+        in_out_data = self._get_in_out_adress(cr, uid, pool, nfe,
+                                              context=context)
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -308,18 +309,13 @@ class NFe200(FiscalDocument):
         if nfe.infNFe.ide.tpNF.valor == '0':
             cnpj = self._mask_cnpj_cpf(True, nfe.infNFe.retirada.CNPJ.valor)
         else:
-            print  nfe.infNFe.entrega.CNPJ.valor
+            print nfe.infNFe.entrega.CNPJ.valor
             cnpj = self._mask_cnpj_cpf(True, nfe.infNFe.entrega.CNPJ.valor)
-
-        print cnpj
 
         partner_ids = pool.get('res.partner').search(
             cr, uid, [('cnpj_cpf', '=', cnpj)])
 
-        print partner_ids
-
-        res = partner_ids[0] if partner_ids else False
-        return {'partner_shipping_id': res}
+        return {'partner_shipping_id': partner_ids[0] if partner_ids else False}
 
     def _nfe_references(self, cr, uid, ids, inv_related, context=None):
 
@@ -359,7 +355,7 @@ class NFe200(FiscalDocument):
             self.nfref.refECF.nECF.valor = inv_related.internal_number
             self.nfref.refECF.nCOO.valor = inv_related.serie
 
-    def _get_nfe_references(self, cr, uid, ids, inv_related, pool, context=None):
+    def _get_nfe_references(self, cr, uid, ids, pool, nfe, context=None):
 
         #
         # Documentos referenciadas
@@ -368,35 +364,40 @@ class NFe200(FiscalDocument):
         state_obj = pool.get('res.country.state')
         fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
         if self.nfref.refNF:
-            state_id = state_obj.search(cr, uid, [
-                ('ibge_code', '=', self.nfref.refNF.cUF.valor)])[0]
-            fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
-                ('code', '=', self.nfref.refNF.mod.valor)])[0]
+            state_ids = state_obj.search(cr, uid, [
+                ('ibge_code', '=', self.nfref.refNF.cUF.valor)])
+            fiscal_doc_ids = fiscal_doc_obj.search(cr, uid, [
+                ('code', '=', self.nfref.refNF.mod.valor)])
+
             nfe_reference.update({
                 'inv_related': {
                     'document_type': 'nf',
-                    'state_id': state_id,
+                    'state_id': state_ids[0] if state_ids else False,
                     'date': self.nfref.refNF.AAMM.valor,
                     'cnpj_cpf': self.nfref.refNF.CNPJ.valor,
-                    'fiscal_document_id': fiscal_doc_id,
+                    'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
+                    else False,
                     'serie': self.nfref.refNF.serie.valor,
                     'internal_number': self.nfref.refNF.nNF.valor,
                 }
             })
+
         elif self.nfref.refNFP:
-            state_id = state_obj.search(cr, uid, [
-                ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])[0]
-            fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
-                ('code', '=', self.nfref.refNFP.mod.valor)])[0]
+            state_ids = state_obj.search(cr, uid, [
+                ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])
+            fiscal_doc_ids = fiscal_doc_obj.search(cr, uid, [
+                ('code', '=', self.nfref.refNFP.mod.valor)])
             cnpj_cpf = (self.nfref.refNFP.CNPJ.valor or
                         self.nfref.refNFP.CPF.valor)
+
             nfe_reference.update({
                 'inv_related': {
                     'document_type': 'nfrural',
-                    'state_id': state_id,
+                    'state_id': state_ids[0] if state_ids else False,
                     'date': self.nfref.refNFP.AAMM.valor,
                     'inscr_est': self.nfref.refNFP.IE.valor,
-                    'fiscal_document_id': fiscal_doc_id,
+                    'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
+                    else False,
                     'serie': self.nfref.refNFP.serie.valor,
                     'internal_number': self.nfref.refNFP.nNF.valor,
                     'cnpj_cpf': cnpj_cpf,
@@ -417,12 +418,13 @@ class NFe200(FiscalDocument):
                 }
             })
         elif self.nfref.refECF:
-            fiscal_doc_id = fiscal_doc_obj.search(cr, uid, [
-                ('code', '=', self.nfref.refECF.mod.valor)])[0]
+            fiscal_doc_ids = fiscal_doc_obj.search(cr, uid, [
+                ('code', '=', self.nfref.refECF.mod.valor)])
             nfe_reference.update({
                 'inv_related': {
                     'document_type': 'cf',
-                    'fiscal_document_id': fiscal_doc_id,
+                    'fiscal_document_id': fiscal_doc_ids[0] if fiscal_doc_ids
+                    else False,
                     'serie': self.nfref.refNF.serie.valor,
                     'internal_number': self.nfref.refNF.nNF.valor,
                 }
@@ -458,27 +460,20 @@ class NFe200(FiscalDocument):
         if inv.company_id.partner_id.inscr_mun:
             self.nfe.infNFe.emit.CNAE.valor = re.sub('[%s]' % re.escape(string.punctuation), '', inv.company_id.cnae_main_id.code or '')
 
-    def _get_emmiter(self, cr, uid, ids, inv, company, pool, context=None):
+    def _get_emmiter(self, cr, uid, pool, nfe, context=None):
 
         #
         # Emitente
         #
         emmiter = {}
-
         partner_obj = pool.get('res.partner')
-        cnpj = self.nfe.infNFe.emit.CNPJ.valor
-        if cnpj:
-            emitter_partner_id = partner_obj.search(cr, uid, [
-                ('cnpj_cpf', '=', cnpj)])[0]
+        cnpj = self._mask_cnpj_cpf(True, nfe.infNFe.emit.CNPJ.valor)
 
-        if emitter_partner_id:
-            emmiter.update({
-                'emitter_partner_id': emitter_partner_id,
-            })
-        else:
-            emmiter.update({
-                'emitter_partner_id': False,
-            })
+        emitter_partner_ids = partner_obj.search(
+            cr, uid, [('cnpj_cpf', '=', cnpj)])
+
+        emmiter['emitter_partner_id'] = \
+            emitter_partner_ids[0] if emitter_partner_ids else False
 
         return emmiter
 
@@ -530,26 +525,24 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.dest.enderDest.fone.valor = re.sub('[%s]' % re.escape(string.punctuation), '', str(inv.partner_id.phone or '').replace(' ',''))
         self.nfe.infNFe.dest.email.valor = inv.partner_id.email or ''
 
-    def _get_receiver(self, cr, uid, ids, inv, company, nfe_environment, pool, context=None):
+    def _get_receiver(self, cr, uid, pool, nfe, context=None):
 
         #
         # Destinatário
         #
         receiver = {}
 
-        if self.nfe.infNFe.dest.CNPJ.valor:
-            cnpj_cpf = self.nfe.infNFe.dest.CNPJ.valor
+        if nfe.infNFe.dest.CNPJ.valor:
+            cnpj_cpf = nfe.infNFe.dest.CNPJ.valor
 
-        elif self.nfe.infNFe.dest.CPF.valor:
-            cnpj_cpf = self.nfe.infNFe.dest.CPF.valor
+        elif nfe.infNFe.dest.CPF.valor:
+            cnpj_cpf = nfe.infNFe.dest.CPF.valor
 
-        receiver_partner_id = pool.get('res.partner').search(
-            cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])[0]
+        receiver_partner_ids = pool.get('res.partner').search(
+            cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])
 
-        if receiver_partner_id:
-            receiver.update({'receiver_partner_id': receiver_partner_id})
-        else:
-            receiver.update({'receiver_partner_id': False})
+        receiver['receiver_partner_id'] = \
+            receiver_partner_ids[0] if receiver_partner_ids else False
 
         return receiver
 
@@ -912,9 +905,7 @@ class NFe200(FiscalDocument):
                 cnpj_cpf = "%s.%s.%s-%s" % (val[0:3], val[3:6], val[6:9],
                                             val[9:11])
 
-            return cnpj_cpf
-
-        return ''
+        return cnpj_cpf
 
     def _get_carrier_data(self, cr, uid, pool, nfe, context=None):
 
