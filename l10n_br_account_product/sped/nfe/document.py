@@ -118,6 +118,9 @@ class NFe200(FiscalDocument):
         elif nfe.infNFe.ide.tpNF.valor == 1:
             action = ('account', 'action_invoice_tree2')
 
+        self.nfe = nfe
+        self.nfref = self._get_NFRef()
+
         pool = pooler.get_pool(cr.dbname)
         invoice_obj = pool.get('account.invoice')
 
@@ -126,6 +129,15 @@ class NFe200(FiscalDocument):
         in_out_data = self._get_in_out_adress(cr, uid, pool, nfe,
                                               context=context)
         receiver = self._get_receiver(cr, uid, pool, nfe, context=context)
+
+        try:
+            nfe_references = self._get_nfe_references(
+                cr, uid, pool, nfe, context=context)
+            fiscal_doc_obj = pool.get('l10n_br_account.fiscal.document')
+            fiscal_doc_id = fiscal_doc_obj.create(
+                cr, uid, nfe_references, context=context)
+        except AttributeError:
+                pass
 
         invoice_vals = {
             'nfe_access_key': False,
@@ -356,7 +368,7 @@ class NFe200(FiscalDocument):
             self.nfref.refECF.nECF.valor = inv_related.internal_number
             self.nfref.refECF.nCOO.valor = inv_related.serie
 
-    def _get_nfe_references(self, cr, uid, ids, pool, nfe, context=None):
+    def _get_nfe_references(self, cr, uid, pool, nfe, context=None):
 
         #
         # Documentos referenciadas
@@ -384,6 +396,7 @@ class NFe200(FiscalDocument):
             })
 
         elif self.nfref.refNFP:
+
             state_ids = state_obj.search(cr, uid, [
                 ('ibge_code', '=', self.nfref.refNFP.cUF.valor)])
             fiscal_doc_ids = fiscal_doc_obj.search(cr, uid, [
