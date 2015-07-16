@@ -533,15 +533,15 @@ class NFe200(FiscalDocument):
         receiver = {}
 
         if nfe.infNFe.dest.CNPJ.valor:
-            cnpj_cpf = nfe.infNFe.dest.CNPJ.valor
+            cnpj_cpf = self._mask_cnpj_cpf(True, nfe.infNFe.dest.CNPJ.valor)
 
         elif nfe.infNFe.dest.CPF.valor:
-            cnpj_cpf = nfe.infNFe.dest.CPF.valor
+            cnpj_cpf = self._mask_cnpj_cpf(False, nfe.infNFe.dest.CPF.valor)
 
         receiver_partner_ids = pool.get('res.partner').search(
             cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])
 
-        receiver['receiver_partner_id'] = \
+        receiver['partner_id'] = \
             receiver_partner_ids[0] if receiver_partner_ids else False
 
         return receiver
