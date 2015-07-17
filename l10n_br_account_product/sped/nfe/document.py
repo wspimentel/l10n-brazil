@@ -299,7 +299,7 @@ class NFe200(FiscalDocument):
         res['date_in_out'] = self.nfe.infNFe.ide.dSaiEnt.valor
         res['nfe_purpose'] = str(self.nfe.infNFe.ide.finNFe.valor)
 
-        # TODO: Campo importante para o SPED:
+        # TODO: Campo importante para o SPED
         # self.nfe.infNFe.ide.indPag.valor =
         # inv.payment_term and inv.payment_term.indPag or '0'
         # TODO: Adicionar campo nfe_enviroment na invoice assim como foi feito
@@ -724,28 +724,49 @@ class NFe200(FiscalDocument):
         inv_line['discount_value'] = float(self.det.prod.vDesc.valor)
         inv_line['other_costs_value'] = float(self.det.prod.vOutro.valor)
 
+        if self.det.imposto.ICMS.orig.valor:
+            inv_line['icms_origin'] = self.det.imposto.ICMS.orig.valor
 
-            # 'icms_origin': self.det.imposto.ICMS.orig.valor,
-            # if inv_line.icms_cst_id.code > 100:
-            #     # self.det.imposto.ICMS.CSOSN.valor = inv_line.icms_cst_id.code
-            #     'icms_percent': self.det.imposto.ICMS.pCredSN.valor,
-            #     'icms_value': self.det.imposto.ICMS.vCredICMSSN.valor,
-            #
-            # # self.det.imposto.ICMS.CST.valor = inv_line.icms_cst_id.code
-            # 'icms_base_type': self.det.imposto.ICMS.modBC.valor,
-            # 'icms_base': self.det.imposto.ICMS.vBC.valor,
-            # 'icms_percent_reduction': self.det.imposto.ICMS.pRedBC.valor,
-            # 'icms_percent': self.det.imposto.ICMS.pICMS.valor,
-            # 'icms_value': self.det.imposto.ICMS.vICMS.valor,
+            if inv_line.icms_cst_id.code > 100:
+
+                icms_cst_ids = pool.get('account.tax.code').search(
+                    cr, uid, [('code', '=', inv_line.icms_cst_id.code)])
+
+            inv_line['icms_cst_id'] = icms_cst_ids[0] if icms_cst_ids else False
+            inv_line['icms_percent'] = self.det.imposto.ICMS.pCredSN.valor
+            inv_line['icms_value'] = self.det.imposto.ICMS.vCredICMSSN.valor
+
+            inv_line['icms_base_type'] = self.det.imposto.ICMS.modBC.valor
+            inv_line['icms_base'] = self.det.imposto.ICMS.vBC.valor
+            inv_line['icms_percent_reduction'] = self.det.imposto.ICMS.pRedBC.valor
+            inv_line['icms_percent'] = self.det.imposto.ICMS.pICMS.valor
+            inv_line['icms_value'] = self.det.imposto.ICMS.vICMS.valor
+
             #
             # # ICMS ST
-            # 'icms_st_base_type': self.det.imposto.ICMS.modBCST.valor,
-            # 'icms_st_mva': self.det.imposto.ICMS.pMVAST.valor,
-            # 'icms_st_percent_reduction': self.det.imposto.ICMS.pRedBCST.valor,
-            # 'icms_st_base': self.det.imposto.ICMS.vBCST.valor,
-            # 'icms_st_percent': self.det.imposto.ICMS.pICMSST.valor,
-            # 'icms_st_value': self.det.imposto.ICMS.vICMSST.valor,
             #
+            inv_line['icms_st_base_type'] = self.det.imposto.ICMS.modBCST.valor
+            inv_line['icms_st_mva'] = self.det.imposto.ICMS.pMVAST.valor
+            inv_line['icms_st_percent_reduction'] = self.det.imposto.ICMS.pRedBCST.valor
+            inv_line['icms_st_base'] = self.det.imposto.ICMS.vBCST.valor
+            inv_line['icms_st_percent'] = self.det.imposto.ICMS.pICMSST.valor
+            inv_line['icms_st_value'] = self.det.imposto.ICMS.vICMSST.valor
+
+            # # IPI
+            
+            # if inv_line.ipi_type == 'percent' or '':
+            #     'ipi_base': self.det.imposto.IPI.vBC.valor,
+            #     'ipi_percent': self.det.imposto.IPI.pIPI.valor,
+            # if inv_line.ipi_type == 'quantity':
+            #     pesol = 0
+            #     if inv_line.product_id:
+            #         pesol = inv_line.product_id.weight_net
+            #         # self.det.imposto.IPI.qUnid.valor = str("%.2f" % inv_line.quantity * pesol)
+            #         'ipi_percent': self.det.imposto.IPI.vUnid.valor,
+            # 'ipi_value': self.det.imposto.IPI.vIPI.valor,
+
+        return inv_line
+
             # # IPI
             # self.det.imposto.IPI.CST.valor = inv_line.ipi_cst_id.code
             # if inv_line.ipi_type == 'percent' or '':
