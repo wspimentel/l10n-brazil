@@ -137,98 +137,99 @@ class NFe200(FiscalDocument):
         except AttributeError:
             pass
 
-        invoice_vals = {
-            'nfe_access_key': False,
-            'comment': u'',
-            'vendor_serie': False,
-            'check_total': 101.8,
-            'number_of_packages': 0,
-            # 'partner_bank_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac750>,
-            'supplier_invoice_number': False,
-            'ind_final': u'0',
-            'icms_base_other': 0.0,
-            'amount_gross': 101.8,
-            # 'carrier_id': carrier_data['carrier_id'],
-            # 'vehicle_id': carrier_data['vehicle_id'],
-            'ipi_base': 0.0,
-            'amount_freight': 0.0,
-            # 'fiscal_category_id': browse_record(l10n_br_account.fiscal.category,21),
-            'fiscal_type': u'product',
-            'issuer': u'1',
-            'user_id': 16,
-            'reference': u'EPC00420',
-            # 'payment_mode_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac910>,
-            'company_id': 1,
-            'amount_tax': 0.0,
-            # 'move_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac990>,
-            'cofins_base': 0.0,
-            'type': u'in_invoice',
-            'sent': False,
-            # 'incoterm': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac9d0>,
-            'internal_number': False,
-            'account_id': 96,
-            'pis_value': 0.0,
-            'notation_of_packages': False,
-            'nfe_export_date': False,
-            'number': False,
-            'date_invoice': False,
-            #'period_id': <openerp.osv.orm.browse_null object at
-            # 0x7f9ebd9aca90>,
-            'icms_st_value': 0.0,
-            'fiscal_document_electronic': True,
-            'origin': u'EPC00420',
-            'amount_total': 101.8,
-            'amount_discount': 0.0,
-            'name': u'EPC00420',
-            # 'partner_shipping_id': in_out_data['partner_shipping_id'],
-            'ipi_base_other': 0.0,
-            # 'payment_term': browse_record(account.payment.term, 6),
-            'amount_insurance': 0.0,
-            'carrier_name': False,
-            # 'commercial_partner_id': browse_record(res.partner, 899),
-            'ii_value': 0.0,
-            'date_due': False,
-            'weight': 0.0,
-            'currency_id': 7,
-            'nfe_purpose': u'1',
-            # 'vehicle_state_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acb10>,
-            # 'partner_id': 899,
-            # 'id': 74,
-            # 'vehicle_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acd10>,
-            'amount_costs': 0.0,
-            'amount_untaxed': 101.8,
-            'document_serie_id': 2,
-            'brand_of_packages': False,
-            'reference_type': u'none',
-            'journal_id': 22,
-            'ind_pres': u'0',
-            'state': u'draft',
-            # 'vehicle_l10n_br_city_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8110>,
-            'nfe_date': False,
-            'cofins_value': 0.0,
-            'reconciled': False,
-            'pis_base': 0.0,
-            'kind_of_packages': False,
-            'date_in_out': False,
-            'weight_net': 0.0,
-            'residual': 0.0,
-            'move_name': False,
-            # 'section_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8150>,
-            # 'fiscal_position': browse_record(account.fiscal.position, 29),
-            # 'agent_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8190>,
-            'ipi_value': 0.0,
-            'vehicle_plate': False,
-            'icms_st_base': 0.0,
-            'nfe_status': False,
-            'nfe_version': u'3.10',
-            'icms_base': 0.0,
-            'date_hour_invoice': False,
-            'fiscal_comment': False,
-            'icms_value': 0.0,
-            'nfe_protocol_number': False,
-            'fiscal_document_id': fiscal_doc_id or False,
-        }
+        # invoice_vals = {
+        #     'nfe_access_key': False,
+        #     'comment': u'',
+        #     'vendor_serie': False,
+        #     'check_total': 101.8,
+        #     'number_of_packages': 0,
+        #     # 'partner_bank_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac750>,
+        #     'supplier_invoice_number': False,
+        #     'ind_final': u'0',
+        #     'icms_base_other': 0.0,
+        #     'amount_gross': 101.8,
+        #     'ipi_base': 0.0,
+        #     'amount_freight': 0.0,
+        #     # 'fiscal_category_id': browse_record(l10n_br_account.fiscal.category,21),
+        #     'fiscal_type': u'product',
+        #     'issuer': u'1',
+        #     'user_id': 16,
+        #     'reference': u'EPC00420',
+        #     # 'payment_mode_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac910>,
+        #     'company_id': 1,
+        #     'amount_tax': 0.0,
+        #     # 'move_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac990>,
+        #     'cofins_base': 0.0,
+        #     'type': u'out_invoice',
+        #     'sent': False,
+        #     # 'incoterm': <openerp.osv.orm.browse_null object at 0x7f9ebd9ac9d0>,
+        #     'internal_number': False,
+        #     'account_id': 96,
+        #     'pis_value': 0.0,
+        #     'notation_of_packages': False,
+        #     'nfe_export_date': False,
+        #     'number': False,
+        #     'date_invoice': False,
+        #     #'period_id': <openerp.osv.orm.browse_null object at
+        #     # 0x7f9ebd9aca90>,
+        #     'icms_st_value': 0.0,
+        #     'fiscal_document_electronic': True,
+        #     'origin': u'EPC00420',
+        #     'amount_total': 101.8,
+        #     'amount_discount': 0.0,
+        #     'name': u'EPC00420',
+        #     # 'partner_shipping_id': in_out_data['partner_shipping_id'],
+        #     'ipi_base_other': 0.0,
+        #     # 'payment_term': browse_record(account.payment.term, 6),
+        #     'amount_insurance': 0.0,
+        #     'carrier_name': False,
+        #     # 'commercial_partner_id': browse_record(res.partner, 899),
+        #     'ii_value': 0.0,
+        #     'date_due': False,
+        #     'weight': 0.0,
+        #     'currency_id': 7,
+        #     'nfe_purpose': u'1',
+        #     # 'vehicle_state_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acb10>,
+        #     # 'partner_id': 899,
+        #     # 'id': 74,
+        #     # 'vehicle_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9acd10>,
+        #     'amount_costs': 0.0,
+        #     'amount_untaxed': 101.8,
+        #     'document_serie_id': 2,
+        #     'brand_of_packages': False,
+        #     'reference_type': u'none',
+        #     'journal_id': 22,
+        #     'ind_pres': u'0',
+        #     'state': u'draft',
+        #     # 'vehicle_l10n_br_city_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8110>,
+        #     'nfe_date': False,
+        #     'cofins_value': 0.0,
+        #     'reconciled': False,
+        #     'pis_base': 0.0,
+        #     'kind_of_packages': False,
+        #     'date_in_out': False,
+        #     'weight_net': 0.0,
+        #     'residual': 0.0,
+        #     'move_name': False,
+        #     # 'section_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8150>,
+        #     # 'fiscal_position': browse_record(account.fiscal.position, 29),
+        #     # 'agent_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8190>,
+        #     'ipi_value': 0.0,
+        #     'vehicle_plate': False,
+        #     'icms_st_base': 0.0,
+        #     'nfe_status': False,
+        #     'nfe_version': u'3.10',
+        #     'icms_base': 0.0,
+        #     'date_hour_invoice': False,
+        #     'fiscal_comment': False,
+        #     'icms_value': 0.0,
+        #     'nfe_protocol_number': False,
+        #     'fiscal_document_id': fiscal_doc_id or False,
+        # }
 
+        invoice_vals = {
+            'account_id': 96
+        }
         carrier_data = self._get_carrier_data(cr, uid, pool, context=context)
         in_out_data = self._get_in_out_adress(cr, uid, pool, context=context)
         receiver = self._get_receiver(cr, uid, pool, context=context)
@@ -246,6 +247,12 @@ class NFe200(FiscalDocument):
         invoice_vals.update(emmiter)
         invoice_vals.update(encashment_data)
 
+        inv_line_ids = []
+        for det in self.nfe.infNFe.det:
+            self.det = det
+            inv_line_ids += self._get_details(cr, uid, pool, context=context)
+
+        invoice_vals['invoice_line'] = inv_line_ids
         invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
 
         return invoice_id, action
@@ -679,17 +686,24 @@ class NFe200(FiscalDocument):
         self.det.imposto.COFINSST.vAliqProd.valor = ''
         self.det.imposto.COFINSST.vCOFINS.valor = str("%.2f" % inv_line.cofins_st_value)
 
-    def _get_details(self, cr, uid, ids, i, pool, context=None):
+    def _get_details(self, cr, uid, pool, context=None):
 
         #
         # Detalhe
         #
+        # Importamos dados da invoice line
         inv_line = {}
 
         product_ids = pool.get('product.product').search(
-            cr, uid, [('code', '=', self.det.prod.cProd.valor)])
+            cr, uid, [('default_code', '=', self.det.prod.cProd.valor)])
 
         inv_line['product_id'] = product_ids[0] if product_ids else False
+
+        # preenchemos a descricao da invoice line porque ela é um campo
+        # obrigatorio
+        product_id = \
+            pool.get('product.product').browse(cr, uid, inv_line['product_id'])
+        inv_line['name'] = product_id.name
 
         fiscal_classification_ids = \
             pool.get('account.product.fiscal.classification').search(cr, uid, [])
@@ -723,18 +737,17 @@ class NFe200(FiscalDocument):
         inv_line['other_costs_value'] = float(self.det.prod.vOutro.valor)
 
         if self.det.imposto.ICMS.orig.valor:
-            inv_line['icms_origin'] = self.det.imposto.ICMS.orig.valor
+            inv_line['icms_origin'] = str(self.det.imposto.ICMS.orig.valor)
 
-            if inv_line.icms_cst_id.code > 100:
-
+            if self.det.imposto.ICMS.CSOSN.valor > 100:
                 icms_cst_ids = pool.get('account.tax.code').search(
-                    cr, uid, [('code', '=', inv_line.icms_cst_id.code)])
+                    cr, uid, [('code', '=', self.det.imposto.ICMS.CSOSN.valor)])
 
             inv_line['icms_cst_id'] = icms_cst_ids[0] if icms_cst_ids else False
             inv_line['icms_percent'] = self.det.imposto.ICMS.pCredSN.valor
             inv_line['icms_value'] = self.det.imposto.ICMS.vCredICMSSN.valor
 
-            inv_line['icms_base_type'] = self.det.imposto.ICMS.modBC.valor
+            inv_line['icms_base_type'] = str(self.det.imposto.ICMS.modBC.valor)
             inv_line['icms_base'] = self.det.imposto.ICMS.vBC.valor
             inv_line['icms_percent_reduction'] = self.det.imposto.ICMS.pRedBC.valor
             inv_line['icms_percent'] = self.det.imposto.ICMS.pICMS.valor
@@ -743,7 +756,7 @@ class NFe200(FiscalDocument):
             #
             # # ICMS ST
             #
-            inv_line['icms_st_base_type'] = self.det.imposto.ICMS.modBCST.valor
+            inv_line['icms_st_base_type'] = str(self.det.imposto.ICMS.modBCST.valor)
             inv_line['icms_st_mva'] = self.det.imposto.ICMS.pMVAST.valor
             inv_line['icms_st_percent_reduction'] = self.det.imposto.ICMS.pRedBCST.valor
             inv_line['icms_st_base'] = self.det.imposto.ICMS.vBCST.valor
@@ -802,7 +815,7 @@ class NFe200(FiscalDocument):
         inv_line['cofins_st_percent'] = self.det.imposto.COFINSST.pCOFINS.valor
         inv_line['cofins_st_value'] = self.det.imposto.COFINSST.vCOFINS.valor
 
-        return inv_line
+        return [(0, 0, inv_line)]
 
     def _di(self, cr, uid, ids, inv, inv_line, inv_di, i, context=None):
         self.di.nDI.valor = inv_di.name
