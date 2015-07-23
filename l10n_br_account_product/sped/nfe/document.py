@@ -211,7 +211,7 @@ class NFe200(FiscalDocument):
         #     'weight_net': 0.0,
         #     'residual': 0.0,
         #     'move_name': False,
-        #     # 'section_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8150>,
+        #     # except'section_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8150>,
         #     # 'fiscal_position': browse_record(account.fiscal.position, 29),
         #     # 'agent_id': <openerp.osv.orm.browse_null object at 0x7f9ebd9b8190>,
         #     'ipi_value': 0.0,
@@ -230,6 +230,7 @@ class NFe200(FiscalDocument):
         invoice_vals = {
             'account_id': 96
         }
+
         carrier_data = self._get_carrier_data(cr, uid, pool, context=context)
         in_out_data = self._get_in_out_adress(cr, uid, pool, context=context)
         receiver = self._get_receiver(cr, uid, pool, context=context)
@@ -567,6 +568,8 @@ class NFe200(FiscalDocument):
         #
         receiver = {}
 
+        cnpj_cpf = ''
+
         if self.nfe.infNFe.dest.CNPJ.valor:
             cnpj_cpf = self._mask_cnpj_cpf(True, self.nfe.infNFe.dest.CNPJ.valor)
 
@@ -577,9 +580,19 @@ class NFe200(FiscalDocument):
         receiver_partner_ids = pool.get('res.partner').search(
             cr, uid, [('cnpj_cpf', '=', cnpj_cpf)])
 
+        # Quando o cliente é estrangeiro, ele nao possui cnpj. Por isso
+        # realizamos a busca usando como chave de busca o nome da empresa ou
+        # a sua razao social
+        if not receiver_partner_ids:
+            aux = ['|',
+                   ('legal_name', '=', self.nfe.infNFe.dest.xNome.valor),
+                   ('legal_name', '=', self.nfe.infNFe.dest.xNome.valor)]
+            receiver_partner_ids = pool.get('res.partner').search(
+                cr, uid, aux)
+
         receiver['partner_id'] = \
             receiver_partner_ids[0] if receiver_partner_ids else False
-
+        print receiver['partner_id']
         return receiver
 
     def _details(self, cr, uid, ids, inv, inv_line, i, context=None):
@@ -698,12 +711,7 @@ class NFe200(FiscalDocument):
             cr, uid, [('default_code', '=', self.det.prod.cProd.valor)])
 
         inv_line['product_id'] = product_ids[0] if product_ids else False
-
-        # preenchemos a descricao da invoice line porque ela é um campo
-        # obrigatorio
-        product_id = \
-            pool.get('product.product').browse(cr, uid, inv_line['product_id'])
-        inv_line['name'] = product_id.name
+        inv_line['name'] = ''
 
         fiscal_classification_ids = \
             pool.get('account.product.fiscal.classification').search(cr, uid, [])
@@ -873,27 +881,34 @@ class NFe200(FiscalDocument):
         #
 
         # Realizamos a busca da move line a partir do nome da mesma
-        account_move_line_ids = pool.get('account.move.line').search(
-            cr, uid, [('name', '=', self.dup.nDup.valor)])
+        # account_move_line_ids = pool.get('account.move.line').search(
+        #     cr, uid, [('name', '=', self.dup.nDup.valor)])
+        #
+        # if not account_move_line_ids:
+        #     # Se nao encontrarmos a move line, nos devemos cria-la
+        #     vals = {
+        #         'name': self.dup.nDup.valor,
+        #         'date_maturity': self.dup.dVenc.valor,
+        #         'debit': self.dup.vDup.valor,
+        #         # 'journal_id': 1,
+        #     }
+        #
+        #     # Inserimos em um lista para que account_move_line_ids continue
+        #     # representando uma lista
+        #     context['journal_id'] = 1
+        #     context['period_id'] = 1
+        #     account_move_line_ids = [pool.get('account.move.line').create(
+        #         cr, uid, vals, context=context)]
+        #
+        # encashment_data = {
+        #     'move_line_receivable_id': account_move_line_ids[0] if
+        #     account_move_line_ids else False,
+        #     'date_due': self.dup.dVenc.valor,
+        # }
 
-        if not account_move_line_ids:
-            # Se nao encontrarmos a move line, nos devemos cria-la
-            vals = {
-                'name': self.dup.nDup.valor,
-                'date_maturity': self.dup.dVenc.valor,
-                'debit': self.dup.vDup.valor,
-            }
-
-            # Inserimos em um lista para que account_move_line_ids continue
-            # representando uma lista
-            account_move_line_ids = [pool.get('account.move.line').create(
-                cr, uid, vals, context=context)]
-
-        encashment_data = {
-            'move_line_receivable_id': account_move_line_ids[0] if
-            account_move_line_ids else False,
-            'date_due': self.dup.dVenc.valor,
-        }
+        # Nao conseguimos obter todos os campos necessarios para criacao
+        # do account.move.line
+        encashment_data = {}
 
         return encashment_data
 
