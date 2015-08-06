@@ -307,6 +307,11 @@ class NFe200(FiscalDocument):
         res['date_in_out'] = self.nfe.infNFe.ide.dSaiEnt.valor
         res['nfe_purpose'] = str(self.nfe.infNFe.ide.finNFe.valor)
 
+        if self.nfe.infNFe.ide.tpNF.valor == 0:
+            res['type'] = 'in_invoice'
+        else:
+            res['type'] = 'out_invoice'
+
         # TODO: Campo importante para o SPED
         # self.nfe.infNFe.ide.indPag.valor =
         # inv.payment_term and inv.payment_term.indPag or '0'
@@ -347,7 +352,6 @@ class NFe200(FiscalDocument):
         if self.nfe.infNFe.ide.tpNF.valor == '0':
             cnpj = self._mask_cnpj_cpf(True, self.nfe.infNFe.retirada.CNPJ.valor)
         else:
-            print self.nfe.infNFe.entrega.CNPJ.valor
             cnpj = self._mask_cnpj_cpf(True, self.nfe.infNFe.entrega.CNPJ.valor)
 
         partner_ids = pool.get('res.partner').search(
@@ -592,7 +596,6 @@ class NFe200(FiscalDocument):
 
         receiver['partner_id'] = \
             receiver_partner_ids[0] if receiver_partner_ids else False
-        print receiver['partner_id']
         return receiver
 
     def _details(self, cr, uid, ids, inv, inv_line, i, context=None):
@@ -747,9 +750,9 @@ class NFe200(FiscalDocument):
         if self.det.imposto.ICMS.orig.valor:
             inv_line['icms_origin'] = str(self.det.imposto.ICMS.orig.valor)
 
-            if self.det.imposto.ICMS.CSOSN.valor > 100:
-                icms_cst_ids = pool.get('account.tax.code').search(
-                    cr, uid, [('code', '=', self.det.imposto.ICMS.CSOSN.valor)])
+            icms_cst_ids = pool.get('account.tax.code').search(
+                cr, uid, [('code', '=', self.det.imposto.ICMS.CST.valor),
+                          ('domain', '=', 'icms')])
 
             inv_line['icms_cst_id'] = icms_cst_ids[0] if icms_cst_ids else False
             inv_line['icms_percent'] = self.det.imposto.ICMS.pCredSN.valor
@@ -774,10 +777,14 @@ class NFe200(FiscalDocument):
             #
             # # IPI
             #
+            ipi_cst_ids = pool.get('account.tax.code').search(
+                cr, uid, [('code', '=', self.det.imposto.IPI.CST.valor),
+                          ('domain', '=', 'ipi')])
             if self.det.imposto.IPI.vBC.valor and self.det.imposto.IPI.pIPI.valor:
                 inv_line['ipi_type'] = 'percent'
                 inv_line['ipi_base'] = self.det.imposto.IPI.vBC.valor
                 inv_line['ipi_percent'] = self.det.imposto.IPI.pIPI.valor
+                inv_line['ipi_cst_id'] = ipi_cst_ids[0] if ipi_cst_ids else False
 
             elif self.det.imposto.IPI.qUnid.valor and \
                     self.det.imposto.IPI.vUnid.valor:
@@ -796,7 +803,7 @@ class NFe200(FiscalDocument):
 
         # PIS
         pis_cst_ids = pool.get('account.tax.code').search(
-            cr, uid, [('code', '=', self.det.imposto.PIS.CST.valor)])
+            cr, uid, [('code', '=', self.det.imposto.PIS.CST.valor),('domain', '=', 'pis')])
 
         inv_line['pis_cst_id'] = pis_cst_ids[0] if pis_cst_ids else False
         inv_line['pis_base'] = self.det.imposto.PIS.vBC.valor
@@ -810,7 +817,7 @@ class NFe200(FiscalDocument):
 
         # COFINS
         cofins_cst_ids = pool.get('account.tax.code').search(
-            cr, uid, [('code', '=', self.det.imposto.COFINS.CST.valor)])
+            cr, uid, [('code', '=', self.det.imposto.COFINS.CST.valor),('domain', '=', 'cofins')])
 
         inv_line['cofins_cst_id'] = \
             cofins_cst_ids[0] if cofins_cst_ids else False
