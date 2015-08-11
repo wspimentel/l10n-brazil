@@ -667,6 +667,23 @@ class NFe200(FiscalDocument):
                     self.det.imposto.IPI.vUnid.valor = str("%.2f" % inv_line.ipi_percent)
             self.det.imposto.IPI.vIPI.valor = str("%.2f" % inv_line.ipi_value)
 
+            # ipi_cst_ids = pool.get('account.tax.code').search(
+            #     cr, uid, [('code', '=', self.det.imposto.IPI.CST.valor),
+            #               ('domain', '=', 'ipi')])
+            # if self.det.imposto.IPI.vBC.valor and self.det.imposto.IPI.pIPI.valor:
+            #     inv_line['ipi_type'] = 'percent'
+            #     inv_line['ipi_base'] = self.det.imposto.IPI.vBC.valor
+            #     inv_line['ipi_percent'] = self.det.imposto.IPI.pIPI.valor
+            #     inv_line['ipi_cst_id'] = ipi_cst_ids[0] if ipi_cst_ids else False
+            #
+            # elif self.det.imposto.IPI.qUnid.valor and \
+            #         self.det.imposto.IPI.vUnid.valor:
+            #     inv_line['ipi_percent'] = self.det.imposto.IPI.vUnid.valor
+            #
+            # inv_line['ipi_value'] = self.det.imposto.IPI.vIPI.valor
+
+
+
         else:
             #ISSQN
             self.det.imposto.ISSQN.vBC.valor = str("%.2f" % inv_line.issqn_base)
@@ -747,59 +764,59 @@ class NFe200(FiscalDocument):
         inv_line['discount_value'] = float(self.det.prod.vDesc.valor)
         inv_line['other_costs_value'] = float(self.det.prod.vOutro.valor)
 
-        if self.det.imposto.ICMS.orig.valor:
-            inv_line['icms_origin'] = str(self.det.imposto.ICMS.orig.valor)
+        # if self.det.imposto.ICMS.orig.valor:
+        inv_line['icms_origin'] = str(self.det.imposto.ICMS.orig.valor)
 
-            icms_cst_ids = pool.get('account.tax.code').search(
-                cr, uid, [('code', '=', self.det.imposto.ICMS.CST.valor),
-                          ('domain', '=', 'icms')])
+        icms_cst_ids = pool.get('account.tax.code').search(
+            cr, uid, [('code', '=', self.det.imposto.ICMS.CST.valor),
+                      ('domain', '=', 'icms')])
 
-            inv_line['icms_cst_id'] = icms_cst_ids[0] if icms_cst_ids else False
-            inv_line['icms_percent'] = self.det.imposto.ICMS.pCredSN.valor
-            inv_line['icms_value'] = self.det.imposto.ICMS.vCredICMSSN.valor
+        inv_line['icms_cst_id'] = icms_cst_ids[0] if icms_cst_ids else False
+        inv_line['icms_percent'] = self.det.imposto.ICMS.pCredSN.valor
+        inv_line['icms_value'] = self.det.imposto.ICMS.vCredICMSSN.valor
 
-            inv_line['icms_base_type'] = str(self.det.imposto.ICMS.modBC.valor)
-            inv_line['icms_base'] = self.det.imposto.ICMS.vBC.valor
-            inv_line['icms_percent_reduction'] = self.det.imposto.ICMS.pRedBC.valor
-            inv_line['icms_percent'] = self.det.imposto.ICMS.pICMS.valor
-            inv_line['icms_value'] = self.det.imposto.ICMS.vICMS.valor
+        inv_line['icms_base_type'] = str(self.det.imposto.ICMS.modBC.valor)
+        inv_line['icms_base'] = self.det.imposto.ICMS.vBC.valor
+        inv_line['icms_percent_reduction'] = self.det.imposto.ICMS.pRedBC.valor
+        inv_line['icms_percent'] = self.det.imposto.ICMS.pICMS.valor
+        inv_line['icms_value'] = self.det.imposto.ICMS.vICMS.valor
 
-            #
-            # # ICMS ST
-            #
-            inv_line['icms_st_base_type'] = str(self.det.imposto.ICMS.modBCST.valor)
-            inv_line['icms_st_mva'] = self.det.imposto.ICMS.pMVAST.valor
-            inv_line['icms_st_percent_reduction'] = self.det.imposto.ICMS.pRedBCST.valor
-            inv_line['icms_st_base'] = self.det.imposto.ICMS.vBCST.valor
-            inv_line['icms_st_percent'] = self.det.imposto.ICMS.pICMSST.valor
-            inv_line['icms_st_value'] = self.det.imposto.ICMS.vICMSST.valor
+        #
+        # # ICMS ST
+        #
+        inv_line['icms_st_base_type'] = str(self.det.imposto.ICMS.modBCST.valor)
+        inv_line['icms_st_mva'] = self.det.imposto.ICMS.pMVAST.valor
+        inv_line['icms_st_percent_reduction'] = self.det.imposto.ICMS.pRedBCST.valor
+        inv_line['icms_st_base'] = self.det.imposto.ICMS.vBCST.valor
+        inv_line['icms_st_percent'] = self.det.imposto.ICMS.pICMSST.valor
+        inv_line['icms_st_value'] = self.det.imposto.ICMS.vICMSST.valor
 
-            #
-            # # IPI
-            #
-            ipi_cst_ids = pool.get('account.tax.code').search(
-                cr, uid, [('code', '=', self.det.imposto.IPI.CST.valor),
-                          ('domain', '=', 'ipi')])
-            if self.det.imposto.IPI.vBC.valor and self.det.imposto.IPI.pIPI.valor:
-                inv_line['ipi_type'] = 'percent'
-                inv_line['ipi_base'] = self.det.imposto.IPI.vBC.valor
-                inv_line['ipi_percent'] = self.det.imposto.IPI.pIPI.valor
-                inv_line['ipi_cst_id'] = ipi_cst_ids[0] if ipi_cst_ids else False
+        #
+        # # IPI
+        #
+        ipi_cst_ids = pool.get('account.tax.code').search(
+            cr, uid, [('code', '=', self.det.imposto.IPI.CST.valor),
+                      ('domain', '=', 'ipi')])
 
-            elif self.det.imposto.IPI.qUnid.valor and \
-                    self.det.imposto.IPI.vUnid.valor:
-                inv_line['ipi_percent'] = self.det.imposto.IPI.vUnid.valor
+        if self.det.imposto.IPI.vBC.valor and self.det.imposto.IPI.pIPI.valor:
+            inv_line['ipi_type'] = 'percent'
+            inv_line['ipi_base'] = self.det.imposto.IPI.vBC.valor
+            inv_line['ipi_percent'] = self.det.imposto.IPI.pIPI.valor
 
-            inv_line['ipi_value'] = self.det.imposto.IPI.vIPI.valor
+        elif self.det.imposto.IPI.qUnid.valor and \
+                self.det.imposto.IPI.vUnid.valor:
+            inv_line['ipi_percent'] = self.det.imposto.IPI.vUnid.valor
 
-        else:
-            #
-            # # ISSQN
-            #
-            inv_line['issqn_base'] = self.det.imposto.ISSQN.vBC.valor
-            inv_line['issqn_percent'] = self.det.imposto.ISSQN.vAliq.valor
-            inv_line['issqn_value'] = self.det.imposto.ISSQN.vISSQN.valor
-            inv_line['issqn_type'] = self.det.imposto.ISSQN.cSitTrib.valor
+        inv_line['ipi_value'] = self.det.imposto.IPI.vIPI.valor
+        inv_line['ipi_cst_id'] = ipi_cst_ids[0] if ipi_cst_ids else False
+
+        #
+        # # ISSQN
+        #
+        inv_line['issqn_base'] = self.det.imposto.ISSQN.vBC.valor
+        inv_line['issqn_percent'] = self.det.imposto.ISSQN.vAliq.valor
+        inv_line['issqn_value'] = self.det.imposto.ISSQN.vISSQN.valor
+        inv_line['issqn_type'] = self.det.imposto.ISSQN.cSitTrib.valor
 
         # PIS
         pis_cst_ids = pool.get('account.tax.code').search(
@@ -879,7 +896,7 @@ class NFe200(FiscalDocument):
 
         self.dup.nDup.valor = line.name
         self.dup.dVenc.valor = line.date_maturity or inv.date_due or inv.date_invoice
-        self.dup.vDup.valor = str("%.2f" % line.debit)
+        self.dup.vDup.valor = str("%.2f" % (line.debit or line.credit))
 
     def _get_encashment_data(self, cr, uid, pool, context=None):
 
@@ -1202,7 +1219,7 @@ class NFe310(NFe200):
         self.nfe.infNFe.ide.indFinal.valor = inv.ind_final or ''
         self.nfe.infNFe.ide.indPres.valor = inv.ind_pres or ''
         self.nfe.infNFe.ide.dhEmi.valor = datetime.strptime(inv.date_hour_invoice, '%Y-%m-%d %H:%M:%S')
-        self.nfe.infNFe.ide.dhSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')
+     #   self.nfe.infNFe.ide.dhSaiEnt.valor = datetime.strptime(inv.date_in_out, '%Y-%m-%d %H:%M:%S')
 
     def _get_nfe_identification(self, cr, uid, pool, context=None):
 
