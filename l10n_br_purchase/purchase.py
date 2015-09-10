@@ -92,20 +92,6 @@ class PurchaseOrder(models.Model):
     _defaults = {
         'fiscal_category_id': _default_fiscal_category}
 
-    # @api.multi
-    # def onchange_partner_id(self, partner_id=False,
-    #                         company_id=False, context=None, **kwargs):
-    #     context = dict(self._context)
-    #     # TODO try to upstream web_context_tunnel in fiscal-rules
-    #     # to avoid having to change this signature
-    #     fiscal_category_id = context.get('fiscal_category_id', False)
-    #     if not company_id:
-    #         company_id = self.env['res.users'].browse(
-    #             self._uid).with_context(context).company_id.id
-    #     return super(PurchaseOrder, self).onchange_partner_id(
-    #         partner_id, company_id, fiscal_category_id=fiscal_category_id,
-    #         **kwargs)
-
     @api.multi
     def onchange_partner_id(self, partner_id=False,
                             company_id=False, context=None, **kwargs):
@@ -122,7 +108,6 @@ class PurchaseOrder(models.Model):
 
         return super(PurchaseOrder, self).onchange_partner_id(
             partner_id, **kwargs)
-
 
     def onchange_dest_address_id(self, cr, uid, ids, partner_id,
                                  dest_address_id, company_id, context,
