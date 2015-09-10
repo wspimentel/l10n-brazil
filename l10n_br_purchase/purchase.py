@@ -109,6 +109,7 @@ class PurchaseOrder(models.Model):
     @api.multi
     def onchange_partner_id(self, partner_id=False,
                             company_id=False, context=None, **kwargs):
+
         context = dict(self._context)
         # TODO try to upstream web_context_tunnel in fiscal-rules
         # to avoid having to change this signature
@@ -116,6 +117,8 @@ class PurchaseOrder(models.Model):
             company_id = self.env['res.users'].browse(
                 self._uid).with_context(context).company_id.id
 
+        kwargs.update({'fiscal_category_id': context.get('fiscal_category_id',
+                                                         False)})
 
         return super(PurchaseOrder, self).onchange_partner_id(
             partner_id, **kwargs)
