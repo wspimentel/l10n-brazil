@@ -581,6 +581,22 @@ class AccountInvoice(orm.Model):
                 self.write(cr, uid, [inv.id], res['value'])
         return True
 
+    def create(self, cr, uid, vals, context=None):
+        if 'date_hour_invoice' in vals and vals['date_hour_invoice']:
+            aux = datetime.datetime.strptime(vals['date_hour_invoice'],
+                                             '%Y-%m-%d %H:%M:%S').date()
+            vals['date_invoice'] = str(aux)
+        return super(AccountInvoice, self).create(cr, uid, vals,
+                                                  context=context)
+
+    def write(self, cr, uid, ids, vals, context=None):
+        if 'date_hour_invoice' in vals and vals['date_hour_invoice']:
+            aux = datetime.datetime.strptime(vals['date_hour_invoice'],
+                                             '%Y-%m-%d %H:%M:%S').date()
+            vals['date_invoice'] = str(aux)
+        return super(AccountInvoice, self).write(cr, uid, ids, vals,
+                                                 context=context)
+
 
 class AccountInvoiceLine(orm.Model):
     _inherit = 'account.invoice.line'
