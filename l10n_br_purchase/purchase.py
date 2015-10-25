@@ -269,19 +269,20 @@ class PurchaseOrderLine(models.Model):
         ctx.update({'use_domain': ('use_purchase', '=', True)})
         result_rule = self.env['account.fiscal.position.rule'].with_context(
             ctx).apply_fiscal_mapping(result, **kwargs)
-        if kwargs.get('product_id', False) and result_rule.get(
-                'fiscal_position', False):
-            obj_fposition = self.env['account.fiscal.position'].browse(
-                result_rule['fiscal_position'])
-            obj_product = self.env['product.product'].browse(
-                kwargs.get('product_id', False))
-            kwargs['context'].update({'fiscal_type': obj_product.fiscal_type,
-                            'type_tax_use': 'purchase'})
-            taxes = obj_product.supplier_taxes_id or False
-            tax_ids = obj_fposition.map_tax(taxes, kwargs.get('context'))
-            result_rule['taxes_id'] = tax_ids
-
         return result_rule
+        # if kwargs.get('product_id', False) and result_rule.get(
+        #         'fiscal_position', False):
+        #     obj_fposition = self.env['account.fiscal.position'].browse(
+        #         result_rule['fiscal_position'])
+        #     obj_product = self.env['product.product'].browse(
+        #         kwargs.get('product_id', False))
+        #     kwargs['context'].update({'fiscal_type': obj_product.fiscal_type,
+        #                     'type_tax_use': 'purchase'})
+        #     taxes = obj_product.supplier_taxes_id or False
+        #     tax_ids = obj_fposition.map_tax(taxes, kwargs.get('context'))
+        #     result_rule['taxes_id'] = tax_ids
+        #
+        # return result_rule
 
 
     def onchange_product_id(self, cr, uid, ids, pricelist_id, product_id,
@@ -317,6 +318,8 @@ class PurchaseOrderLine(models.Model):
             result.update(self._fiscal_position_map(cr, uid, result, **kwargs))
             if result['value'].get('fiscal_position'):
                 fiscal_position_id = result['value'].get('fiscal_position')
+            else:
+                result['value']['fiscal_position'] = fiscal_position_id
 
             obj_product = self.pool.get('product.product').browse(
                 cr, uid, product_id)
@@ -351,39 +354,75 @@ class PurchaseOrderLine(models.Model):
         })
         return self._fiscal_position_map(result, **kwargs)
 
-    @api.multi
-    def onchange_fiscal_position(self, partner_id,
+    # @api.multi
+    # def onchange_fiscal_position(self, partner_id,
+    #                              dest_address_id=False, product_id=False,
+    #                              fiscal_position=False,
+    #                              fiscal_category_id=False, company_id=False,
+    #                              context=None, **kwargs):
+    #     result = {'value': {'taxes_id': False}}
+    #     if not company_id or not partner_id:
+    #         return result
+    #
+    #     kwargs.update({
+    #         'company_id': company_id,
+    #         'product_id': product_id,
+    #         'partner_id': partner_id,
+    #         'partner_invoice_id': partner_id,
+    #         'fiscal_category_id': fiscal_category_id,
+    #         'context': {},
+    #     })
+    #
+    #     result.update(self._fiscal_position_map(result, **kwargs))
+    #     fiscal_position = result['value'].get('fiscal_position')
+    #
+    #     if product_id and fiscal_position:
+    #         obj_fposition = self.env['account.fiscal.position'].browse(
+    #             fiscal_position)
+    #         obj_product = self.env['product.product'].browse(
+    #             product_id)
+    #         context = {'fiscal_type': obj_product.fiscal_type,
+    #                    'type_tax_use': 'purchase'}
+    #         taxes = obj_product.supplier_taxes_id or False
+    #         taxes_ids = self.env['account.fiscal.position']
+    #
+    #         taxes_ids = taxes_ids.map_tax(self, obj_fposition, taxes, context)
+    #
+    #         result['value']['taxes_id'] = taxes_ids
+    #
+    #     return result
+
+    def onchange_fiscal_position(self, cr, uid, ids, partner_id,
                                  dest_address_id=False, product_id=False,
                                  fiscal_position=False,
                                  fiscal_category_id=False, company_id=False,
                                  context=None, **kwargs):
-        result = {'value': {'taxes_id': False}}
-        if not company_id or not partner_id:
+        result = {'value': {'tax_id': False}}
+        if not partner_id:
             return result
 
-        kwargs.update({
+        kwargs = {
             'company_id': company_id,
             'product_id': product_id,
             'partner_id': partner_id,
             'partner_invoice_id': partner_id,
             'fiscal_category_id': fiscal_category_id,
-            'context': context,
-        })
-
-        result.update(self._fiscal_position_map(result, **kwargs))
+            'context': {},
+        }
+        result.update(self._fiscal_position_map(cr, uid, result, **kwargs))
         fiscal_position = result['value'].get('fiscal_position')
 
         if product_id and fiscal_position:
-            obj_fposition = self.env['account.fiscal.position'].browse(
-                fiscal_position)
-            obj_product = self.env['product.product'].browse(
-                product_id)
+            obj_fposition = self.pool.get('account.fiscal.position').browse(
+                cr, uid, fiscal_position)
+            obj_product = self.pool.get('product.product').browse(
+                cr, uid, product_id)
             context = {'fiscal_type': obj_product.fiscal_type,
-                       'type_tax_use': 'purchase'}
+                       'type_tax_use': 'sale'}
             taxes = obj_product.supplier_taxes_id or False
-            taxes_ids = self.env['account.fiscal.position'].map_tax(
-                obj_fposition, taxes, context=context)
+            tax_ids = self.pool.get('account.fiscal.position').map_tax(
+                cr, uid, obj_fposition, taxes, context)
 
-            result['value']['taxes_id'] = taxes_ids
+            result['value']['tax_id'] = tax_ids
 
         return result
