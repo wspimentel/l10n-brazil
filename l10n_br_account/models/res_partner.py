@@ -138,32 +138,22 @@ class AccountFiscalPositionTaxTemplate(models.Model):
     tax_code_dest_id = fields.Many2one('account.tax.code.template',
                                         string='Replacement Tax Code')
 
-    def _tax_domain(self, cr, uid, ids, tax_src_id=False,
-                    tax_code_src_id=False, context=None):
-
+    @staticmethod
+    def _tax_domain(tax_src_id, tax_code_src_id):
         tax_domain = False
         if tax_src_id:
-            tax_domain = self.pool.get('account.tax.template').read(
-                cr, uid, tax_src_id, ['domain'], context=context)['domain']
-
+            tax_domain = tax_src_id.domain
         if tax_code_src_id:
-            tax_domain = self.pool.get('account.tax.code.template').read(
-                cr, uid, tax_code_src_id, ['domain'],
-                context=context)['domain']
+            tax_domain = tax_code_src_id.domain
+        return tax_domain
 
-        return {'value': {'tax_src_domain': tax_domain}}
-
-    def onchange_tax_src_id(self, cr, uid, ids, tax_src_id=False,
-                            tax_code_src_id=False, context=None):
-
-        return self._tax_domain(cr, uid, ids, tax_src_id, tax_code_src_id,
-                                context=context)
-
-    def onchange_tax_code_src_id(self, cr, uid, ids, tax_src_id=False,
-                                 tax_code_src_id=False, context=None):
-
-        return self._tax_domain(cr, uid, ids, tax_src_id, tax_code_src_id,
-                                context=context)
+    @api.onchange('tax_src_id', 'tax_code_src_id')
+    def onchange_tax_src_id(self):
+        if self.tax_code_src_id or self.tax_src_id:
+            self.tax_src_domain = self._tax_domain(
+                self.tax_src_id,
+                self.tax_code_src_id
+            )
 
 
 class AccountFiscalPosition(models.Model):
@@ -331,32 +321,22 @@ class AccountFiscalPositionTax(models.Model):
     tax_code_dest_id = fields.Many2one(
         'account.tax.code', string='Replacement Tax Code')
 
-    def _tax_domain(self, cr, uid, ids, tax_src_id=False,
-                    tax_code_src_id=False, context=None):
-
+    @staticmethod
+    def _tax_domain(tax_src_id, tax_code_src_id):
         tax_domain = False
         if tax_src_id:
-            tax_domain = self.pool.get('account.tax').read(
-                cr, uid, tax_src_id, ['domain'], context=context)['domain']
-
+            tax_domain = tax_src_id.domain
         if tax_code_src_id:
-            tax_domain = self.pool.get('account.tax.code').read(
-                cr, uid, tax_code_src_id, ['domain'],
-                context=context)['domain']
+            tax_domain = tax_code_src_id.domain
+        return tax_domain
 
-        return {'value': {'tax_src_domain': tax_domain}}
-
-    def onchange_tax_src_id(self, cr, uid, ids, tax_src_id=False,
-                            tax_code_src_id=False, context=None):
-
-        return self._tax_domain(cr, uid, ids, tax_src_id, tax_code_src_id,
-                                context=context)
-
-    def onchange_tax_code_src_id(self, cr, uid, ids, tax_src_id=False,
-                                 tax_code_src_id=False, context=None):
-
-        return self._tax_domain(cr, uid, ids, tax_src_id, tax_code_src_id,
-                                context=context)
+    @api.onchange('tax_src_id', 'tax_code_src_id')
+    def onchange_tax_src_id(self):
+        if self.tax_code_src_id or self.tax_src_id:
+            self.tax_src_domain = self._tax_domain(
+                self.tax_src_id,
+                self.tax_code_src_id
+            )
 
 
 class ResPartner(models.Model):
