@@ -88,8 +88,6 @@ class ResPartner(models.Model):
     _sql_constraints = [
         ('res_partner_cnpj_cpf_uniq', 'unique (cnpj_cpf)',
          u'Já existe um parceiro cadastrado com este CPF/CNPJ !'),
-        ('res_partner_inscr_est_uniq', 'unique (inscr_est)',
-         u'Já existe um parceiro cadastrado com esta Inscrição Estadual/RG !')
     ]
 
     @api.one

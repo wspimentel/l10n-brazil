@@ -312,19 +312,19 @@ class AccountFiscalPositionTax(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    @api.model
-    def _default_partner_fiscal_type_id(self, is_company=False):
-        """Define o valor padão para o campo tipo fiscal, por padrão pega
-        o tipo fiscal para não contribuinte já que quando é criado um novo
-        parceiro o valor do campo is_company é false"""
-        ft_ids = self.env['l10n_br_account.partner.fiscal.type'].search(
-            [('default', '=', 'True'), ('is_company', '=', is_company)])
-        return ft_ids
+    # @api.model
+    # def _default_partner_fiscal_type_id(self, is_company=False):
+    #     """Define o valor padão para o campo tipo fiscal, por padrão pega
+    #     o tipo fiscal para não contribuinte já que quando é criado um novo
+    #     parceiro o valor do campo is_company é false"""
+    #     ft_ids = self.env['l10n_br_account.partner.fiscal.type'].search(
+    #         [('default', '=', 'True'), ('is_company', '=', is_company)])
+    #     return ft_ids
 
     partner_fiscal_type_id = fields.Many2one(
-        'l10n_br_account.partner.fiscal.type', 'Tipo Fiscal do Parceiro',
-        domain="[('is_company', '=', is_company)]",
-        default=_default_partner_fiscal_type_id)
+        'l10n_br_account.partner.fiscal.type', 'Tipo Fiscal do Parceiro'
+        # domain="[('is_company', '=', is_company)]",
+      )
 
     @api.multi
     def onchange_mask_cnpj_cpf(self, is_company, cnpj_cpf):

@@ -408,6 +408,414 @@
 			<field name="use_invoice">True</field>
 			<field name="fiscal_type">3</field>
 		</record>
+		<!--Regras de posições fiscais para não contribuintes-->
+		<!--Vendas-->
+
+		<record id="demo_account_fiscal_position_rule_resale_1" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ac" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_2" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_al" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_3" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_am" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_4" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ap" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_5" model="account.fiscal.position.rule">
+		    <field name="name">Revenda</field>
+		    <field name="description">Revenda para Fora do Estado</field>
+		    <field name="company_id" ref="base.main_company" />
+		    <field name="from_country" ref="base.br" />
+		    <field name="from_state" ref="l10n_br_base.br_sp" />
+		    <field name="to_invoice_country" ref="base.br" />
+		    <field name="to_invoice_state" ref="l10n_br_base.br_ba" />
+		    <field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+		    <field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+		    <field name="use_sale">True</field>
+		    <field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_6" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ce" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_7" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_df" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_8" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_es" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_9" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_go" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_10" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ma" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_11" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_mg" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms12_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_12" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ms" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_13" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_mt" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_14" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pa" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_15" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pb" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_16" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pe" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_17" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pi" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_18" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pr" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms12_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_19" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rj" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms12_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_20" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rn" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_21" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ro" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_22" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rr" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_23" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rs" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms12_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_24" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_sc" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms12_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_25" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_se" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_26" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Dentro do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_sp" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_internal_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_position_rule_resale_27" model="account.fiscal.position.rule">
+			<field name="name">Revenda</field>
+			<field name="description">Revenda para Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_to" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_f8f20f4fc3420ac4fc03a8e409e54914_external_icms7_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_f8f20f4fc3420ac4fc03a8e409e54914" />
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
 
 		<!-- Regras de posições fiscais para contribuintes -->
 		<!-- VendaST -->
@@ -1643,6 +2051,495 @@
 			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_b7aafa9c3056c3f020ceae63d7312504_external_icms7_demo" />
 			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_b7aafa9c3056c3f020ceae63d7312504" />
 			<field name="use_purchase">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<!--Regras de posições fiscais para não contribuintes-->
+		<!--Vendas consumidor final-->
+
+		<record id="demo_account_fiscal_type_3_rule_1" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ac" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_2" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_al" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_3" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_am" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_4" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ap" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_5" model="account.fiscal.position.rule">
+		    <field name="name">Vendas</field>
+		    <field name="description">Vendas para Consumidor Final Fora do Estado</field>
+		    <field name="company_id" ref="base.main_company" />
+		    <field name="from_country" ref="base.br" />
+		    <field name="from_state" ref="l10n_br_base.br_sp" />
+		    <field name="to_invoice_country" ref="base.br" />
+		    <field name="to_invoice_state" ref="l10n_br_base.br_ba" />
+		    <field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+		    <field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+		    <field name="use_sale">True</field>
+		    <field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_6" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ce" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_7" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_df" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_8" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_es" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_9" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_go" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_10" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ma" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_11" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_mg" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_12" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ms" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_13" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_mt" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_14" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pa" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_15" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pb" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_16" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pe" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_17" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pi" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_18" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_pr" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_19" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rj" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_20" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rn" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_21" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_ro" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_22" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rr" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_23" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_rs" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_24" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_sc" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_25" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_se" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_26" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Dentro do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_sp" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_internal_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
+			<field name="use_invoice">True</field>
+			<field name="fiscal_type">3</field>
+		</record>
+
+		<record id="demo_account_fiscal_type_3_rule_27" model="account.fiscal.position.rule">
+			<field name="name">Vendas</field>
+			<field name="description">Vendas para Consumidor Final Fora do Estado</field>
+			<field name="company_id" ref="base.main_company" />
+			<field name="from_country" ref="base.br" />
+			<field name="from_state" ref="l10n_br_base.br_sp" />
+			<field name="to_invoice_country" ref="base.br" />
+			<field name="to_invoice_state" ref="l10n_br_base.br_to" />
+			<field name="fiscal_position_id" ref="l10n_br_account_product.fp_78df616ab31e95ee46c6a519a2ce9e12_external_final_demo" />
+			<field name="fiscal_category_id" ref="l10n_br_account_product.fc_78df616ab31e95ee46c6a519a2ce9e12" />
+			<field name="partner_fiscal_type_id" ref="l10n_br_account.partner_fiscal_type_4"/>
+			<field name="asset_operation" eval="1"/>
+			<field name="sequence">8</field>
+			<field name="use_sale">True</field>
 			<field name="use_invoice">True</field>
 			<field name="fiscal_type">3</field>
 		</record>
