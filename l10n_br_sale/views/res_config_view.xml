@@ -18,6 +18,12 @@
 						</div>
 					</group>
 				</separator>
+				<xpath expr="//group[@name='Product Features']/div" position="inside">
+					<div>
+						<field name="discount_included" class="oe_inline"/>
+						<label for="discount_included"/>
+					</div>
+				</xpath>
 			</field>
 		</record>
 

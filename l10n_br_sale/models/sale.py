@@ -240,6 +240,9 @@ class SaleOrderLine(models.Model):
     def _calc_line_quantity(self):
         return self.product_uom_qty
 
+    def _calc_price_gross(self, qty):
+        return self.price_unit * qty
+
     @api.one
     @api.depends('price_unit', 'tax_id', 'discount', 'product_uom_qty')
     def _amount_line(self):
@@ -253,7 +256,7 @@ class SaleOrderLine(models.Model):
 
         self.price_subtotal = self.order_id.pricelist_id.currency_id.round(
             taxes['total'])
-        self.price_gross = self.price_unit * qty
+        self.price_gross = self._calc_price_gross()
         self.discount_value = self.order_id.pricelist_id.currency_id.round(
             self.price_gross - (price * qty))
 

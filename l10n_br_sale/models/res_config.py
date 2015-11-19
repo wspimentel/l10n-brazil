@@ -32,6 +32,7 @@ class SaleConfiguration(models.TransientModel):
 
     copy_note = fields.Boolean(u'Copiar Observações nos Documentos Fiscais',
                                default=_get_default_copy_note)
+    discount_included = fields.Boolean(u'Desconto incluso no preço?')
 
     def set_sale_defaults(self, cr, uid, ids, context=None):
         result = super(SaleConfiguration, self).set_sale_defaults(
