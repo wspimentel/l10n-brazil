@@ -138,40 +138,37 @@ class AccountFiscalPositionRule(models.Model):
             '|', ('revenue_start', '=', False),
             ('revenue_start', '<=', company.annual_revenue),
             '|', ('revenue_end', '=', False),
-            ('revenue_end', '>=', company.annual_revenue)
-        ]
+            ('revenue_end', '>=', company.annual_revenue)]
 
         for address_type, address in addrs.items():
             key_country = 'to_%s_country' % address_type
             key_state = 'to_%s_state' % address_type
             to_country = address.country_id.id or False
-            domain += ['|', (key_country, '=', to_country),
+            domain += [
+                '|', (key_country, '=', to_country),
                 (key_country, '=', False)]
             to_state = address.state_id.id or False
-            domain += ['|', (key_state, '=', to_state),
-                (key_state, '=', False)]
+            domain += [
+                '|', (key_state, '=', to_state), (key_state, '=', False)]
 
         return domain
 
-    def product_fiscal_category_map(self, cr, uid, product_id=False,
-                                    fiscal_category_id=False):
-        result = False
+    def product_fiscal_category_map(self, product_id, fiscal_category_id,
+                                    to_state_id=None):
+        result = None
 
         if not product_id or not fiscal_category_id:
             return result
-
-        product_tmpl_id = self.pool.get('product.product').read(
-            cr, uid, product_id, ['product_tmpl_id'])['product_tmpl_id'][0]
-        default_product_fiscal_category = self.pool.get(
-            'l10n_br_account.product.category').search(
-                cr, uid, [('product_tmpl_id', '=', product_tmpl_id),
-                ('fiscal_category_source_id', '=', fiscal_category_id)])
-        if default_product_fiscal_category:
-            fc_des_id = self.pool.get('l10n_br_account.product.category').read(
-                cr, uid, default_product_fiscal_category,
-                ['fiscal_category_destination_id']
-            )[0]['fiscal_category_destination_id'][0]
-            result = fc_des_id
+        product_tmpl_id = self.env['product.product'].browse(
+            product_id).product_tmpl_id.id
+        fiscal_category = self.env[
+            'l10n_br_account.product.category'].search(
+                [('product_tmpl_id', '=', product_tmpl_id),
+                    ('fiscal_category_source_id', '=', fiscal_category_id),
+                    '|', ('to_state_id', '=', False),
+                    ('to_state_id', '=', to_state_id)])
+        if fiscal_category:
+            result = fiscal_category[0].fiscal_category_destination_id.id
         return result
 
 

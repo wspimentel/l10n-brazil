@@ -526,8 +526,9 @@ class AccountInvoiceLine(models.Model):
         if not parent_fiscal_category_id or not product or not fiscal_position:
             return result
         obj_fp_rule = self.env['account.fiscal.position.rule']
+        partner = self.env['res.partner'].browse(partner_id)
         product_fiscal_category_id = obj_fp_rule.product_fiscal_category_map(
-            product, parent_fiscal_category_id)
+            product, parent_fiscal_category_id, partner.state_id.id)
 
         if product_fiscal_category_id:
             parent_fiscal_category_id = product_fiscal_category_id
