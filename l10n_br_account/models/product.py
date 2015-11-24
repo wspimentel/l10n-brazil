@@ -50,4 +50,6 @@ class L10n_brAccountProductFiscalCategory(models.Model):
     fiscal_category_destination_id = fields.Many2one(
         'l10n_br_account.fiscal.category', string='Categoria de Destino')
     product_tmpl_id = fields.Many2one(
-        'product.template', string='Produto', ondelete='cascade')
+        'product.template', 'Produto', ondelete='cascade')
+    to_state_id = fields.Many2one(
+        'res.country.state', 'Estado Destino')
