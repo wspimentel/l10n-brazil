@@ -23,6 +23,21 @@ FISCAL_POSITION_COLUMNS = {
     'cfop_id': fields.many2one('l10n_br_account_product.cfop', 'CFOP'),
 }
 
+FISCAL_POSITION_TAX_COLUMNS = {
+    'fiscal_classification_id': fields.many2one(
+        'account.product.fiscal.classification', 'NCM'),
+}
+
+
+class AccountFiscalPositionTax(orm.Model):
+    _inherit = 'account.fiscal.position.tax.template'
+    _columns = FISCAL_POSITION_TAX_COLUMNS
+
+
+class AccountFiscalPositionTax(orm.Model):
+    _inherit = 'account.fiscal.position.tax'
+    _columns = FISCAL_POSITION_TAX_COLUMNS
+
 
 class AccountFiscalPositionTemplate(orm.Model):
     _inherit = 'account.fiscal.position.template'
