@@ -23,7 +23,7 @@ from openerp.osv import orm, fields
 
 from openerp.addons.l10n_br_base.tools import fiscal
 from openerp.addons import decimal_precision as dp
-from openerp.addons.l10n_br_account.l10n_br_account import TYPE
+from openerp.addons.l10n_br_account.models.l10n_br_account import TYPE
 
 PRODUCT_FISCAL_TYPE = [
     ('product', 'Produto')
