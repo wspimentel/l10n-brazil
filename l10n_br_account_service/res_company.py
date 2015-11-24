@@ -19,7 +19,7 @@
 
 from openerp.osv import orm, fields
 
-from openerp.addons.l10n_br_account.res_company import SQL_CONSTRAINTS
+from openerp.addons.l10n_br_account.models.res_company import SQL_CONSTRAINTS
 
 
 class ResCompany(orm.Model):
