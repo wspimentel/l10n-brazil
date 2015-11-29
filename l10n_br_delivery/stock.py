@@ -48,8 +48,6 @@ class StockPicking(orm.Model):
             result['freight_value'] = move_line.sale_line_id.freight_value
         return result
 
-<<<<<<< HEAD
-=======
     def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, move,
                           context=None):
 
@@ -73,7 +71,6 @@ class StockPicking(orm.Model):
         return inv_vals
 
 
->>>>>>> 63a15b3... [FIX] Adicionado metodo get_invoice_vals para copiar dados da transportadora para a fatura do picking.
 class StockMove(orm.Model):
     _inherit = 'stock.move'
 
