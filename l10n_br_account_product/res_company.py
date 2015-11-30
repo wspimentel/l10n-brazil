@@ -91,6 +91,8 @@ class ResCompany(orm.Model):
             'account.tax', 'Insurance Sale Tax'),
         'other_costs_tax_id': fields.many2one(
             'account.tax', 'Other Costs Sale Tax'),
+        'accountant_cnpj_cpf': fields.char(string='CNPJ/CPF Contador',
+                                           size=18),
     }
     _defaults = {
         'nfe_version': '2.00',

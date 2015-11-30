@@ -574,7 +574,11 @@ class NFe310(NFe200):
         #
         # self.nfe.infNFe.ide.hSaiEnt.valor = datetime.strptime(
         #     inv.date_in_out[-8:], '%H:%M:%S')
-
+        self.aut_xml = self._get_AutXML()
+        self.aut_xml.CNPJ.valor = re.sub(
+            '[%s]' % re.escape(string.punctuation), '',
+            inv.company_id.accountant_cnpj_cpf or '')
+        self.nfe.infNFe.autXML.append(self.aut_xml)
 
     def get_NFe(self):
 
@@ -611,3 +615,19 @@ class NFe310(NFe200):
             raise orm.except_orm(_(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
 
         return Dup_310()
+
+    def _get_DI(self):
+        try:
+            from pysped.nfe.leiaute import DI_310
+        except ImportError:
+            raise UserError(
+                _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        return DI_310()
+
+    def _get_AutXML(self):
+        try:
+            from pysped.nfe.leiaute import AutXML_310
+        except ImportError:
+            raise UserError(
+                _(u'Erro!'), _(u"Biblioteca PySPED não instalada!"))
+        return AutXML_310()
