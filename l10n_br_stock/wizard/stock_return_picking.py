@@ -110,8 +110,11 @@ class StockReturnPicking(models.TransientModel):
                         send_move.location_dest_id.id,
                         picking.partner_id.id)
                     
-                    line_onchange['value']['fiscal_category_id'] = \
-                        line_fiscal_category_id
+                    res = {
+                        'fiscal_position': line_onchange['value'].get(
+                            'fiscal_position', False),
+                        'fiscal_category_id': line_fiscal_category_id,
+                    }
                     #set correct quantity in moves passed from wizard  
                     for return_move in self.product_return_moves:
                         if return_move.move_id == send_move:
@@ -120,6 +123,6 @@ class StockReturnPicking(models.TransientModel):
                             line_onchange['value']['product_uos_qty'] = result_qty['value'].get('product_uos_qty',1.0)
                     
                     for m in move_obj.browse([move_ids[idx].id]):
-                        m.write(line_onchange['value'])
+                        m.write(res)
                      
             return result
