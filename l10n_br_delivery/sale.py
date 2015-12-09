@@ -77,3 +77,10 @@ class SaleOrder(orm.Model):
             amount_freight = grid_obj.get_price(cr, uid, grid.id, order,
             time.strftime('%Y-%m-%d'), context)
         return self.write(cr, uid, ids, {'amount_freight': amount_freight})
+
+    def _prepare_procurement_group(self, cr, uid, order, context=None):
+        '''Copy ind_pres from sale.order to procurement.group'''
+        res = super(SaleOrder, self)._prepare_procurement_group(
+            cr, uid, order, context=context)
+        res.update({'ind_pres': order.ind_pres or False})
+        return res

@@ -88,3 +88,12 @@ class StockMove(orm.Model):
             })
 
         return res
+
+    def _prepare_picking_assign(self, cr, uid, move, context=None):
+        '''Copy ind_pres from procurement.group to stock.picking'''
+        res = super(StockMove, self)._prepare_picking_assign(
+            cr, uid, move, context=context)
+        res.update({
+            'ind_pres': move.group_id and move.group_id.ind_pres or False
+        })
+        return res
