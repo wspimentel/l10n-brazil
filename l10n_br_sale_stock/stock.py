@@ -92,7 +92,7 @@ class StockPicking(orm.Model):
                                        sale.fiscal_category_id.id),
                 'fiscal_position': (sale.fiscal_position and
                                     sale.fiscal_position.id),
-                'ind_pres': sale.ind_pres,
+                'ind_pres': move.picking_id.ind_pres,
                 })
         return inv_vals
 
