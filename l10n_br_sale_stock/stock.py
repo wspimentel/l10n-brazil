@@ -79,20 +79,24 @@ class StockPicking(orm.Model):
         requisito. É interessante manter a invoice coerente com a sale.order
         e não permitir a alteração dos campos fiscais.
         """
+        picking = move.picking_id
         sale = move.picking_id.sale_id
         if sale and not journal_id:
             journal_id = sale.fiscal_category_id.property_journal.id
         inv_vals = super(StockPicking, self)._get_invoice_vals(
             cr, uid, key, inv_type, journal_id, move, context=context)
+        if picking:
+            inv_vals.update({
+                'fiscal_category_id': (picking.fiscal_category_id and
+                                       picking.fiscal_category_id.id) or False,
+                'fiscal_position': (picking.fiscal_position and
+                                    picking.fiscal_position.id) or False,
+                })
+
         if sale:
             inv_vals.update({
-                'comment': sale.note, # TODO: Verificar se os comentarios estão
-                #  ok!
-                'fiscal_category_id': (sale.fiscal_category_id and
-                                       sale.fiscal_category_id.id),
-                'fiscal_position': (sale.fiscal_position and
-                                    sale.fiscal_position.id),
-                'ind_pres': sale.ind_pres,
+                'comment': sale.note, # TODO: Verificar se os comentarios
+                # estão ok
                 })
         return inv_vals
 
