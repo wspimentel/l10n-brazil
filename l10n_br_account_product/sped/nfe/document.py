@@ -308,6 +308,11 @@ class NFe200(FiscalDocument):
                     invoice.partner_id.cnpj_cpf)
                 self.nfe.infNFe.dest.IE.valor = punctuation_rm(
                     invoice.partner_id.inscr_est)
+
+                if invoice.partner_id.inscr_est:
+                    self.nfe.infNFe.dest.indIEDest.valor = '1'
+                else:
+                    self.nfe.infNFe.dest.indIEDest.valor = '2'
             else:
                 self.nfe.infNFe.dest.CPF.valor = punctuation_rm(
                     invoice.partner_id.cnpj_cpf)
