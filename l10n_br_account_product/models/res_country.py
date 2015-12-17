@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 ###############################################################################
 #                                                                             #
-# Copyright (C) 2015  Renato Lima - Akretion                                  #
+# Copyright (C) 2015  Daniel Sadamo - KMEE                                    #
 #                                                                             #
 # This program is free software: you can redistribute it and/or modify        #
 # it under the terms of the GNU Affero General Public License as published by #
@@ -17,12 +17,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.       #
 ###############################################################################
 
-from . import res_company
-from . import l10n_br_account_product
-from . import l10n_br_account
-from . import account_product_fiscal_classification
-from . import account_invoice
-from . import account
-from . import product
-from . import res_partner
-from . import res_country
+from openerp import models, fields
+
+
+class ResCountryState(models.Model):
+    _inherit = 'res.country.state'
+
+    icms_table_id = fields.One2many('state.icms.table',
+                                    'origin_state_id',
+                                    'Impostos por Estado')
+
+class ResCountryStateIcmsTable(models.Model):
+    _name = 'state.icms.table'
+
+    origin_state_id = fields.Many2one('res.country.state')
+    icms_tax_id = fields.Many2one('account.tax',
+                                  'Alíquota do ICMS',
+                                  domain=[('domain', '=','icms'),
+                                          # ('type','in',('all','sale'))
+                                          ])
+    destination_state_id = fields.Many2one('res.country.state',
+                                           'Estado de destino')
