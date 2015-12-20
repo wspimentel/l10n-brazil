@@ -60,3 +60,11 @@ class ProductTemplate(models.Model):
 
     service_type_id = fields.Many2one(
         'l10n_br_account.service.type', u'Tipo de Serviço')
+
+    fcp = fields.Float(string="% Fundo de Combate à Pobreza (FCP)",
+                       help="Percentual adicional inserido na alíquota interna"
+                            " da UF de destino, relativo ao Fundo de Combate à"
+                            " Pobreza (FCP) em operações interestaduais com o "
+                            "consumidor com esta UF. "
+                            "Nota: Caso preenchido este percentual sobrecreve "
+                            "o definido na UF")
