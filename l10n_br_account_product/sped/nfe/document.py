@@ -362,7 +362,10 @@ class NFe200(FiscalDocument):
         #
         # Produto entra no total da NF-e
         #
-        self.det.prod.indTot.valor = 1
+        if invoice_line.indTot:
+            self.det.prod.indTot.valor = 1
+        else:
+            self.det.prod.indTot.valor = 0
 
         if invoice_line.product_type == 'product':
             # ICMS

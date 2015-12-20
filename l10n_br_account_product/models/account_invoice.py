@@ -69,7 +69,8 @@ class AccountInvoice(models.Model):
         self.amount_gross = sum(line.price_gross for line in self.invoice_line)
         self.amount_tax_discount = 0.0
         self.amount_untaxed = sum(
-            line.price_total for line in self.invoice_line)
+            line.price_total for line in self.invoice_line
+            if line.indTot)
         self.amount_tax = sum(tax.amount
                               for tax in self.tax_line
                               if not tax.tax_code_id.tax_discount)
@@ -764,6 +765,9 @@ class AccountInvoiceLine(models.Model):
     freight_value = fields.Float(
         'Frete', digits=dp.get_precision('Account'), default=0.00)
     fiscal_comment = fields.Text(u'Observação Fiscal')
+    indTot = fields.Boolean(
+        string='Valor total bruto compoe o valor total',
+        default=True,)
 
     def _amount_tax_icms(self, tax=None):
         result = {
