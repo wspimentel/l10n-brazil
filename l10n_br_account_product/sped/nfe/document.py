@@ -316,6 +316,7 @@ class NFe200(FiscalDocument):
             else:
                 self.nfe.infNFe.dest.CPF.valor = punctuation_rm(
                     invoice.partner_id.cnpj_cpf)
+                self.nfe.infNFe.dest.indIEDest.valor = '9'
 
         self.nfe.infNFe.dest.enderDest.xLgr.valor = (
             invoice.partner_id.street or '')
@@ -414,7 +415,7 @@ class NFe200(FiscalDocument):
             self.det.imposto.ICMSUFDest.vBCUFDest.valor = str(
                 "%.2f" % invoice_line.vBCUFDest)
             self.det.imposto.ICMSUFDest.pFCPUFDest.valor = str(
-                "%.2f" % invoice_line.vBCUFDest)
+                "%.2f" % invoice_line.pFCPUFDest)
             self.det.imposto.ICMSUFDest.pICMSUFDest.valor = str(
                 "%.2f" % invoice_line.pICMSUFDest)
             self.det.imposto.ICMSUFDest.pICMSInter.valor = str(

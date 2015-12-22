@@ -177,9 +177,20 @@ class AccountTax(models.Model):
         # Calcula ICMS
         specific_icms = [tx for tx in result['taxes']
                          if tx['domain'] == 'icms']
+        difa = {}
         if fiscal_position and fiscal_position.asset_operation:
             total_base = result['total'] + insurance_value + \
                 freight_value + other_costs_value + ipi_value
+            difa['vBCUFDest'] = total_base
+            difa['pFCPUFDest'] = 0.02
+            difa['pICMSUFDest'] = specific_icms[0]['percent']
+            difa['pICMSInter'] = 0.12
+            difa['pICMSInterPart'] = 0.40
+            icms_difa = ((difa['vBCUFDest'] * difa['pICMSUFDest']) -
+                         (difa['vBCUFDest'] * difa['pICMSInter']))
+            difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
+            difa['vICMSUFDest'] = icms_difa * difa['pICMSInterPart']
+            difa['vICMSUFRemet'] = icms_difa * (1-difa['pICMSInterPart'])
         else:
             total_base = result['total'] + insurance_value + \
                 freight_value + other_costs_value
@@ -193,10 +204,11 @@ class AccountTax(models.Model):
             quantity,
             precision,
             base_tax)
-        totaldc += result_icms['tax_discount']
-        calculed_taxes += result_icms['taxes']
         if result_icms['taxes']:
             icms_value = result_icms['taxes'][0]['amount']
+            result_icms['taxes'][0].update(difa)
+        totaldc += result_icms['tax_discount']
+        calculed_taxes += result_icms['taxes']
 
         # Calcula ICMS ST
         specific_icmsst = [tx for tx in result['taxes']

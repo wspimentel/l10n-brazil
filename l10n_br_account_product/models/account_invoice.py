@@ -827,6 +827,14 @@ class AccountInvoiceLine(models.Model):
             'icms_percent': tax.get('percent', 0.0) * 100,
             'icms_percent_reduction': tax.get('base_reduction') * 100,
             'icms_base_type': tax.get('icms_base_type', '0'),
+            'vBCUFDest': tax.get('vBCUFDest', 0.0),
+            'pFCPUFDest': tax.get('pFCPUFDest', 0.0) * 100,
+            'pICMSUFDest': tax.get('pICMSUFDest', 0.0) * 100,
+            'pICMSInter': tax.get('pICMSInter', 0.0) * 100,
+            'pICMSInterPart': tax.get('pICMSInterPart', 0.0) * 100,
+            'vFCPUFDest': tax.get('vFCPUFDest', 0.0),
+            'vICMSUFDest': tax.get('vICMSUFDest', 0.0),
+            'vICMSUFRemet': tax.get('vICMSUFRemet', 0.0),
         }
         return result
 
