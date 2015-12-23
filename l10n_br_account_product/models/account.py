@@ -181,14 +181,23 @@ class AccountTax(models.Model):
         if fiscal_position and fiscal_position.asset_operation:
             total_base = result['total'] + insurance_value + \
                 freight_value + other_costs_value + ipi_value
-            difa['vBCUFDest'] = total_base
-            difa['pFCPUFDest'] = 0.02
-            difa['pICMSUFDest'] = specific_icms[0]['percent']
-            difa['pICMSInter'] = 0.12
-            difa['pICMSInterPart'] = 0.40
+
+            #if fiscal_position and fiscal_position.difa: # TODO: Criar campo
+            icms_inter = [tx for tx in result['taxes']
+                             if tx['domain'] == 'icmsinter']
+            icms_fcp = [tx for tx in result['taxes']
+                        if tx['domain'] == 'icmsfcp']
+            difa['vBCUFDest'] = total_base #BASE UNICA!
+            difa['pICMSUFDest'] = specific_icms[0]['percent'] # [BC x ALQ INTER]
+            difa['pICMSInterPart'] = 0.40 #TODO criar parametro
+            if icms_inter:
+                difa['pICMSInter'] = icms_inter[0]['percent']
             icms_difa = ((difa['vBCUFDest'] * difa['pICMSUFDest']) -
                          (difa['vBCUFDest'] * difa['pICMSInter']))
-            difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
+            if icms_fcp:
+                difa['pFCPUFDest'] = icms_fcp[0]['percent'] # Fundo pobreza
+                difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
+                icms_difa -= difa['vFCPUFDest']
             difa['vICMSUFDest'] = icms_difa * difa['pICMSInterPart']
             difa['vICMSUFRemet'] = icms_difa * (1-difa['pICMSInterPart'])
         else:

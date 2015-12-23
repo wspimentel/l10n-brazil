@@ -12,6 +12,9 @@
 					<group colspan="4">
 					<notebook>
 						<page string="ICMS">
+							<group>
+								<field name="fcp"/>
+							</group>
 							<field name="icms_table_id" >
 								<tree editable="bottom">
 									<field name="destination_state_id" />
