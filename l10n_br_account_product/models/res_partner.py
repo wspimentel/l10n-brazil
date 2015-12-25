@@ -18,6 +18,8 @@
 ###############################################################################
 
 from openerp import models, fields, api
+from openerp.addons.l10n_br_account_product.models.product import \
+    PRODUCT_ORIGIN
 
 
 class AccountFiscalPositionTemplate(models.Model):
@@ -37,6 +39,7 @@ class AccountFiscalPositionTaxTemplate(models.Model):
 
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification.template', 'NCM')
+    origin = fields.Selection(PRODUCT_ORIGIN, 'Origem',)
     tax_ipi_guideline_id = fields.Many2one(
         'l10n_br_account_product.ipi_guideline', string=u'Enquadramento IPI')
     tax_icms_relief_id = fields.Many2one(
@@ -195,6 +198,7 @@ class AccountFiscalPositionTax(models.Model):
 
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification', 'NCM')
+    origin = fields.Selection(PRODUCT_ORIGIN, 'Origem',)
     tax_ipi_guideline_id = fields.Many2one(
         'l10n_br_account_product.ipi_guideline', string=u'Enquadramento IPI')
     tax_icms_relief_id = fields.Many2one(
