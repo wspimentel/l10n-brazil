@@ -1063,12 +1063,7 @@ class AccountInvoiceLine(models.Model):
         if product_fiscal_category_id:
             kwargs['fiscal_category_id'] = product_fiscal_category_id
 
-        product_fcp = obj_fp_rule.with_context(
-            ctx).product_fcp_map(
-                kwargs.get('product_id'), partner.state_id)
 
-        if product_fcp:
-            kwargs['pFCPUFDest'] = product_fcp
 
         result_rule = obj_fp_rule.with_context(ctx).apply_fiscal_mapping(
             result, **kwargs)

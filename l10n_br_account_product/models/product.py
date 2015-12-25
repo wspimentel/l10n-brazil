@@ -69,17 +69,4 @@ class ProductTemplate(models.Model):
                             u"consumidor com esta UF. "
                             u"Nota: Caso preenchido este percentual sobrecreve "
                             u"o definido na UF")
-    fcp_ids = fields.One2many(
-        'l10n_br_account.product.fcp', 'product_tmpl_id',
-        u'Fundo de Combate a Pobreza')
 
-
-class L10n_brAccountProductFiscalCategory(models.Model):
-    _name = 'l10n_br_account.product.fcp'
-
-    fcp = fields.Float(string='FCP do produto na UF',
-                       digits_compute=dp.get_precision('Account'))
-    product_tmpl_id = fields.Many2one(
-        'product.template', 'Produto', ondelete='cascade')
-    to_state_id = fields.Many2one(
-        'res.country.state', 'Estado Destino')

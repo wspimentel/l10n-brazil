@@ -225,6 +225,9 @@ class AccountProductFiscalClassification(models.Model):
     tax_estimate_ids = fields.One2many(
         'l10n_br_tax.estimate', 'fiscal_classification_id',
         'Impostos Estimados')
+    tax_fcp_ids = fields.One2many(
+        'l10n_br_tax.fcp', 'fiscal_classification_id',
+        u'Fundo de Combate a Pobreza')
 
     cest = fields.Char(
         string='CEST',
@@ -405,5 +408,16 @@ class WizardAccountProductFiscalClassification(models.TransientModel):
 
             map_taxes_codes(fc_template.purchase_tax_definition_line,
                             'purchase')
-
         return True
+
+
+class L10nBrTaxFcp(models.Model):
+    _name = 'l10n_br_tax.fcp'
+
+    fcp = fields.Float(string='FCP do produto na UF',
+                       digits_compute=dp.get_precision('Account'))
+    fiscal_classification_id = fields.Many2one(
+        'account.product.fiscal.classification',
+        'Fiscal Classification', select=True)
+    to_state_id = fields.Many2one(
+        'res.country.state', 'Estado Destino')

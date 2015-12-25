@@ -169,6 +169,11 @@ class AccountTax(models.Model):
         specific_ipi = [tx for tx in result['taxes'] if tx['domain'] == 'ipi']
         result_ipi = self._compute_tax(cr, uid, specific_ipi, result['total'],
                                        product, quantity, precision, base_tax)
+        # Calcula a FCP
+        specific_fcp = [tx for tx in result['taxes']
+                        if tx['domain'] == 'icmsfcp']
+        # result_fcp = self._compute_tax(cr, uid, specific_fcp, result['total'],
+        #                                product, quantity, precision, base_tax)
         totaldc += result_ipi['tax_discount']
         calculed_taxes += result_ipi['taxes']
         for ipi in result_ipi['taxes']:
@@ -182,22 +187,27 @@ class AccountTax(models.Model):
             total_base = result['total'] + insurance_value + \
                 freight_value + other_costs_value + ipi_value
 
-            #if fiscal_position and fiscal_position.difa: # TODO: Criar campo
-            icms_inter = [tx for tx in result['taxes']
-                             if tx['domain'] == 'icmsinter']
-            icms_fcp = [tx for tx in result['taxes']
-                        if tx['domain'] == 'icmsfcp']
-            difa['vBCUFDest'] = total_base #BASE UNICA!
-            difa['pICMSUFDest'] = specific_icms[0]['percent'] # [BC x ALQ INTER]
-            difa['pICMSInterPart'] = 0.40 #TODO criar parametro
-            if icms_inter:
-                difa['pICMSInter'] = icms_inter[0]['percent']
-            icms_difa = ((difa['vBCUFDest'] * difa['pICMSUFDest']) -
-                         (difa['vBCUFDest'] * difa['pICMSInter']))
-            if icms_fcp:
-                difa['pFCPUFDest'] = icms_fcp[0]['percent'] # Fundo pobreza
-                difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
-                icms_difa -= difa['vFCPUFDest']
+            # Para operações fora do estado e aquisição de ativo
+            # TODO: Verificar se existem outras condições que
+            # devem passar por este trecho
+            if fiscal_position and fiscal_position.cfop_id.id_dest == '2':
+                icms_inter = [tx for tx in result['taxes']
+                                 if tx['domain'] == 'icmsinter']
+                # BASE UNICA
+                difa['vBCUFDest'] = total_base
+                #ICMS origem = [BC x ALQ INTER]
+                difa['pICMSUFDest'] = specific_icms[0]['percent']
+                difa['pICMSInterPart'] = 0.40 #TODO criar parametro
+                if icms_inter:
+                    #ICMS interno Destino = [BC x ALQ intra]
+                    difa['pICMSInter'] = icms_inter[0]['percent']
+                #ICMS destino = [BC x ALQ intra] - ICMS origem
+                icms_difa = ((difa['vBCUFDest'] * difa['pICMSUFDest']) -
+                             (difa['vBCUFDest'] * difa['pICMSInter']))
+                # if result_fcp['taxes']:
+                    # difa['pFCPUFDest'] = result_fcp[0]['percent'] # Fundo pobreza
+                    # difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
+                    # icms_difa -= difa['vFCPUFDest'] # FIXME: O ICMS deve ter o FCP incluso.
             difa['vICMSUFDest'] = icms_difa * difa['pICMSInterPart']
             difa['vICMSUFRemet'] = icms_difa * (1-difa['pICMSInterPart'])
         else:
