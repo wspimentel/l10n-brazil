@@ -26,13 +26,14 @@ class ResCountryState(models.Model):
     icms_table_id = fields.One2many('state.icms.table',
                                     'origin_state_id',
                                     'Impostos por Estado')
-    fcp = fields.Float(string=u"% Fundo de Combate à Pobreza (FCP)",
-                       help=u"Percentual adicional inserido na alíquota interna"
-                            u" da UF de destino, relativo ao Fundo de Combate à"
-                            u" Pobreza (FCP) em operações interestaduais com o "
-                            u"consumidor com esta UF. "
-                            u"Nota: Percentual máximo de 2%,"
-                            u" conforme a legislação")
+    fcp_tax_id = fields.Many2one(
+        'account.tax', string=u"% Fundo de Combate à Pobreza (FCP)",
+        help=u"Percentual adicional inserido na alíquota interna"
+        u" da UF de destino, relativo ao Fundo de Combate à"
+        u" Pobreza (FCP) em operações interestaduais com o "
+        u"consumidor com esta UF. "
+        u"Nota: Percentual máximo de 2%,"
+        u" conforme a legislação")
 
 class ResCountryStateIcmsTable(models.Model):
     _name = 'state.icms.table'

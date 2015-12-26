@@ -136,6 +136,7 @@ class AccountFiscalPosition(models.Model):
             product_ncm_tax_def = product_fc.purchase_tax_definition_line
 
         for ncm_tax_def in product_ncm_tax_def:
+            # TODO buscar a FCP e incluir nas taxas.
             if ncm_tax_def.tax_id:
                 result[ncm_tax_def.tax_id.domain] = {
                     'tax': ncm_tax_def.tax_id,

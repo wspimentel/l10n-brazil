@@ -226,6 +226,10 @@ class PurchaseOrderLine(models.Model):
             ctx.update({'fiscal_type': obj_product.fiscal_type,
                         'type_tax_use': 'purchase'})
             taxes = obj_product.supplier_taxes_id
+            if obj_product.fiscal_classification_id:
+                taxes |= obj_fp_rule.with_context(
+                    ctx).fp_rule_obj(
+                    kwargs.get('product_id'), partner.state_id)
             taxes_ids = obj_fposition.with_context(ctx).map_tax(taxes)
             result['value']['taxes_id'] = taxes_ids
 

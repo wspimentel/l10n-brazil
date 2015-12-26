@@ -414,10 +414,32 @@ class WizardAccountProductFiscalClassification(models.TransientModel):
 class L10nBrTaxFcp(models.Model):
     _name = 'l10n_br_tax.fcp'
 
-    fcp = fields.Float(string='FCP do produto na UF',
-                       digits_compute=dp.get_precision('Account'))
+    fcp_tax_id = fields.Many2one(
+        'account.tax', string=u"% Fundo de Combate à Pobreza (FCP)",
+        help=u"Percentual adicional inserido na alíquota interna"
+        u" da UF de destino, relativo ao Fundo de Combate à"
+        u" Pobreza (FCP) em operações interestaduais com o "
+        u"consumidor com esta UF. "
+        u"Nota: Percentual máximo de 2%,"
+        u" conforme a legislação")
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification',
         'Fiscal Classification', select=True)
     to_state_id = fields.Many2one(
         'res.country.state', 'Estado Destino')
+
+    @staticmethod
+    def product_fcp_map(self, product_id, to_state=None):
+        result = 0.00
+        product_tmpl_id = self.env['product.product'].browse(
+            product_id).product_tmpl_id.id
+        fcp = self.env[
+            'l10n_br_account.product.fcp'].search(
+            [('product_tmpl_id', '=', product_tmpl_id),
+             '|', ('to_state_id', '=', False),
+             ('to_state_id', '=', to_state.id)])
+        if fcp:
+            result = fcp.fcp
+        else:
+            result = to_state.fcp
+        return result

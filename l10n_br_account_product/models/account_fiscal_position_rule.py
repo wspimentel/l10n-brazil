@@ -26,16 +26,16 @@ class AccountFiscalPositionRule(models.Model):
     _inherit = 'account.fiscal.position.rule'
 
     def product_fcp_map(self, product_id, to_state=None):
-        result = 0.00
-        product_tmpl_id = self.env['product.product'].browse(
-            product_id).product_tmpl_id.id
+        result = self.env['account.tax']
+        fiscal_classification_id = self.env['product.product'].browse(
+            product_id).fiscal_classification_id
         fcp = self.env[
-            'l10n_br_account.product.fcp'].search(
-            [('product_tmpl_id', '=', product_tmpl_id),
+            'l10n_br_tax.fcp'].search(
+            [('fiscal_classification_id', '=', fiscal_classification_id.id),
              '|', ('to_state_id', '=', False),
              ('to_state_id', '=', to_state.id)])
         if fcp:
-            result = fcp.fcp
+            result |= fcp.fcp_tax_id
         else:
-            result = to_state.fcp
+            result |= to_state.fcp_tax_id
         return result
