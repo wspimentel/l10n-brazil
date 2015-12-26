@@ -172,8 +172,8 @@ class AccountTax(models.Model):
         # Calcula a FCP
         specific_fcp = [tx for tx in result['taxes']
                         if tx['domain'] == 'icmsfcp']
-        # result_fcp = self._compute_tax(cr, uid, specific_fcp, result['total'],
-        #                                product, quantity, precision, base_tax)
+        result_fcp = self._compute_tax(cr, uid, specific_fcp, result['total'],
+                                       product, quantity, precision, base_tax)
         totaldc += result_ipi['tax_discount']
         calculed_taxes += result_ipi['taxes']
         for ipi in result_ipi['taxes']:
@@ -204,10 +204,12 @@ class AccountTax(models.Model):
                 #ICMS destino = [BC x ALQ intra] - ICMS origem
                 icms_difa = ((difa['vBCUFDest'] * difa['pICMSUFDest']) -
                              (difa['vBCUFDest'] * difa['pICMSInter']))
-                # if result_fcp['taxes']:
-                    # difa['pFCPUFDest'] = result_fcp[0]['percent'] # Fundo pobreza
-                    # difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
-                    # icms_difa -= difa['vFCPUFDest'] # FIXME: O ICMS deve ter o FCP incluso.
+                if result_fcp['taxes']:
+                    # % Fundo pobreza
+                    difa['pFCPUFDest'] = result_fcp['taxes'][0]['percent']
+                    difa['vFCPUFDest'] = difa['vBCUFDest'] * difa['pFCPUFDest']
+                    # FIXME: O ICMS deve ter o FCP incluso?
+                    icms_difa -= difa['vFCPUFDest']
             difa['vICMSUFDest'] = icms_difa * difa['pICMSInterPart']
             difa['vICMSUFRemet'] = icms_difa * (1-difa['pICMSInterPart'])
         else:

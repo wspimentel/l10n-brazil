@@ -315,7 +315,7 @@ class SaleOrderLine(models.Model):
                 'type_tax_use': 'sale', 'product_id': product_id})
             taxes = obj_product.taxes_id
             if obj_product.fiscal_classification_id:
-                taxes |= obj_fp_rule.with_context(
+                taxes |= fp_rule_obj.with_context(
                     ctx).fp_rule_obj(
                     kwargs.get('product_id'), partner_invoice.state_id)
             tax_ids = obj_fposition.with_context(context).map_tax(taxes)
