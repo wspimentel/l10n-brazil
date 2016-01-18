@@ -100,6 +100,48 @@ class AccountTax(models.Model):
         result['taxes'] = taxes
         return result
 
+    def _compute_costs(self, cr, uid, insurance_value, freight_value,
+                       other_costs_value, context=False):
+        result = []
+        total_included = 0.0
+
+        company = self.pool.get('res.users').browse(
+            cr, uid, [uid], context=context)[0].company_id
+
+        costs = {
+            company.insurance_tax_id: insurance_value,
+            company.freight_tax_id: freight_value,
+            company.other_costs_tax_id: other_costs_value,
+        }
+
+        for tax in costs:
+            if costs[tax]:
+                result.append({
+                    'domain': tax.domain,
+                    'ref_tax_code_id': tax.ref_tax_code_id,
+                    'sequence': tax.sequence,
+                    'total_base': costs[tax],
+                    'account_paid_id': tax.account_paid_id.id,
+                    'base_sign': tax.base_sign,
+                    'id': tax.id,
+                    'ref_base_code_id': tax.ref_base_code_id.id,
+                    'account_analytic_collected_id':
+                        tax.account_analytic_collected_id.id,
+                    'tax_code_id': tax.tax_code_id.id,
+                    'ref_tax_sign': tax.ref_tax_sign,
+                    'type': tax.type,
+                    'ref_base_sign': tax.ref_base_sign,
+                    'base_code_id': tax.base_code_id.id,
+                    'account_analytic_paid_id':
+                        tax.account_analytic_paid_id.id,
+                    'name': tax.name,
+                    'account_collected_id': tax.account_collected_id.id,
+                    'amount': costs[tax],
+                    'tax_sign':tax.tax_sign,
+                })
+                total_included += costs[tax]
+        return result, total_included
+
     # TODO
     # Refatorar este método, para ficar mais simples e não repetir
     # o que esta sendo feito no método l10n_br_account_product
@@ -297,8 +339,10 @@ class AccountTax(models.Model):
             result_icmsst['taxes'][0][
                 'icms_st_base_other'] = icms_st_base_other
 
-            if result_icmsst['taxes'][0]['percent']:
+            if result_icmsst['taxes'][0]['percent'] and not partner.has_gnre:
                 calculed_taxes += result_icmsst['taxes']
+            elif result_icmsst['taxes'][0]['percent']:
+                result['total_gnre'] = result_icmsst['taxes'][0]['amount']
 
         # Estimate Taxes
         if fiscal_position and fiscal_position.asset_operation:
@@ -328,12 +372,19 @@ class AccountTax(models.Model):
                                tax_estimate_percent)
                 result['total_taxes'] = round(total_taxes, precision)
 
+
+        costs, costs_values = self._compute_costs(
+            cr, uid, insurance_value, freight_value, other_costs_value)
+        calculed_taxes += costs
+        result['total_included'] += costs_values
+
         return {
             'total': result['total'],
             'total_included': result.get('total_included', 0.00),
             'total_tax_discount': totaldc,
             'taxes': calculed_taxes,
             'total_taxes': result.get('total_taxes', 0.00),
+            'total_gnre': result.get('total_gnre', 0.00),
         }
 
     @api.v8
@@ -343,7 +394,8 @@ class AccountTax(models.Model):
                     other_costs_value=0.0, base_tax=0.00):
         return self._model.compute_all(
             self._cr, self._uid, self, price_unit, quantity,
-            product=product, partner=partner, force_excluded=force_excluded,
+            product=product, partner=partner,
+            force_excluded=force_excluded,
             fiscal_position=fiscal_position, insurance_value=insurance_value,
             freight_value=freight_value, other_costs_value=other_costs_value,
             base_tax=base_tax)

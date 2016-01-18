@@ -76,8 +76,9 @@ class AccountInvoice(models.Model):
         self.amount_tax = sum(tax.amount
                               for tax in self.tax_line
                               if not tax.tax_code_id.tax_discount)
-        self.amount_total = self.amount_tax + self.amount_untaxed + \
-            self.amount_costs + self.amount_insurance + self.amount_freight
+        self.amount_total = self.amount_tax + self.amount_untaxed
+        self.amount_total_gnre = sum(
+            line.gnre_value for line in self.invoice_line)
 
         for line in self.invoice_line:
             if line.icms_cst_id.code not in (
@@ -374,6 +375,11 @@ class AccountInvoice(models.Model):
         store=True,
         digits=dp.get_precision('Account'),
         compute='_compute_amount')
+    amount_total_gnre = fields.Float(
+        string='Total de Tributos a recolher via GNRE',
+        store=True,
+        digits=dp.get_precision('Account'),
+        compute='_compute_amount')
 
     # TODO não foi migrado por causa do bug github.com/odoo/odoo/issues/1711
     def fields_view_get(self, cr, uid, view_id=None, view_type=False,
@@ -507,49 +513,6 @@ class AccountInvoice(models.Model):
             if result and result.get('value'):
                 invoice.write(result['value'])
         return True
-
-    @api.multi
-    def button_reset_taxes(self):
-        result = super(AccountInvoice, self).button_reset_taxes()
-        ait = self.env['account.invoice.tax']
-        for invoice in self:
-            invoice.read()
-            costs = []
-            company = invoice.company_id
-            if invoice.amount_insurance:
-                costs.append((company.insurance_tax_id,
-                              invoice.amount_insurance))
-            if invoice.amount_freight:
-                costs.append((company.freight_tax_id,
-                              invoice.amount_freight))
-            if invoice.amount_costs:
-                costs.append((company.other_costs_tax_id,
-                              invoice.amount_costs))
-            for tax, cost in costs:
-                ait_id = ait.search([
-                    ('invoice_id', '=', invoice.id),
-                    ('tax_code_id', '=', tax.id),
-                ])
-                vals = {
-                    'tax_amount': cost,
-                    'name': tax.name,
-                    'sequence': 1,
-                    'invoice_id': invoice.id,
-                    'manual': True,
-                    'base_amount': cost,
-                    'base_code_id': tax.base_code_id.id,
-                    'tax_code_id': tax.tax_code_id.id,
-                    'amount': cost,
-                    'base': cost,
-                    'account_analytic_id':
-                        tax.account_analytic_collected_id.id or False,
-                    'account_id': tax.account_paid_id.id
-                 }
-                if ait_id:
-                    ait_id.write(vals)
-                else:
-                    ait.create(vals)
-        return result
 
 
 class AccountInvoiceLine(models.Model):
@@ -821,6 +784,11 @@ class AccountInvoiceLine(models.Model):
         string=u'Valor do ICMS Interestadual para a UF do remetente',
         digits=dp.get_precision('Account'),
         default=0.00)
+    gnre_value = fields.Float(
+        string=u'Valor do recolhimento via GNRE',
+        digits=dp.get_precision('Account'),
+        default=0.00
+    )
 
     def _amount_tax_icms(self, tax=None):
         result = {
@@ -982,6 +950,8 @@ class AccountInvoiceLine(models.Model):
         if values.get('invoice_line_tax_id'):
             tax_ids = values.get('invoice_line_tax_id', [[6, 0, []]])[
                 0][2] or self.invoice_line_tax_id.ids
+        else:
+            tax_ids = self.invoice_line_tax_id.ids
         partner_id = values.get('partner_id') or self.partner_id.id
         product_id = values.get('product_id') or self.product_id.id
         quantity = values.get('quantity') or self.quantity
@@ -1000,8 +970,12 @@ class AccountInvoiceLine(models.Model):
 
         if self:
             partner = self.invoice_id.partner_id
-        else:
+        elif partner_id:
             partner = self.env['res.partner'].browse(partner_id)
+        else:
+            partner = self.env['account.invoice'].browse(
+                values.get('invoice_id')).partner_id
+
 
         taxes = self.env['account.tax'].browse(tax_ids)
         fiscal_position = self.env['account.fiscal.position'].browse(
@@ -1027,12 +1001,13 @@ class AccountInvoiceLine(models.Model):
             result['icms_origin'] = product.origin
 
         taxes_calculed = taxes.compute_all(
-            price, quantity, product, partner,
+            price, quantity, product=product, partner=partner,
             fiscal_position=fiscal_position,
             insurance_value=insurance_value,
             freight_value=freight_value,
             other_costs_value=other_costs_value)
 
+        result['gnre_value'] = taxes_calculed['total_gnre']
         result['total_taxes'] = taxes_calculed['total_taxes']
 
         for tax in taxes_calculed['taxes']:
@@ -1372,10 +1347,10 @@ class AccountInvoiceLine(models.Model):
 
     # TODO comentado por causa deste bug
     # https://github.com/odoo/odoo/issues/2197
-    # @api.multi
-    # def write(self, vals):
-    #    vals.update(self._validate_taxes(vals))
-    #    return super(AccountInvoiceLine, self).write(vals)
+    @api.multi
+    def write(self, vals):
+       vals.update(self._validate_taxes(vals))
+       return super(AccountInvoiceLine, self).write(vals)
 
 
 class AccountInvoiceTax(models.Model):
@@ -1390,7 +1365,8 @@ class AccountInvoiceTax(models.Model):
         for line in invoice.invoice_line:
             taxes = line.invoice_line_tax_id.compute_all(
                 (line.price_unit * (1 - (line.discount or 0.0) / 100.0)),
-                line.quantity, line.product_id, invoice.partner_id,
+                line.quantity, product=line.product_id,
+                partner=invoice.partner_id,
                 fiscal_position=line.fiscal_position,
                 insurance_value=line.insurance_value,
                 freight_value=line.freight_value,
@@ -1403,8 +1379,9 @@ class AccountInvoiceTax(models.Model):
                     'manual': False,
                     'sequence': tax['sequence'],
                     'base': currency.round(
-                        tax['price_unit'] *
-                        line['quantity']),
+                        tax.get('total_base',
+                                tax.get('price_unit', 0.00) *
+                                line['quantity'])),
                 }
                 if invoice.type in ('out_invoice', 'in_invoice'):
                     val['base_code_id'] = tax['base_code_id']

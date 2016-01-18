@@ -61,8 +61,7 @@ class SaleOrder(models.Model):
             amount_untaxed)
         self.amount_extra = self.pricelist_id.currency_id.round(amount_extra)
         self.amount_total = (self.amount_untaxed +
-                             self.amount_tax +
-                             self.amount_extra)
+                             self.amount_tax)
         self.amount_discount = self.pricelist_id.currency_id.round(
             amount_discount)
         self.amount_gross = self.pricelist_id.currency_id.round(amount_gross)
@@ -74,8 +73,10 @@ class SaleOrder(models.Model):
         qty = line._calc_line_quantity()
         for computed in line.tax_id.compute_all(
                 price,
-                qty, line.order_id.partner_invoice_id.id,
-                line.product_id.id, line.order_id.partner_id,
+                qty,
+                partner=line.order_id.partner_invoice_id,
+                product=line.product_id,
+                # line.order_id.partner_id,
                 fiscal_position=line.fiscal_position,
                 insurance_value=line.insurance_value,
                 freight_value=line.freight_value,
@@ -218,8 +219,8 @@ class SaleOrderLine(models.Model):
         taxes = self.tax_id.compute_all(
             price,
             qty,
-            self.product_id.id,
-            self.order_id.partner_invoice_id.id,
+            product=self.product_id,
+            partner=self.order_id.partner_invoice_id,
             fiscal_position=self.fiscal_position,
             insurance_value=self.insurance_value,
             freight_value=self.freight_value,
