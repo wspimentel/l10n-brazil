@@ -1050,6 +1050,10 @@ class AccountInvoiceLine(models.Model):
 
         fiscal_category_id = ctx.get('parent_fiscal_category_id')
 
+        # if product:
+        #     produto_template = self.env['product.product'].browse(product)
+        #     result['value']['name'] = produto_template.display_name
+
         if not fiscal_category_id or not product:
             return result
 
