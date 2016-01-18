@@ -90,7 +90,7 @@ class AccountInvoice(models.Model):
                 self.icms_base += 0.00
                 self.icms_base_other += 0.00
                 self.icms_value += 0.00
-            if line.icms_cst_id.code in ('10', '30', '60', '90', ):
+            if line.icms_cst_id.code in ('10', '30', '60', '90'):
                 self.icms_st_base += line.icms_st_base
                 self.icms_st_value += line.icms_st_value
 
