@@ -18,7 +18,6 @@
 ###############################################################################
 
 from openerp import models, fields, api
-
 from .l10n_br_account import PRODUCT_FISCAL_TYPE
 
 
@@ -107,32 +106,35 @@ class AccountFiscalPositionTemplate(models.Model):
                           'state': position.state,
                           'type_tax_use': position.type_tax_use,
                           'cfop_id':
-                          position.cfop_id and position.cfop_id.id or False,
+                              position.cfop_id and position.cfop_id.id or False,
                           'inv_copy_note': position.inv_copy_note,
                           'asset_operation': position.asset_operation,
                           'fiscal_category_id':
-                          position.fiscal_category_id and
-                          position.fiscal_category_id.id or False})
+                              position.fiscal_category_id and
+                              position.fiscal_category_id.id or False})
             for tax in position.tax_ids:
                 obj_tax_fp.create(cr, uid, {
                     'tax_src_id':
-                    tax.tax_src_id and
-                    tax_template_ref.get(tax.tax_src_id.id, False),
+                        tax.tax_src_id and
+                        tax_template_ref.get(tax.tax_src_id.id, False),
                     'tax_code_src_id':
-                    tax.tax_code_src_id and
-                    tax_code_template_ref.get(tax.tax_code_src_id.id, False),
+                        tax.tax_code_src_id and
+                        tax_code_template_ref.get(tax.tax_code_src_id.id,
+                                                  False),
                     'tax_src_domain': tax.tax_src_domain,
                     'tax_dest_id': tax.tax_dest_id and
-                    tax_template_ref.get(tax.tax_dest_id.id, False),
+                                   tax_template_ref.get(tax.tax_dest_id.id,
+                                                        False),
                     'tax_code_dest_id': tax.tax_code_dest_id and
-                    tax_code_template_ref.get(tax.tax_code_dest_id.id, False),
+                                        tax_code_template_ref.get(
+                                            tax.tax_code_dest_id.id, False),
                     'position_id': new_fp
                 })
             for acc in position.account_ids:
                 obj_ac_fp.create(cr, uid, {
                     'account_src_id': acc_template_ref[acc.account_src_id.id],
                     'account_dest_id':
-                    acc_template_ref[acc.account_dest_id.id],
+                        acc_template_ref[acc.account_dest_id.id],
                     'position_id': new_fp
                 })
         return True
@@ -194,11 +196,17 @@ class AccountFiscalPosition(models.Model):
          ('unapproved', u'Não Aprovada')], 'Status', readonly=True,
         track_visibility='onchange', select=True, default='draft')
 
+    message_id = fields.Many2many('invoice.message',
+                                  'invoice_message_fiscal_position_rel',
+                                  'fiscal_position_id',
+                                  'message_id',
+                                  string='Message')
+
     @api.multi
     def onchange_type(self, type):
         type_tax = {'input': 'purchase', 'output': 'sale'}
         return {'value': {'type_tax_use': type_tax.get(type, 'all'),
-                'tax_ids': False}}
+                          'tax_ids': False}}
 
     @api.multi
     def onchange_fiscal_category_id(self, fiscal_category_id=None):
@@ -215,8 +223,8 @@ class AccountFiscalPosition(models.Model):
         result = []
         if not context:
             context = {}
-        if fposition_id and fposition_id.company_id and\
-                context.get('type_tax_use') in ('sale', 'all'):
+        if fposition_id and fposition_id.company_id and \
+                        context.get('type_tax_use') in ('sale', 'all'):
             if context.get('fiscal_type', 'product') == 'product':
                 company_tax_ids = self.pool.get('res.company').read(
                     cr, uid, fposition_id.company_id.id, ['product_tax_ids'],
@@ -244,7 +252,7 @@ class AccountFiscalPosition(models.Model):
             for tax in fposition_id.tax_ids:
                 tax_src = tax.tax_src_id and tax.tax_src_id.id == t.id
                 tax_code_src = tax.tax_code_src_id and \
-                    tax.tax_code_src_id.id == t.tax_code_id.id
+                               tax.tax_code_src_id.id == t.tax_code_id.id
 
                 if tax_src or tax_code_src:
                     if tax.tax_dest_id:
@@ -259,7 +267,8 @@ class AccountFiscalPosition(models.Model):
     def map_tax(self, taxes):
         result = self.env['account.tax'].browse()
         if self.company_id and \
-                self.env.context.get('type_tax_use') in ('sale', 'all'):
+                        self.env.context.get('type_tax_use') in (
+                'sale', 'all'):
             if self.env.context.get('fiscal_type', 'product') == 'product':
                 company_taxes = self.company_id.product_tax_ids
             else:
@@ -309,6 +318,37 @@ class AccountFiscalPositionTax(models.Model):
                 self.tax_code_src_id
             )
 
+
+class AccountProductFiscalClassification(models.Model):
+    _inherit = 'account.product.fiscal.classification'
+
+    message_id = fields.Many2many('invoice.message',
+                                  'invoice_message_fiscal_classification_rel',
+                                  'fiscal_classification_id',
+                                  'message_id',
+                                  string='Message')
+
+
+class InvoiceMessage(models.Model):
+    _name = 'invoice.message'
+
+    def _default_company_id(self):
+        company_model = self.env['res.company']
+        return company_model._company_default_get(self._name)
+
+    message_invoice = fields.Text('Message')
+    company_id = fields.Many2one('res.company', string='Empresa',
+                                 default=_default_company_id)
+    fiscal_classification_id = fields.Many2many(
+        'account.product.fiscal.classification',
+        'invoice_message_fiscal_classification_rel',
+        'message_id',
+        'fiscal_classification_id',
+        string=u'Classificação Fiscal')
+    fiscal_position_id = fields.Many2many(
+        'account.fiscal.position', 'invoice_message_fiscal_position_rel',
+        'message_id', 'fiscal_position_id', string=u'Posição Fiscal')
+    # company_id = fields.One2many('res.company', u'Empresa')
 
 
 class ResPartner(models.Model):
