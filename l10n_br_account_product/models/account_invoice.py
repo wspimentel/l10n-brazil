@@ -414,8 +414,6 @@ class AccountInvoice(models.Model):
         default=GNRE_RESPONSE_DEFAULT,
         string=u'Responsabilidade'
     )
-    has_gnre_paid = fields.Boolean(
-        string=u"Guia paga")
     gnre_state = fields.Selection(
         [('isento', 'Isento'),
          ('sujeito', 'Sujeito'),

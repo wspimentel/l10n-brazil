@@ -28,7 +28,6 @@
                         <field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					    <field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					    <field name="amount_total_gnre" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-                        <field name="has_gnre_paid" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
                     </group>
                 </xpath>
 				<label for="comment" position="replace">
@@ -192,7 +191,6 @@
 					<field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					<field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					<field name="amount_total_gnre" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-					<field name="has_gnre_paid" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 				</xpath>
 				<label for="comment" position="replace">
 				</label>
