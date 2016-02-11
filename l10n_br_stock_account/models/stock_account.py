@@ -69,8 +69,8 @@ class StockPicking(models.Model):
         comment = ''
         if picking.fiscal_position.inv_copy_note:
             comment += picking.fiscal_position.note or ''
-        if picking.sale_id and picking.sale_id.copy_note:
-            comment += picking.sale_id.note or ''
+        # if picking.sale_id and picking.sale_id.copy_note:
+        #     comment += picking.sale_id.note or ''
         if picking.note:
             comment += ' - ' + picking.note
 
@@ -80,6 +80,12 @@ class StockPicking(models.Model):
         result['fiscal_category_id'] = picking.fiscal_category_id.id
         result['fiscal_position'] = picking.fiscal_position.id
         result['invoice_reserved_number'] = picking.invoice_reserved_number
+        # result['has_gnre'] = (
+        #     picking.sale_id and picking.sale_id.has_gnre or False)
+        # result['gnre_due_days'] = (
+        #     picking.sale_id and picking.sale_id.gnre_due_days or False)
+        # result['gnre_response'] = (
+        #     picking.sale_id and picking.sale_id.gnre_response or False)
 
         vals.update(result)
         return super(StockPicking, self)._create_invoice_from_picking(

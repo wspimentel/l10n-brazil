@@ -35,10 +35,10 @@ class SaleOrder(models.Model):
         if not partner_id:
             return result
         partner = self.env['res.partner'].browse(partner_id)
-        result['value']['has_gnre'] = partner.has_gnre
-        result['value']['gnre_due_days'] = partner.gnre_due_days
-        result['value']['gnre_response'] = partner.gnre_response
-
+        if partner.has_gnre:
+            result['value']['has_gnre'] = partner.has_gnre
+            result['value']['gnre_due_days'] = partner.gnre_due_days
+            result['value']['gnre_response'] = partner.gnre_response
         return result
 
     @api.one

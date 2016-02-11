@@ -24,6 +24,20 @@ from openerp import models
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, move,
+                          context=None):
+        inv_vals = super(StockPicking, self)._get_invoice_vals(
+            cr, uid, key, inv_type, journal_id, move, context=context)
+
+        sale = move.picking_id.sale_id
+        if sale and inv_type in ('out_invoice', 'out_refund'):
+            inv_vals.update({
+                'has_gnre': sale.has_gnre or False,
+                'gnre_due_days': sale.gnre_due_days or False,
+                'gnre_response': sale.gnre_response or False,
+                })
+        return inv_vals
+
     # TODO migrate to new API - Não existe mais este método
     def _prepare_invoice(self, cr, uid, picking, partner,
                          inv_type, journal_id, context=None):

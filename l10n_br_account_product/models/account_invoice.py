@@ -556,7 +556,10 @@ class AccountInvoice(models.Model):
                 invoice.write(result['value'])
             if not invoice.gnre_state:
                 if invoice.has_gnre and invoice.amount_total_gnre > 0:
-                    invoice.gnre_state = 'sujeito'
+                    if invoice.gnre_response not in ('isento'):
+                        invoice.gnre_state = 'sujeito'
+                    else:
+                        invoice.gnre_state = 'isento'
         return True
 
 
