@@ -28,6 +28,7 @@
                         <field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					    <field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					    <field name="amount_total_gnre" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+						<field name="gnre_receipt_file" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
                     </group>
                 </xpath>
 				<label for="comment" position="replace">

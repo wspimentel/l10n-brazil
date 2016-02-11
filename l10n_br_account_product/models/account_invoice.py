@@ -419,8 +419,10 @@ class AccountInvoice(models.Model):
          ('sujeito', 'Sujeito'),
          ('gerada', 'Gerada'),
          ('pago', 'Pago')],
-        u'GNRE STATUS', readonly=True,
-        states={'draft': [('readonly', False)]})
+        u'GNRE STATUS')
+    gnre_receipt_file = fields.Binary(
+        string="Comprovante"
+        )
 
 
     # TODO não foi migrado por causa do bug github.com/odoo/odoo/issues/1711
