@@ -289,6 +289,11 @@ class AccountTax(models.Model):
                             quantity,
                             precision,
                             base_tax)
+                        if (has_gnre and
+                                partner.partner_fiscal_type_id.has_gnre_inter):
+                            result['gnre_value'] = result_icms_inter[
+                                'taxes'][0]['amount']
+                            result['gnre_type'] = 'inter'
                         totaldc += result_icms_inter['tax_discount']
                         calculed_taxes += result_icms_inter['taxes']
                 except:
@@ -349,14 +354,9 @@ class AccountTax(models.Model):
 
         if has_gnre:
             if result_icmsst['taxes']:
-                result['gnre_value'] = result_icms_inter[
-                    'taxes'][0]['amount']
+                result['gnre_value'] = result_icmsst['taxes'][0]['amount']
                 result['gnre_type'] = 'st'
-            elif result_icms_inter['taxes']:
-                if partner.partner_fiscal_type_id.has_gnre_inter:
-                    result['gnre_value'] = result_icms_inter[
-                        'taxes'][0]['amount']
-                    result['gnre_type'] = 'inter'
+
 
         # Estimate Taxes
         if fiscal_position and fiscal_position.tax_estimate:

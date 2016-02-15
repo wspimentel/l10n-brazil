@@ -259,7 +259,7 @@ class SaleOrderLine(models.Model):
             insurance_value=self.insurance_value,
             freight_value=self.freight_value,
             other_costs_value=self.other_costs_value)
-        self.gnre_value = taxes['total_gnre']
+        self.gnre_value = taxes['gnre_value']
         self.price_subtotal = (self.order_id.pricelist_id
                                .currency_id.round(taxes['total']))
         self.price_gross = self._calc_price_gross(qty)
