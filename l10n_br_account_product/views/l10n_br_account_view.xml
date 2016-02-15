@@ -13,5 +13,20 @@
 			</field>
 		</record>
 
+		<record id="view_l10n_br_account_product_partner_fiscal_type_form" model="ir.ui.view">
+			<field name="name">l10n_br_account.partner.fiscal.type</field>
+			<field name="model">l10n_br_account.partner.fiscal.type</field>
+			<field name="inherit_id" ref="l10n_br_account.view_l10n_br_account_partner_fiscal_type_form"/>
+			<field name="arch" type="xml">
+				<field name="default" position="after">
+					<group string="Recupera Impostos" colspan="4">
+						<field name="icms"/>
+						<field name="ipi"/>
+						<field name="has_gnre_inter"/>
+					</group>
+				</field>
+			</field>
+		</record>
+
 	</data>
 </openerp>

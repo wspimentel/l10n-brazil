@@ -80,6 +80,11 @@ class AccountFiscalPosition(models.Model):
         states={'draft': [('readonly', False)]},
         default=True
     )
+    has_gnre = fields.Boolean(
+        string=u'Recolhe imposto através de GNRE',
+        states={'draft': [('readonly', False)]},
+        default=False
+    )
 
     @api.v7
     def map_tax(self, cr, uid, fposition_id, taxes, context=None):

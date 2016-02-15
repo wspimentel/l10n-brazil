@@ -10,7 +10,7 @@
                 <field name="number" position="after">
                     <group>
                     <label options='{"no_open": True}' class="oe_inline" string="Atenção: Operação c/ GNRE"
-                           attrs="{'invisible':[('amount_total_gnre','=',0)]}"/>
+                           attrs="{'invisible':[('amount_total_gnre_st','=',0),('amount_total_gnre_inter','=',0)]}"/>
                     </group>
                 </field>
 				<xpath expr="//sheet[@string='Invoice']/h1" position="before">
@@ -27,10 +27,13 @@
                         <field name="gnre_state" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
                         <field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 					    <field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-					    <field name="amount_total_gnre" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="amount_total_gnre_st" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="amount_total_gnre_inter" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="gnre_type" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="gnre_type_id" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
 						<field name="gnre_receipt_file" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
                     </group>
-                </xpath>
+				</xpath>
 				<label for="comment" position="replace">
 				</label>
 				<field name="comment" position="replace">
@@ -184,14 +187,21 @@
                 <field name="number" position="after">
                     <group>
                     <label options='{"no_open": True}' class="oe_inline" string="Atenção: Operação c/ GNRE"
-                           attrs="{'invisible':[('amount_total_gnre','=',0)]}"/>
+                           attrs="{'invisible':[('amount_total_gnre_st','=',0),('amount_total_gnre_inter','=',0)]}"/>
                     </group>
                 </field>
 				<xpath expr="//field[@name='payment_term']" position="after">
-					<field name="has_gnre" invisible="1"/>
-					<field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-					<field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-					<field name="amount_total_gnre" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+                    <field name="has_gnre" invisible="1"/>
+                    <group string="GNRE" attrs="{'invisible': [('has_gnre','!=', True)]}">
+                        <field name="gnre_state" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+                        <field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="amount_total_gnre_st" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="amount_total_gnre_inter" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					    <field name="gnre_type" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+                        <field name="gnre_type_id" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+						<field name="gnre_receipt_file" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+                    </group>
 				</xpath>
 				<label for="comment" position="replace">
 				</label>
@@ -283,6 +293,14 @@
 						</notebook>
 					</page>
                     <page string="Observações">
+                        <group string="Observações">
+                            <field name="comment" nolabel="1"/>
+                        </group>
+                        <group string="Observações Fiscais">
+                            <field name="fiscal_comment" nolabel="1"/>
+                        </group>
+                    </page>
+					<page string="GNRE" attrs="{'invisible': [('has_gnre','!=', True)]}">
                         <group string="Observações">
                             <field name="comment" nolabel="1"/>
                         </group>
@@ -398,7 +416,8 @@
 										</group>
 										<group string="GNRE">
 											<group>
-												<field name="gnre_value"/>
+												<field name="gnre_inter_value"/>
+												<field name="gnre_st_value"/>
 											</group>
 										</group>
 									</page>

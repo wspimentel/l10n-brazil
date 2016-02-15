@@ -31,6 +31,12 @@ class ResCountryState(models.Model):
         u"consumidor com esta UF. "
         u"Nota: Percentual máximo de 2%,"
         u" conforme a legislação")
-    gnre_id = fields.Many2one(
+    gnre_st_id = fields.Many2one(
         'l10n_br_tax.gnre',
-        string=u'Código de recolhimento')
+        string=u'Tipo de GNRE ST',
+        domain="[('gnre_type', '=', 'st')]")
+    gnre_inter_id = fields.Many2one(
+        'l10n_br_tax.gnre',
+        string=u'Tipo de GNRE Difal',
+        domain="[('gnre_type', '=', 'inter')]")
+

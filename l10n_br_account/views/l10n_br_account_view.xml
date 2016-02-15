@@ -186,10 +186,6 @@
 					        <field name="name" select="1"/>
 					        <field name="is_company" select="1"/>
 					        <field name="default"/>
-					        <group string="Recupera Impostos" colspan="4">
-					            <field name="icms"/>
-					            <field name="ipi"/>
-                            </group>
                         </group>
                     </sheet>
 				</form>

@@ -45,3 +45,5 @@ class L10nBrAccountPartnerFiscalType(models.Model):
 
     icms = fields.Boolean('Recupera ICMS', default=True)
     ipi = fields.Boolean('Recupera IPI', default=True)
+    has_gnre_inter = fields.Boolean(u'Recolher Diferencial de ICMS nas '
+                                    u'operações Interestaduais via GNRE')

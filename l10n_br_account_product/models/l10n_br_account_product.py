@@ -390,9 +390,24 @@ class L10nBrTaxGnre(models.Model):
     _description = 'Guia de Recolhimento'
 
     code = fields.Char(u'Código', required=True)
-    name = fields.Text(u'Descrição', required=True)
-    gnre_response= fields.Selection(
+    name = fields.Char(u'Descrição', required=True)
+    gnre_response = fields.Selection(
         selection=GNRE_RESPONSE,
         default=GNRE_RESPONSE_DEFAULT,
         string='Responsabilidade'
+    )
+    tax_code_id = fields.Many2one(
+        'account.tax.code', string=u'Tipo de imposto')
+    account_credit_id = fields.Many2one(
+        'account.account', string=u'Conta de crédito')
+    account_debit_id = fields.Many2one(
+        'account.account', string=u'Conta de débito')
+    gnre_type = fields.Selection(
+        selection=[
+            ('st', u'Substituição Tributária'),
+            ('inter', u'Diferencial de Aliquota'),
+        ],
+        string=u'Tipo',
+        copy=False,
+        readonly=True,
     )

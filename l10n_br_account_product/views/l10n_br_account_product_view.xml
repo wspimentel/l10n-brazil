@@ -248,5 +248,48 @@
                   action="action_l10n_br_tax_icms_partition_form"
                   sequence="63"  />
 
+		<record	id="l10n_br_tax_gnre_form_view" model="ir.ui.view">
+            <field	name="name">l10n_br_tax.gnre.form.view</field>
+            <field	name="model">l10n_br_tax.gnre</field>
+            <field name="priority" eval="16"/>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="code"/>
+                            <field name="name"/>
+                            <field name="gnre_response"/>
+                            <field name="tax_code_id"/>
+                            <field name="account_credit_id"/>
+                            <field name="account_debit_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record	id="l10n_br_tax_gnre_tree_view" model="ir.ui.view">
+            <field	name="name">l10n_br_tax.gnre.tree.view</field>
+            <field	name="model">l10n_br_tax.gnre</field>
+            <field name="priority" eval="16"/>
+            <field	name="arch"	type="xml">
+                <tree>
+					<field name="code"/>
+					<field name="name"/>
+					<field name="tax_code_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <act_window id="action_l10n_br_tax_gnre_form"
+                    name="GNRE"
+                    res_model="l10n_br_tax.gnre"
+                    view_mode="tree,form" />
+
+        <menuitem id="menu_action_gnre"
+                  name="GNRE"
+                  parent="l10n_br_account.menu_l10n_br_account_fiscal_manager"
+                  action="action_l10n_br_tax_gnre_form"
+                  sequence="64"  />
 	</data>
 </openerp>

@@ -63,6 +63,9 @@ class AccountTax(models.Model):
          ('2', 'Lista Positiva (valor)'), ('3', 'Lista Neutra (valor)'),
          ('4', 'Margem Valor Agregado (%)'), ('5', 'Pauta (valor)')],
         'Tipo Base ICMS ST', required=True, default='4')
+    has_gnre = fields.Boolean(
+        string="Passivo de recolha atravês de GNRE"
+        )
 
     def _compute_tax(self, cr, uid, taxes, total_line, product, product_qty,
                      precision, base_tax=0.0):
@@ -184,6 +187,8 @@ class AccountTax(models.Model):
         ipi_value = 0.0
         calculed_taxes = []
 
+        has_gnre = fiscal_position and fiscal_position.has_gnre
+
         for tax in result['taxes']:
             tax_list = [tx for tx in taxes if tx.id == tax['id']]
             if tax_list:
@@ -286,7 +291,6 @@ class AccountTax(models.Model):
                             base_tax)
                         totaldc += result_icms_inter['tax_discount']
                         calculed_taxes += result_icms_inter['taxes']
-
                 except:
                     raise UserError(u'Tributação do ICMS para a UF de destino',
                               u'Configurada incorretamente')
@@ -342,8 +346,17 @@ class AccountTax(models.Model):
             if result_icmsst['taxes'][0]['percent'] and not \
                     (fiscal_position and fiscal_position.icms_st_extract):
                 calculed_taxes += result_icmsst['taxes']
-            elif result_icmsst['taxes'][0]['percent']:
-                result['total_gnre'] = result_icmsst['taxes'][0]['amount']
+
+        if has_gnre:
+            if result_icmsst['taxes']:
+                result['gnre_value'] = result_icms_inter[
+                    'taxes'][0]['amount']
+                result['gnre_type'] = 'st'
+            elif result_icms_inter['taxes']:
+                if partner.partner_fiscal_type_id.has_gnre_inter:
+                    result['gnre_value'] = result_icms_inter[
+                        'taxes'][0]['amount']
+                    result['gnre_type'] = 'inter'
 
         # Estimate Taxes
         if fiscal_position and fiscal_position.tax_estimate:
@@ -385,7 +398,8 @@ class AccountTax(models.Model):
             'total_tax_discount': totaldc,
             'taxes': calculed_taxes,
             'total_taxes': result.get('total_taxes', 0.00),
-            'total_gnre': result.get('total_gnre', 0.00),
+            'gnre_value': result.get('gnre_value', 0.00),
+            'gnre_type': result.get('gnre_type', False),
         }
 
     @api.v8

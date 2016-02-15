@@ -37,6 +37,7 @@ from openerp.addons.l10n_br_account_product.sped.nfe.validator import txt
 from openerp.addons.l10n_br_account_product.models.l10n_br_account_product\
     import (GNRE_RESPONSE,
             GNRE_RESPONSE_DEFAULT)
+from datetime import datetime, timedelta
 
 
 class AccountInvoice(models.Model):
@@ -98,8 +99,10 @@ class AccountInvoice(models.Model):
                               for tax in self.tax_line
                               if not tax.tax_code_id.tax_discount)
         self.amount_total = self.amount_tax + self.amount_untaxed
-        self.amount_total_gnre = sum(
-            line.gnre_value for line in self.invoice_line)
+        self.amount_total_gnre_st = sum(
+            line.gnre_st_value for line in self.invoice_line)
+        self.amount_total_gnre_inter = sum(
+            line.gnre_inter_value for line in self.invoice_line)
 
         for line in self.invoice_line:
             if line.icms_cst_id.code not in (
@@ -164,7 +167,23 @@ class AccountInvoice(models.Model):
         for line in self.invoice_line:
             if line.cfop_id:
                 lines |= line.cfop_id
-        self.cfop_ids = (lines).sorted()
+        self.cfop_ids = lines.sorted()
+
+    # Não creio que seja possivel ter dois tipos de GNRE na mesma fatura.
+    @api.one
+    @api.depends('invoice_line.gnre_type')
+    def _compute_gnre_type(self):
+        gnre_type = ''
+        gnre_id = self.env['l10n_br_tax.gnre']
+        for line in self.invoice_line:
+            if line.gnre_st_value:
+                gnre_type = 'st'
+                gnre_id = self.partner_id.state_id.gnre_st_id
+            elif line.gnre_inter_value:
+                gnre_type = 'inter'
+                gnre_id = self.partner_id.state_id.gnre_inter_id
+        self.gnre_type_id = gnre_id
+        self.gnre_type = gnre_type
 
     nfe_version = fields.Selection(
         [('1.10', '1.10'), ('2.00', '2.00'), ('3.10', '3.10')],
@@ -173,7 +192,9 @@ class AccountInvoice(models.Model):
     date_hour_invoice = fields.Datetime(
         u'Data e hora de emissão', readonly=True,
         states={'draft': [('readonly', False)]},
-        select=True, help="Deixe em branco para usar a data atual")
+        select=True,
+        copy=False,
+        help="Deixe em branco para usar a data atual")
     ind_final = fields.Selection([
         ('0', u'Não'),
         ('1', u'Sim')
@@ -400,8 +421,13 @@ class AccountInvoice(models.Model):
         store=True,
         digits=dp.get_precision('Account'),
         compute='_compute_amount')
-    amount_total_gnre = fields.Float(
-        string='Total de Tributos a recolher via GNRE',
+    amount_total_gnre_st = fields.Float(
+        string='Total de ST a recolher via GNRE',
+        store=True,
+        digits=dp.get_precision('Account'),
+        compute='_compute_amount')
+    amount_total_gnre_inter = fields.Float(
+        string='Total de Difal a recolher via GNRE',
         store=True,
         digits=dp.get_precision('Account'),
         compute='_compute_amount')
@@ -412,7 +438,27 @@ class AccountInvoice(models.Model):
     gnre_response = fields.Selection(
         selection=GNRE_RESPONSE,
         default=GNRE_RESPONSE_DEFAULT,
-        string=u'Responsabilidade'
+        string=u'Responsabilidade',
+        copy=False,
+    )
+    gnre_type = fields.Selection(
+        selection=[
+            ('st', u'Substituição Tributária'),
+            ('inter', u'Diferencial de Aliquota'),
+        ],
+        compute='_compute_gnre_type',
+        string=u'Tipo',
+        copy=False,
+        readonly=True,
+        store=True
+    )
+    gnre_type_id = fields.Many2one(
+        'l10n_br_tax.gnre',
+        compute='_compute_gnre_type',
+        string=u'GNRE Type',
+        copy=False,
+        readonly=True,
+        store=True
     )
     gnre_state = fields.Selection(
         [('isento', 'Isento'),
@@ -545,6 +591,12 @@ class AccountInvoice(models.Model):
                         msg, action.id, _(u'Criar uma nova série'))
                 self.document_serie_id = series[0]
 
+    def _has_gnre(self):
+        if (self.has_gnre and self.amount_total_gnre_st or
+                self.amount_total_gnre_inter):
+            return True
+        return False
+
     @api.multi
     def action_date_assign(self):
         for invoice in self:
@@ -557,13 +609,93 @@ class AccountInvoice(models.Model):
             if result and result.get('value'):
                 invoice.write(result['value'])
             if not invoice.gnre_state:
-                if invoice.has_gnre and invoice.amount_total_gnre > 0:
+                if invoice._has_gnre():
                     if invoice.gnre_response not in ('isento'):
                         invoice.gnre_state = 'sujeito'
                     else:
                         invoice.gnre_state = 'isento'
         return True
 
+    def _prepare_gnre_line(self):
+
+        gnre = self.gnre_type_id
+
+        ctx = dict(self._context, lang=self.partner_id.lang)
+
+        if not self.date_invoice:
+            self.with_context(ctx).write(
+                {'date_invoice': fields.Date.context_today(self)})
+        date_invoice = self.date_invoice
+
+        partner = self.env['res.partner']._find_accounting_partner(
+            self.partner_id)
+
+        if self.type in ('in_invoice', 'in_refund'):
+            ref = self.reference
+        else:
+            ref = self.number
+
+        amount_total_gnre = (self.amount_total_gnre_st or
+                self.amount_total_gnre_inter)
+
+        return [(0, 0, {
+            'account_id': gnre.account_debit_id.id,
+            'amount_currency': 0,
+            'analytic_account_id': False,
+            'analytic_lines': [],
+            'credit': False,
+            'currency_id': False,
+            'date': date_invoice,
+            'date_maturity': (
+                datetime.strptime(
+                    date_invoice, "%Y-%m-%d") +
+                timedelta(days=self.gnre_due_days)),
+            'debit': amount_total_gnre,
+            'name': ref + u'/GN',
+            'partner_id': partner.id,
+            'product_id': False,
+            'product_uom_id': False,
+            'quantity': 1.0,
+            'ref': ref,
+            'tax_amount': False,
+            'tax_code_id': False,
+        }), (0, 0, {
+            'account_id': gnre.account_credit_id.id,
+            'amount_currency': 0,
+            'analytic_account_id': False,
+            'analytic_lines': [],
+            'credit': amount_total_gnre,
+            'currency_id': False,
+            'date': date_invoice,
+            'date_maturity': False,
+            'debit': False,
+            'name': gnre.tax_code_id.name,
+            'partner_id': partner.id,
+            'product_id': False,
+            'product_uom_id': False,
+            'quantity': 1.0,
+            'ref': ref,
+            'tax_amount': False,
+            'tax_code_id': gnre.tax_code_id.id,
+        })]
+
+    @api.multi
+    def finalize_invoice_move_lines(self, move_lines):
+        """ finalize_invoice_move_lines(move_lines) -> move_lines
+
+            Hook method to be overridden in additional modules to verify and
+            possibly alter the move lines to be created by an invoice, for
+            special cases.
+            :param move_lines: list of dictionaries with the account.move.lines
+            (as for create())
+            :return: the (possibly updated) final move_lines to create for this
+            invoice
+        """
+        result = super(AccountInvoice,
+                       self).finalize_invoice_move_lines(move_lines)
+        if self._has_gnre():
+            result += self._prepare_gnre_line()
+        return result
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -834,10 +966,24 @@ class AccountInvoiceLine(models.Model):
         string=u'Valor do ICMS Interestadual para a UF do remetente',
         digits=dp.get_precision('Account'),
         default=0.00)
-    gnre_value = fields.Float(
-        string=u'Valor do recolhimento via GNRE',
+    gnre_st_value = fields.Float(
+        string=u'Valor do recolhimento de ST via GNRE',
         digits=dp.get_precision('Account'),
         default=0.00
+    )
+    gnre_inter_value = fields.Float(
+        string=u'Valor do recolhimento de Diferencial de aliquota via GNRE',
+        digits=dp.get_precision('Account'),
+        default=0.00
+    )
+    gnre_type = fields.Selection(
+        selection=[
+            ('st', u'Substituição Tributária'),
+            ('inter', u'Diferencial de Aliquota'),
+        ],
+        string=u'Tipo',
+        copy=False,
+        readonly=True,
     )
 
     def _amount_tax_icms(self, tax=None):
@@ -1059,7 +1205,13 @@ class AccountInvoiceLine(models.Model):
             freight_value=freight_value,
             other_costs_value=other_costs_value)
 
-        result['gnre_value'] = taxes_calculed['total_gnre']
+
+        result['gnre_type'] = taxes_calculed['gnre_type']
+        if result['gnre_type'] == 'st':
+            result['gnre_st_value'] = taxes_calculed['gnre_value']
+        elif result['gnre_type'] == 'inter':
+            result['gnre_inter_value'] = taxes_calculed['gnre_value']
+
         result['total_taxes'] = taxes_calculed['total_taxes']
 
         for tax in taxes_calculed['taxes']:
