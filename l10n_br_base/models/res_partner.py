@@ -65,6 +65,23 @@ class ResPartner(models.Model):
                 address_format = '%(company_name)s\n' + address_format
             return address_format % args
 
+    @api.one
+    @api.depends('name', 'legal_name')
+    def _compute_display_name(self):
+        if self.legal_name:
+            self.display_name = self.legal_name + ' (' + self.name + ')'
+        else:
+            self.display_name = self.name
+
+    @api.multi
+    def name_get(self):
+        result = []
+        for record in self:
+            result.append((record.id, "%s (%s)" % (record.legal_name or '', record.name  or '')))
+        return result
+
+    display_name = fields.Char(compute='_compute_display_name')
+
     cnpj_cpf = fields.Char('CNPJ/CPF', size=18)
 
     inscr_est = fields.Char('Inscr. Estadual/RG', size=16)
