@@ -115,7 +115,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.ide.cUF.valor = (company.state_id and
                                          company.state_id.ibge_code or '')
         self.nfe.infNFe.ide.cNF.valor = ''
-        self.nfe.infNFe.ide.natOp.valor = invoice.cfop_ids[0].small_name or ''
+        self.nfe.infNFe.ide.natOp.valor = invoice.fiscal_category_id.name or ''
         self.nfe.infNFe.ide.indPag.valor = (invoice.payment_term and
                                             invoice.payment_term.indPag or '0')
         self.nfe.infNFe.ide.mod.valor = invoice.fiscal_document_id.code or ''
@@ -239,7 +239,7 @@ class NFe200(FiscalDocument):
         self.nfe.infNFe.emit.CNPJ.valor = punctuation_rm(
             invoice.company_id.partner_id.cnpj_cpf)
         self.nfe.infNFe.emit.xNome.valor = (
-            invoice.company_id.partner_id.legal_name)
+            invoice.company_id.partner_id.legal_name[:60])
         self.nfe.infNFe.emit.xFant.valor = invoice.company_id.partner_id.name
         self.nfe.infNFe.emit.enderEmit.xLgr.valor = company.street or ''
         self.nfe.infNFe.emit.enderEmit.nro.valor = company.number or ''
@@ -301,7 +301,7 @@ class NFe200(FiscalDocument):
                 'NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL')
         else:
             self.nfe.infNFe.dest.xNome.valor = (
-                invoice.partner_id.legal_name or '')
+                invoice.partner_id.legal_name[:60] or '')
 
             if invoice.partner_id.is_company:
                 self.nfe.infNFe.dest.CNPJ.valor = punctuation_rm(
@@ -337,9 +337,9 @@ class NFe200(FiscalDocument):
         self.det.nItem.valor = index
         self.det.prod.cProd.valor = invoice_line.product_id.code or ''
         self.det.prod.cEAN.valor = invoice_line.product_id.ean13 or ''
-        self.det.prod.xProd.valor = invoice_line.product_id.name or ''
+        self.det.prod.xProd.valor = invoice_line.product_id.name[:120] or ''
         self.det.prod.NCM.valor = punctuation_rm(
-            invoice_line.fiscal_classification_id.name or '')
+            invoice_line.fiscal_classification_id.code or '')[:8]
         self.det.prod.EXTIPI.valor = ''
         self.det.prod.nFCI.valor = invoice_line.fci or ''
         self.det.prod.CFOP.valor = invoice_line.cfop_id.code
@@ -510,11 +510,11 @@ class NFe200(FiscalDocument):
     def _carrier_data(self, invoice):
         """Dados da Transportadora e veiculo"""
 
-        if invoice.carrier_id:
+        self.nfe.infNFe.transp.modFrete.valor = (
+            invoice.incoterm and
+            invoice.incoterm.freight_responsibility or '9')
 
-            self.nfe.infNFe.transp.modFrete.valor = (
-                invoice.incoterm and
-                invoice.incoterm.freight_responsibility or '9')
+        if invoice.carrier_id:
 
             if invoice.carrier_id.partner_id.is_company:
                 self.nfe.infNFe.transp.transporta.CNPJ.valor = \
@@ -526,7 +526,7 @@ class NFe200(FiscalDocument):
                         invoice.carrier_id.partner_id.cnpj_cpf or '')
 
             self.nfe.infNFe.transp.transporta.xNome.valor = (
-                invoice.carrier_id.partner_id.legal_name or '')
+                invoice.carrier_id.partner_id.legal_name[:60] or '')
             self.nfe.infNFe.transp.transporta.IE.valor = punctuation_rm(
                 invoice.carrier_id.partner_id.inscr_est)
             self.nfe.infNFe.transp.transporta.xEnder.valor = (
@@ -596,10 +596,12 @@ class NFe200(FiscalDocument):
 
     def _export(self, invoice):
         "Informações de exportação"
-        self.nfe.infNFe.exporta.UFEmbarq.valor = (
+        self.nfe.infNFe.exporta.UFSaidaPais.valor = (
             invoice.shipping_state_id.code or '')
         self.nfe.infNFe.exporta.xLocEmbarq.valor = (
             invoice.shipping_location or '')
+        self.nfe.infNFe.exporta.xLocDespacho.valor = (
+            invoice.expedition_location or '')
 
     def get_NFe(self):
 
