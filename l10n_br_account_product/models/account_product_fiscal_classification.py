@@ -33,7 +33,7 @@ from openerp.addons.l10n_br_base.tools.misc import punctuation_rm
 
 class AccountProductFiscalClassificationTemplate(models.Model):
     _inherit = 'account.product.fiscal.classification.template'
-    _rec_name = 'code'
+    _rec_name = 'display_name'
 
     @api.multi
     @api.depends('purchase_tax_definition_line',
@@ -44,6 +44,9 @@ class AccountProductFiscalClassificationTemplate(models.Model):
                                fc.sale_tax_definition_line]
             fc.purchase_tax_ids = [line.tax_template_id.id for line in
                                    fc.purchase_tax_definition_line]
+
+    display_name = fields.Char(
+        'Name', compute='_get_display_name', store=True)
 
     type = fields.Selection([('view', u'Visão'),
                              ('normal', 'Normal'),
@@ -93,14 +96,19 @@ class AccountProductFiscalClassificationTemplate(models.Model):
         inverse_name='fiscal_classification_id',
         string=u'Fundo de Combate a Pobreza')
 
-    _sql_constraints = [
-        ('account_fiscal_classfication_code_uniq', 'unique (code)',
-         u'Já existe um classificação fiscal com esse código!')]
-
     cest = fields.Char(
         string='CEST',
         size=9,
         help=u"Código Especificador da Substituição Tributária ")
+
+    @api.one
+    @api.depends('name', 'code')
+    def _get_display_name(self):
+        if self.code and self.name:
+            name = [self.code, self.name]
+        else:
+            name = [self.name]
+        self.display_name = " - ".join(name)
 
 
 class L10n_brTaxDefinitionTemplateModel(L10n_brTaxDefinitionTemplate):
@@ -180,7 +188,7 @@ class L10n_brTaxEstimateTemplate(models.Model):
 
 class AccountProductFiscalClassification(models.Model):
     _inherit = 'account.product.fiscal.classification'
-    _rec_name = 'code'
+    _rec_name = 'display_name'
 
     @api.multi
     @api.depends('purchase_tax_definition_line',
@@ -191,6 +199,9 @@ class AccountProductFiscalClassification(models.Model):
                                fc.sale_tax_definition_line]
             fc.purchase_tax_ids = [line.tax_id.id for line in
                                    fc.purchase_tax_definition_line]
+
+    display_name = fields.Char(
+        'Name', compute='_get_display_name', store=True)
 
     type = fields.Selection([('view', u'Visão'),
                              ('normal', 'Normal'),
@@ -243,9 +254,14 @@ class AccountProductFiscalClassification(models.Model):
         size=9,
         help=u"Código Especificador da Substituição Tributária ")
 
-    _sql_constraints = [
-        ('account_fiscal_classfication_code_uniq', 'unique (code)',
-         u'Já existe um classificação fiscal com esse código!')]
+    @api.one
+    @api.depends('name', 'code')
+    def _get_display_name(self):
+        if self.code and self.name:
+            name = [self.code, self.name]
+        else:
+            name = [self.name]
+        self.display_name = " - ".join(name)
 
     @api.multi
     def write(self, vals):
