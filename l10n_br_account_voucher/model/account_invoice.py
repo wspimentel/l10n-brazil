@@ -24,18 +24,30 @@ class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
     @api.multi
+    def _check_rules(self, object):
+        """
+        This rules are here to determine if the invoice has no commercial
+        value and to allow the code to pass if the rules validate.
+        Returns: true or false
+        """
+        if (not object.journal_id.revenue_expense
+            and object.journal_id.automatic_conciliation
+            and object.fiscal_category_id.property_journal ==
+                object.journal_id
+            and object.state == 'open'
+            and object.company_id.id ==
+                self.env.user.company_id.id
+            and object.journal_id.conciliation_journal):
+                return True
+        else:
+            return False
+
+    @api.multi
     def invoice_validate(self):
         super(AccountInvoice, self).invoice_validate()
         for object in self.env['account.invoice'].search(
                 [('id', '=', self.id)]):
-            if (not object.journal_id.revenue_expense
-                and object.journal_id.automatic_conciliation
-                and object.fiscal_category_id.property_journal ==
-                    object.journal_id
-                and object.state == 'open'
-                and object.company_id.id ==
-                    self.env.user.company_id.id
-                and object.journal_id.conciliation_journal):
+            if (self._check_rules(object)):
                 voucher_obj = self.env['account.voucher']
                 context = {}
                 context.update({
