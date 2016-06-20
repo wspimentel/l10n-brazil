@@ -1,0 +1,59 @@
+-
+  Create sale journal
+-
+  !record {model: account.journal, id: jounal_remittance}:
+    code: DREM
+    name: Diario de Remessa
+    type: sale
+    update_posted: True
+    revenue_expense: False
+    default_credit_account_id: account.a_sale
+    default_debit_account_id: account.a_sale
+-
+  Create fiscal category
+-
+  !record {model: l10n_br_account.fiscal.category, id: fiscal_category_remittance}:
+    code: Remessa em Bonificação
+    name: Remessa em Bonificação
+    type: output
+    journal_type: sale
+    property_journal: jounal_remittance
+-
+  Create Fiscal Position
+-
+  !record {model: account.fiscal.position, id: fiscal_position_remittance}:
+    name: Remessa Bonificação
+    type: output
+    company_id: base.main_company
+    fiscal_category_id: fiscal_category_remittance
+-
+  Create Fiscal Position Rule
+-
+  !record {model: account.fiscal.position.rule, id: fiscal_position_rule_remittance}:
+    name: Remessa Bonificação
+    description: Remessa Bonificação
+    company_id: base.main_company
+    from_country: base.br
+    fiscal_category_id: fiscal_category_remittance
+    fiscal_position_id: fiscal_position_remittance
+    use_sale: true
+    use_invoice: true
+    use_picking: true
+-
+  Create a customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer_remittance, view: view_l10n_br_account_journal_voucher_form}:
+    payment_term: account.account_payment_term_advance
+    partner_id: base.res_partner_3
+    fiscal_category_id: fiscal_category_remittance
+    reference_type: none
+    name: 'Test Customer Invoice Remittance'
+    invoice_line:
+      - product_id: product.product_product_5
+        quantity: 10.0
+-
+  I check that Initially customer invoice is in the "Draft" state
+-
+  !assert {model: account.invoice, id: account_invoice_customer_remittance}:
+    - state == 'draft'
+    - fiscal_position.id == ref('fiscal_position_remittance')
