@@ -33,6 +33,9 @@
     'data': [
         'view/account_journal.xml',
     ],
+    'demo': [
+      #'demo/accounting_demo.xml'
+    ],
     'test': [
         'test/account_customer_invoice.yml',
     ],
