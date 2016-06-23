@@ -85,8 +85,6 @@ class ResPartner(models.Model):
 
     number = fields.Char(u'Número', size=10)
 
-
-    # para pegar configuracoes com checkbox ver modulo do DIvino serasa parts/kmee/addons/serasa_crednet
     @api.one
     @api.constrains('cnpj_cpf', 'inscr_est')
     def _check_cnpj_inscr_est(self):
