@@ -92,6 +92,11 @@ class AccountProductFiscalClassificationTemplate(models.Model):
         ('account_fiscal_classfication_code_uniq', 'unique (code)',
          u'Já existe um classificação fiscal com esse código!')]
 
+    cest = fields.Char(
+        string='CEST',
+        size=9,
+        help=u"Código Especificador da Substituição Tributária ")
+
 
 class L10nBrTaxDefinitionTemplateModel(L10nBrTaxDefinitionTemplate):
     """Model for tax definition template"""
@@ -99,6 +104,10 @@ class L10nBrTaxDefinitionTemplateModel(L10nBrTaxDefinitionTemplate):
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification.template',
         'Fiscal Classification', select=True)
+    tax_ipi_guideline_id = fields.Many2one(
+        'l10n_br_account_product.ipi_guideline', string=u'Enquadramento IPI')
+    tax_icms_relief_id = fields.Many2one(
+        'l10n_br_account_product.icms_relief', string=u'Desoneração ICMS')
 
     _sql_constraints = [
         ('l10n_br_tax_definition_template_tax_template_id_uniq', 'unique \
@@ -264,6 +273,10 @@ class L10nBrTaxDefinitionModel(L10nBrTaxDefinition):
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification',
         'Parent Fiscal Classification', select=True)
+    tax_ipi_guideline_id = fields.Many2one(
+        'l10n_br_account_product.ipi_guideline', string=u'Enquadramento IPI')
+    tax_icms_relief_id = fields.Many2one(
+        'l10n_br_account_product.icms_relief', string=u'Desoneração ICMS')
 
     _sql_constraints = [
         ('l10n_br_tax_definition_tax_id_uniq', 'unique (tax_id,\
@@ -394,3 +407,37 @@ class WizardAccountProductFiscalClassification(models.TransientModel):
                             'purchase')
 
         return True
+
+
+class L10nBrTaxFcpModel(models.AbstractModel):
+    _name = 'l10n_br_tax.fcp.model'
+    _auto = False
+
+    fcp_tax_id = fields.Many2one(
+        'account.tax', string=u"% Fundo de Combate à Pobreza (FCP)",
+        help=u"Percentual adicional inserido na alíquota interna"
+        u" da UF de destino, relativo ao Fundo de Combate à"
+        u" Pobreza (FCP) em operações interestaduais com o "
+        u"consumidor com esta UF. "
+        u"Nota: Percentual máximo de 2%,"
+        u" conforme a legislação")
+    to_state_id = fields.Many2one(
+        'res.country.state', 'Estado Destino')
+
+
+class L10nBrTaxFcpTemplate(models.Model):
+    _name = 'l10n_br_tax.fcp.template'
+    _inherit = 'l10n_br_tax.fcp.model'
+
+    fiscal_classification_id = fields.Many2one(
+        'account.product.fiscal.classification.template',
+        'Fiscal Classification', select=True)
+
+
+class L10nBrTaxFcp(models.Model):
+    _name = 'l10n_br_tax.fcp'
+    _inherit = 'l10n_br_tax.fcp.model'
+
+    fiscal_classification_id = fields.Many2one(
+        'account.product.fiscal.classification',
+        'Fiscal Classification', select=True)

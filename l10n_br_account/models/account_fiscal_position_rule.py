@@ -27,8 +27,22 @@ from .res_company import COMPANY_FISCAL_TYPE, COMPANY_FISCAL_TYPE_DEFAULT
 class AccountFiscalPositionRuleTemplate(models.Model):
     _inherit = 'account.fiscal.position.rule.template'
 
-    partner_fiscal_type_id = fields.Many2one(
-        'l10n_br_account.partner.fiscal.type', 'Tipo Fiscal do Parceiro')
+    partner_fiscal_type_id = fields.Many2many(
+        comodel_name='l10n_br_account.partner.fiscal.type',
+        relation='afp_rule_template_l10n_br_account_partner_fiscal_type',
+        column1='afp_template',
+        column2='partner_fiscal_type',
+        string='Tipo Fiscal do Parceiro',
+    )
+    partner_special_fiscal_type_id = fields.Many2many(
+        comodel_name='l10n_br_account.partner.special.fiscal.type',
+        relation=(
+            'afp_rule_template_l10n_br_account_partner_special_fiscal_type'
+        ),
+        column1='afp_id',
+        column2='partner_special_fiscal_type_id',
+        string='Regime especial'
+    )
     fiscal_category_id = fields.Many2one(
         'l10n_br_account.fiscal.category', 'Categoria')
     fiscal_type = fields.Selection(
@@ -49,8 +63,20 @@ class AccountFiscalPositionRuleTemplate(models.Model):
 class AccountFiscalPositionRule(models.Model):
     _inherit = 'account.fiscal.position.rule'
 
-    partner_fiscal_type_id = fields.Many2one(
-        'l10n_br_account.partner.fiscal.type', 'Tipo Fiscal do Parceiro')
+    partner_fiscal_type_id = fields.Many2many(
+        comodel_name='l10n_br_account.partner.fiscal.type',
+        relation='afp_rule_l10n_br_account_partner_fiscal_type',
+        column1='afp_id',
+        column2='partner_fiscal_type_id',
+        string='Tipo Fiscal do Parceiro'
+    )
+    partner_special_fiscal_type_id = fields.Many2many(
+        comodel_name='l10n_br_account.partner.special.fiscal.type',
+        relation='afp_rule_l10n_br_account_partner_special_fiscal_type',
+        column1='afp_id',
+        column2='partner_special_fiscal_type_id',
+        string='Regime especial'
+    )
     fiscal_category_id = fields.Many2one(
         'l10n_br_account.fiscal.category', 'Categoria')
     fiscal_type = fields.Selection(
@@ -75,12 +101,26 @@ class AccountFiscalPositionRule(models.Model):
         document_date = self.env.context.get('date', time.strftime('%Y-%m-%d'))
         use_domain = self.env.context.get(
             'use_domain', ('use_sale', '=', True))
-
-        domain = [
-            '&', ('company_id', '=', company.id), use_domain,
+        special_domain = []
+        domain = ['&']
+        for special in self.env[
+            'l10n_br_account.partner.special.fiscal.type'
+        ].search([]).ids:
+            if special in partner.partner_special_fiscal_type_id.ids:
+                special_domain.append(
+                    ('partner_special_fiscal_type_id', 'in', special))
+            else:
+                special_domain.append(
+                    ('partner_special_fiscal_type_id', 'not in', special))
+        if special_domain:
+            domain += special_domain
+        else:
+            domain += [('partner_special_fiscal_type_id', '=', False)]
+        domain += [
+            ('company_id', '=', company.id), use_domain,
             ('fiscal_type', '=', company.fiscal_type),
             ('fiscal_category_id', '=', kwargs.get('fiscal_category_id')),
-            '|', ('partner_fiscal_type_id', '=', partner_fiscal_type_id),
+            '|', ('partner_fiscal_type_id', 'in', partner_fiscal_type_id),
             ('partner_fiscal_type_id', '=', False),
             '|', ('from_country', '=', from_country),
             ('from_country', '=', False),
@@ -153,13 +193,9 @@ class WizardAccountFiscalPositionRule(models.TransientModel):
             partner_ft_id = fpr_template.partner_fiscal_type_id.id or False
             fiscal_category_id = fpr_template.fiscal_category_id.id or False
 
-            fiscal_position_id = False
-            fp_id = self.env['account.fiscal.position'].search([
+            fiscal_position_id = self.env['account.fiscal.position'].search([
                 ('name', '=', fpr_template.fiscal_position_id.name),
-                ('company_id', '=', company_id)])
-
-            if fp_id:
-                fiscal_position_id = fp_id[0]
+                ('company_id', '=', company_id)], limit=1)
 
             fprt_id = obj_fpr.search([
                 ('name', '=', fpr_template.name),
@@ -173,10 +209,10 @@ class WizardAccountFiscalPositionRule(models.TransientModel):
                 ('use_invoice', '=', fpr_template.use_invoice),
                 ('use_purchase', '=', fpr_template.use_purchase),
                 ('use_picking', '=', fpr_template.use_picking),
-                ('fiscal_position_id', '=', fiscal_position_id)])
+                ('fiscal_position_id', '=', fiscal_position_id.id)])
 
             if fprt_id:
-                obj_fpr.write(fprt_id, {
+                obj_fpr.write({
                     'partner_fiscal_type_id': partner_ft_id,
                     'fiscal_category_id': fiscal_category_id,
                     'fiscal_type': fpr_template.fiscal_type,

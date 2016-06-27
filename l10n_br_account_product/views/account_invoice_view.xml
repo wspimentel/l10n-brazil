@@ -154,6 +154,7 @@
 			<field name="arch" type="xml">
 				<filter name="proforma" position="before">
 					<filter icon="terp-check" string="Exportada Receita" domain="[('state','=','sefaz_export')]" />
+					<filter icon="terp-check" string="Tem GNRE" domain="[('has_gnre','=','True')]" />
 				</filter>
 			</field>
 		</record>
@@ -164,6 +165,26 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_supplier_form" />
 			<field name="arch" type="xml">
+				<xpath expr="//sheet/div[@class='oe_title']" position="before">
+					<div class="oe_right oe_button_box" name="br_buttons">
+						<button class="oe_inline oe_stat_button" type="action" name="408" icon="fa-truck">
+							<div>Recalcular<br/>Custos</div>
+						</button>
+					</div>
+				</xpath>
+                <field name="number" position="after">
+                    <group>
+                    <label options='{"no_open": True}' class="oe_inline" string="Atenção: Operação c/ GNRE"
+                           attrs="{'invisible':[('amount_total_gnre','=',0)]}"/>
+                    </group>
+                </field>
+				<xpath expr="//field[@name='payment_term']" position="after">
+					<field name="has_gnre" invisible="1"/>
+					<field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					<field name="gnre_response" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					<field name="amount_total_gnre" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+					<field name="has_gnre_paid" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+				</xpath>
 				<label for="comment" position="replace">
 				</label>
 				<field name="comment" position="replace">
@@ -318,6 +339,7 @@
 									<group>
 										<field name="product_type" attrs="{'readonly': [('product_id','!=', False)]}"/>
 										<field name="fiscal_classification_id" required="True" attrs="{'readonly': [('product_id','!=', False)]}"/>
+										<field name="cest"/>
 										<field name="fci" attrs="{'readonly': [('product_id','!=', False)]}"/>
 										<field name="fiscal_category_id" required="1" domain="[('journal_type', '=', 'sale')]" on_change="onchange_fiscal_category_id(parent.partner_id, parent.company_id, product_id, fiscal_category_id, account_id, context)"/>
 										<field name="fiscal_position" required="1" domain="[('fiscal_category_id', '=', fiscal_category_id)]" on_change="onchange_fiscal_position(parent.partner_id, parent.company_id, product_id, fiscal_category_id, account_id, quantity, price_unit, discount, insurance_value, freight_value, other_costs_value, context)"/>
@@ -347,9 +369,11 @@
 												<field name="icms_percent_reduction"/>
 											</group>
 											<group>
+												<field name="icms_relief_id"/>
 												<field name="icms_base_other"/>
 												<field name="icms_percent"/>
 												<field name="icms_value"/>
+												<field name="icms_relief_value"/>
 											</group>
 										</group>
 										<group string="Substituição Tributária ICMS">
@@ -363,6 +387,11 @@
 												<field name="icms_st_percent"/>
 												<field name="icms_st_mva"/>
 												<field name="icms_st_value"/>
+											</group>
+										</group>
+										<group string="GNRE">
+											<group>
+												<field name="gnre_value"/>
 											</group>
 										</group>
 									</page>
@@ -385,6 +414,7 @@
 												<field name="ipi_base"/>
 											</group>
 											<group>
+												<field name="ipi_guideline_id"/>
 												<field name="ipi_base_other"/>
 												<field name="ipi_percent"/>
 												<field name="ipi_value"/>
@@ -447,10 +477,30 @@
 											<field name="ii_value"/>
 										</group>
 									</page>
+									<page string="Informação do ICMS interestadual" attrs="{'invisible': [('product_type','=', 'service')]}">
+										<group string="Detalhes do ICMS interestadual">
+											<field name="vBCUFDest"/>
+											<field name="pFCPUFDest"/>
+											<field name="pICMSUFDest"/>
+											<field name="pICMSInter"/>
+											<field name="pICMSInterPart"/>
+											<field name="vFCPUFDest"/>
+											<field name="vICMSUFDest"/>
+											<field name="vICMSUFRemet"/>
+										</group>
+									</page>
 								</notebook>
 							</page>
 							<page string="Informações Adicionais">
-								<group>
+								<group string="Informação de interesse do emissor para controle do B2B">
+									<group>
+										<field name="xped"/>
+									</group>
+									<group>
+										<field name="nitemped"/>
+									</group>
+								</group>
+								<group string="Observações Fiscais">
 									<field name="fiscal_comment" nolabel="1"/>
 								</group>
 							</page>
@@ -514,6 +564,17 @@
 				</form>
 			</field>
 		</record>
+
+    <record model="ir.ui.view" id="l10n_br_account_product_invoice_tree_custom">
+      <field name="name">l10n_br_account_product.invoice.tree.inherit</field>
+      <field name="model">account.invoice</field>
+      <field name="inherit_id" ref="account.invoice_tree"/>
+      <field name="arch" type="xml">
+        <field name="state" position="after">
+          <field name="gnre_state" string="GNRE"/>
+        </field>
+      </field>
+    </record>
 
 		<record id="account.action_invoice_tree" model="ir.actions.act_window">
 			<field name="domain">[('type', '=', 'out_invoice'), ('fiscal_type', '=', 'product')]</field>

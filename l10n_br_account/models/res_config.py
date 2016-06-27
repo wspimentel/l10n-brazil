@@ -23,6 +23,7 @@ from openerp import models, fields
 
 
 class ResConfig(models.Model):
+
     _inherit = 'account.config.settings'
 
     ipbt_token = fields.Char(

@@ -26,10 +26,11 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.multi
+
     @api.depends('order_line.price_unit', 'order_line.tax_id',
                  'order_line.discount', 'order_line.product_uom_qty',
                  'order_line.freight_value', 'order_line.insurance_value',
-                 'order_line.other_costs_value')
+                 'order_line.other_costs_value', 'order_line.gnre_value')
     def _amount_all_wrapper(self):
         """
         Wrapper because of direct method passing as parameter
@@ -73,6 +74,7 @@ class SaleOrder(models.Model):
             order.amount_gross = order.pricelist_id.currency_id.round(
                 amount_gross)
 
+
     @api.model
     def _amount_line_tax(self, line):
         value = 0.0
@@ -80,8 +82,10 @@ class SaleOrder(models.Model):
         qty = line._calc_line_quantity()
         for computed in line.tax_id.compute_all(
                 price,
-                qty, line.order_id.partner_invoice_id.id,
-                line.product_id.id, line.order_id.partner_id,
+                qty,
+                partner=line.order_id.partner_invoice_id,
+                product=line.product_id,
+                # line.order_id.partner_id,
                 fiscal_position=line.fiscal_position,
                 insurance_value=line.insurance_value,
                 freight_value=line.freight_value,
@@ -113,6 +117,7 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             if not self.amount_gross:
                 break
+
             line.write({
                 'freight_value': calc_price_ratio(
                     line.price_gross,
@@ -193,6 +198,20 @@ class SaleOrder(models.Model):
         compute=_get_costs_value, inverse=_set_amount_insurance,
         string='Seguro', default=0.00, digits=dp.get_precision('Account'),
         readonly=True, states={'draft': [('readonly', False)]})
+    amount_total_gnre = fields.Float(
+        string='Total de Tributos a recolher via GNRE',
+        store=True,
+        digits=dp.get_precision('Account'),
+        compute='_amount_all_wrapper')
+    has_gnre = fields.Boolean(
+        string=u"Recolhe imposto antecipadamente atraves de GNRE")
+    gnre_due_days = fields.Integer(
+        string=u"Vencimento (em dias)")
+    # gnre_response = fields.Selection(
+    #     selection=GNRE_RESPONSE,
+    #     default=GNRE_RESPONSE_DEFAULT,
+    #     string=u'Responsabilidade'
+    # )
 
     def _fiscal_comment(self, cr, uid, order, context=None):
         fp_comment = []
@@ -224,13 +243,13 @@ class SaleOrderLine(models.Model):
         taxes = self.tax_id.compute_all(
             price,
             qty,
-            self.product_id.id,
-            self.order_id.partner_invoice_id.id,
+            product=self.product_id,
+            partner=self.order_id.partner_invoice_id,
             fiscal_position=self.fiscal_position,
             insurance_value=self.insurance_value,
             freight_value=self.freight_value,
             other_costs_value=self.other_costs_value)
-
+        self.gnre_value = taxes['total_gnre']
         self.price_subtotal = (self.order_id.pricelist_id
                                .currency_id.round(taxes['total']))
         self.price_gross = self._calc_price_gross(qty)
@@ -256,6 +275,7 @@ class SaleOrderLine(models.Model):
                                   string='Subtotal',
                                   digits=dp.get_precision('Sale Price'))
 
+
     def _prepare_order_line_invoice_line(self, cr, uid, line,
                                          account_id=False, context=None):
         result = super(SaleOrderLine, self)._prepare_order_line_invoice_line(
@@ -264,6 +284,8 @@ class SaleOrderLine(models.Model):
         result['insurance_value'] = line.insurance_value
         result['other_costs_value'] = line.other_costs_value
         result['freight_value'] = line.freight_value
+        result['xped'] = line.xped
+        result['nitemped'] = line.nitemped
 
         # FIXME
         # Necessário informar estes campos pois são related do

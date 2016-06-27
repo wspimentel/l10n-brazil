@@ -23,6 +23,7 @@ from lxml import etree
 from openerp import models, fields, api, _
 from openerp.addons import decimal_precision as dp
 from openerp.exceptions import RedirectWarning
+from openerp.exceptions import ValidationError
 
 from openerp.addons.l10n_br_account.models.account_invoice import (
     OPERATION_TYPE,
@@ -34,9 +35,30 @@ from .l10n_br_account_product import (
 from .product import PRODUCT_ORIGIN
 from openerp.addons.l10n_br_account_product.sped.nfe.validator import txt
 
+from openerp.addons.l10n_br_account_product.models.l10n_br_account_product\
+    import (GNRE_RESPONSE,
+            GNRE_RESPONSE_DEFAULT)
+
 
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
+
+    @api.multi
+    def onchange_partner_id(self, type, partner_id, date_invoice=False,
+                            payment_term=False, partner_bank_id=False,
+                            company_id=False):
+
+        result = super(AccountInvoice, self).onchange_partner_id(
+            type, partner_id, date_invoice, payment_term,
+            partner_bank_id, company_id)
+
+        if not partner_id or not company_id:
+            return result
+        partner = self.env['res.partner'].browse(partner_id)
+        result['value']['has_gnre'] = partner.has_gnre
+        result['value']['gnre_due_days'] = partner.gnre_due_days
+        result['value']['gnre_response'] = partner.gnre_response
+        return result
 
     @api.one
     @api.depends('invoice_line', 'tax_line.amount')
@@ -56,6 +78,10 @@ class AccountInvoice(models.Model):
         self.cofins_value = sum(
             line.cofins_value for line in self.invoice_line)
         self.ii_value = sum(line.ii_value for line in self.invoice_line)
+        self.vFCPUFDest = sum(line.vFCPUFDest for line in self.invoice_line)
+        self.vICMSUFDest = sum(line.vICMSUFDest for line in self.invoice_line)
+        self.vICMSUFRemet = sum(
+            line.vICMSUFRemet for line in self.invoice_line)
         self.amount_discount = sum(
             line.discount_value for line in self.invoice_line)
         self.amount_insurance = sum(
@@ -64,6 +90,7 @@ class AccountInvoice(models.Model):
             line.other_costs_value for line in self.invoice_line)
         self.amount_freight = sum(
             line.freight_value for line in self.invoice_line)
+
         self.amount_total_taxes = sum(
             line.total_taxes for line in self.invoice_line)
         self.amount_gross = sum(line.price_gross for line in self.invoice_line)
@@ -82,12 +109,33 @@ class AccountInvoice(models.Model):
                 self.icms_base += line.icms_base
                 self.icms_base_other += line.icms_base_other
                 self.icms_value += line.icms_value
+                self.icms_relief_value += line.icms_relief_value
             else:
                 self.icms_base += 0.00
                 self.icms_base_other += 0.00
                 self.icms_value += 0.00
-            self.icms_st_base += line.icms_st_base
-            self.icms_st_value += line.icms_st_value
+            if line.icms_cst_id.code in ('10', '30', '60', '90'):
+                self.icms_st_base += line.icms_st_base
+                self.icms_st_value += line.icms_st_value
+            else:
+                self.icms_st_base += 0.00
+                self.icms_st_value += 0.00
+        self.amount_total_taxes = sum(
+            line.total_taxes for line in self.invoice_line)
+        self.amount_gross = sum(line.price_gross for line in self.invoice_line)
+        self.amount_tax_discount = self.price_subtotal = 0.0
+        self.amount_tax_discount = sum(
+            line.price_tax_discount for line in self.invoice_line)
+        self.amount_untaxed = sum(
+            line.price_subtotal for line in self.invoice_line)
+        self.amount_tax = sum(tax.amount
+                              for tax in self.tax_line
+                              if not tax.tax_code_id.tax_discount)
+        self.amount_total = (self.amount_tax +
+                             self.amount_untaxed -
+                             self.icms_relief_value)
+        self.amount_total_gnre = sum(
+            line.gnre_value for line in self.invoice_line)
 
     @api.model
     @api.returns('l10n_br_account.fiscal_category')
@@ -146,10 +194,11 @@ class AccountInvoice(models.Model):
         select=True, help="Deixe em branco para usar a data atual")
     ind_final = fields.Selection([
         ('0', u'Não'),
-        ('1', u'Consumidor final')
-    ], u'Operação com Consumidor final', readonly=True,
+        ('1', u'Sim')
+    ], u'Consumidor final', readonly=True,
+        related='fiscal_position.ind_final',
         states={'draft': [('readonly', False)]}, required=False,
-        help=u'Indica operação com Consumidor final.', default='0')
+        help=u'Indica operação com Consumidor final.')
     ind_pres = fields.Selection([
         ('0', u'Não se aplica'),
         ('1', u'Operação presencial'),
@@ -321,6 +370,20 @@ class AccountInvoice(models.Model):
         string='Valor II', store=True,
         digits=dp.get_precision('Account'), compute='_compute_amount',
         readonly=True)
+    vFCPUFDest = fields.Float(
+        string='Valor total do Fundo de Combate à Pobreza (FCP)', store=True,
+        digits=dp.get_precision('Account'), compute='_compute_amount',
+        readonly=True)
+    vICMSUFDest = fields.Float(
+        string='Valor total do ICMS Interestadual para a UF de destino',
+        store=True,
+        digits=dp.get_precision('Account'), compute='_compute_amount',
+        readonly=True)
+    vICMSUFRemet = fields.Float(
+        string='Valor total do ICMS Interestadual para a UF do remetente',
+        store=True,
+        digits=dp.get_precision('Account'), compute='_compute_amount',
+        readonly=True)
     weight = fields.Float(
         string='Gross weight', states={'draft': [('readonly', False)]},
         help="The gross weight in Kg.", readonly=True)
@@ -355,6 +418,32 @@ class AccountInvoice(models.Model):
         store=True,
         digits=dp.get_precision('Account'),
         compute='_compute_amount')
+    amount_total_gnre = fields.Float(
+        string='Total de Tributos a recolher via GNRE',
+        store=True,
+        digits=dp.get_precision('Account'),
+        compute='_compute_amount')
+    has_gnre = fields.Boolean(
+        string=u"Recolhe imposto antecipadamente atraves de GNRE")
+    gnre_due_days = fields.Integer(
+        string=u"Vencimento (em dias)")
+    gnre_response = fields.Selection(
+        selection=GNRE_RESPONSE,
+        default=GNRE_RESPONSE_DEFAULT,
+        string=u'Responsabilidade'
+    )
+    has_gnre_paid = fields.Boolean(
+        string=u"Guia paga")
+    gnre_state = fields.Selection(
+        [('isento', 'Isento'),
+         ('sujeito', 'Sujeito'),
+         ('gerada', 'Gerada'),
+         ('pago', 'Pago')],
+        u'GNRE STATUS', readonly=True,
+        states={'draft': [('readonly', False)]})
+    icms_relief_value = fields.Float(
+        string='Valor ICMS Desoneração', digits=dp.get_precision('Account'),
+        compute='_compute_amount', store=True)
 
     # TODO não foi migrado por causa do bug github.com/odoo/odoo/issues/1711
     def fields_view_get(self, cr, uid, view_id=None, view_type=False,
@@ -487,6 +576,9 @@ class AccountInvoice(models.Model):
                 invoice.payment_term.id, invoice.date_invoice)
             if result and result.get('value'):
                 invoice.write(result['value'])
+            if not invoice.gnre_state:
+                if invoice.has_gnre and invoice.amount_total_gnre > 0:
+                    invoice.gnre_state = 'sujeito'
         return True
 
     @api.multi
@@ -550,14 +642,14 @@ class AccountInvoiceLine(models.Model):
             insurance_value=self.insurance_value,
             freight_value=self.freight_value,
             other_costs_value=self.other_costs_value)
+        self.price_tax_discount = 0.0
         self.price_subtotal = 0.0
-        self.price_total = 0.0
         self.price_gross = 0.0
         self.discount_value = 0.0
         if self.invoice_id:
-            self.price_subtotal = self.invoice_id.currency_id.round(
+            self.price_tax_discount = self.invoice_id.currency_id.round(
                 taxes['total'] - taxes['total_tax_discount'])
-            self.price_total = self.invoice_id.currency_id.round(
+            self.price_subtotal = self.invoice_id.currency_id.round(
                 taxes['total'])
             self.price_gross = self.invoice_id.currency_id.round(
                 self.price_unit * self.quantity)
@@ -575,6 +667,9 @@ class AccountInvoiceLine(models.Model):
     cfop_id = fields.Many2one('l10n_br_account_product.cfop', 'CFOP')
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification', 'Classificação Fiscal')
+    cest = fields.Char(
+        string="CEST",
+        related='fiscal_classification_id.cest')
     fci = fields.Char('FCI do Produto', size=36)
     import_declaration_ids = fields.One2many(
         'l10n_br_account_product.import.declaration',
@@ -588,11 +683,8 @@ class AccountInvoiceLine(models.Model):
     price_gross = fields.Float(
         string='Vlr. Bruto', store=True, compute='_compute_price',
         digits=dp.get_precision('Account'))
-    price_subtotal = fields.Float(
+    price_tax_discount = fields.Float(
         string='Subtotal', store=True, compute='_compute_price',
-        digits=dp.get_precision('Account'))
-    price_total = fields.Float(
-        string='Total', store=True, compute='_compute_price',
         digits=dp.get_precision('Account'))
     total_taxes = fields.Float(
         string='Total de Tributos', requeried=True, default=0.00,
@@ -643,6 +735,9 @@ class AccountInvoiceLine(models.Model):
         digits=dp.get_precision('Account'), default=0.00)
     icms_cst_id = fields.Many2one(
         'account.tax.code', 'CST ICMS', domain=[('domain', '=', 'icms')])
+    icms_relief_id = fields.Many2one(
+        'l10n_br_account_product.icms_relief',
+        string=u'Desoneração ICMS')
     issqn_manual = fields.Boolean('ISSQN Manual?', default=False)
     issqn_type = fields.Selection(
         [('N', 'Normal'), ('R', 'Retida'),
@@ -677,6 +772,9 @@ class AccountInvoiceLine(models.Model):
         default=0.00)
     ipi_cst_id = fields.Many2one(
         'account.tax.code', 'CST IPI', domain=[('domain', '=', 'ipi')])
+    ipi_guideline_id = fields.Many2one(
+        'l10n_br_account_product.ipi_guideline',
+        string=u'Enquadramento Legal IPI')
     pis_manual = fields.Boolean('PIS Manual?', default=False)
     pis_type = fields.Selection(
         [('percent', 'Percentual'), ('quantity', 'Em Valor')],
@@ -757,6 +855,64 @@ class AccountInvoiceLine(models.Model):
     freight_value = fields.Float(
         'Frete', digits=dp.get_precision('Account'), default=0.00)
     fiscal_comment = fields.Text(u'Observação Fiscal')
+    vBCUFDest = fields.Float(
+        string=u'Valor da BC do ICMS na UF de destino',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    pFCPUFDest = fields.Float(
+        string=u'% Fundo de Combate à Pobreza (FCP)',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    pICMSUFDest = fields.Float(
+        string=u'Alíquota interna da UF de destino',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    pICMSInter = fields.Float(
+        string=u'Alíquota interestadual das UF envolvidas',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    pICMSInterPart = fields.Float(
+        string=u'Percentual provisório de partilha do ICMS Interestadual',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    vFCPUFDest = fields.Float(
+        string=(u'Valor do ICMS relativo ao Fundo de Combate à Pobreza (FCP)'
+                u' da UF de destino'),
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    vICMSUFDest = fields.Float(
+        string=u'Valor do ICMS Interestadual para a UF de destino',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    vICMSUFRemet = fields.Float(
+        string=u'Valor do ICMS Interestadual para a UF do remetente',
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    gnre_value = fields.Float(
+        string=u'Valor do recolhimento via GNRE',
+        digits=dp.get_precision('Account'),
+        default=0.00
+    )
+    icms_relief_value = fields.Float(
+        string=(u'Valor da Desoneração do ICMS'
+                u' da UF de destino'),
+        digits=dp.get_precision('Account'),
+        default=0.00)
+    xped = fields.Char(
+        string=u"Código do Pedido (xPed)",
+        size=15,
+    )
+    nitemped = fields.Char(
+        string=u"Item do Pedido (nItemPed)",
+        size=6,
+    )
+
+    @api.onchange("nitemped")
+    def _check_nitemped(self):
+        if self.nitemped and not self.nitemped.isdigit():
+            raise ValidationError(
+                _(u"nItemPed must be a number with up to six digits")
+            )
 
     def _amount_tax_icms(self, tax=None):
         result = {
@@ -766,6 +922,14 @@ class AccountInvoiceLine(models.Model):
             'icms_percent': tax.get('percent', 0.0) * 100,
             'icms_percent_reduction': tax.get('base_reduction') * 100,
             'icms_base_type': tax.get('icms_base_type', '0'),
+            'vBCUFDest': tax.get('vBCUFDest', 0.0),
+            'pFCPUFDest': tax.get('pFCPUFDest', 0.0) * 100,
+            'pICMSUFDest': tax.get('pICMSUFDest', 0.0) * 100,
+            'pICMSInter': tax.get('pICMSInter', 0.0) * 100,
+            'pICMSInterPart': tax.get('pICMSInterPart', 0.0) * 100,
+            'vFCPUFDest': tax.get('vFCPUFDest', 0.0),
+            'vICMSUFDest': tax.get('vICMSUFDest', 0.0),
+            'vICMSUFRemet': tax.get('vICMSUFRemet', 0.0),
         }
         return result
 
@@ -887,6 +1051,8 @@ class AccountInvoiceLine(models.Model):
         result['ipi_cst_id'] = tax_codes.get('ipi')
         result['pis_cst_id'] = tax_codes.get('pis')
         result['cofins_cst_id'] = tax_codes.get('cofins')
+        result['icms_relief_id'] = tax_codes.get('icms_relief')
+        result['ipi_guideline_id'] = tax_codes.get('ipi_guideline')
         return result
 
     # TODO
@@ -897,7 +1063,7 @@ class AccountInvoiceLine(models.Model):
         context = self.env.context
 
         price_unit = values.get('price_unit', 0.0) or self.price_unit
-        discount = values.get('discount', 0.0)
+        discount = values.get('discount', 0.0) or self.discount
         insurance_value = values.get(
             'insurance_value', 0.0) or self.insurance_value
         freight_value = values.get(
@@ -908,6 +1074,8 @@ class AccountInvoiceLine(models.Model):
         if values.get('invoice_line_tax_id'):
             tax_ids = values.get('invoice_line_tax_id', [[6, 0, []]])[
                 0][2] or self.invoice_line_tax_id.ids
+        else:
+            tax_ids = self.invoice_line_tax_id.ids
         partner_id = values.get('partner_id') or self.partner_id.id
         product_id = values.get('product_id') or self.product_id.id
         quantity = values.get('quantity') or self.quantity
@@ -926,8 +1094,11 @@ class AccountInvoiceLine(models.Model):
 
         if self:
             partner = self.invoice_id.partner_id
-        else:
+        elif partner_id:
             partner = self.env['res.partner'].browse(partner_id)
+        else:
+            partner = self.env['account.invoice'].browse(
+                values.get('invoice_id')).partner_id
 
         taxes = self.env['account.tax'].browse(tax_ids)
         fiscal_position = self.env['account.fiscal.position'].browse(
@@ -949,17 +1120,23 @@ class AccountInvoiceLine(models.Model):
 
             if product.fci:
                 result['fci'] = product.fci
+                result['fiscal_comment'] = u'Res. Senado Fed. ' \
+                                           u'nº13/12 FCI: ' + product.fci
 
             result['icms_origin'] = product.origin
 
         taxes_calculed = taxes.compute_all(
-            price, quantity, product, partner,
+            price, quantity, product=product, partner=partner,
             fiscal_position=fiscal_position,
             insurance_value=insurance_value,
             freight_value=freight_value,
             other_costs_value=other_costs_value)
 
+        result['gnre_value'] = taxes_calculed['total_gnre']
         result['total_taxes'] = taxes_calculed['total_taxes']
+
+        result['icms_relief_value'] = taxes_calculed[
+            'icms_relief_value']
 
         for tax in taxes_calculed['taxes']:
             try:
@@ -1011,6 +1188,10 @@ class AccountInvoiceLine(models.Model):
                     elif kwargs.get('account_id'):
                         account_id = kwargs['account_id']
                         taxes |= account_obj.browse(account_id).tax_ids
+                    if product.fiscal_classification_id:
+                        taxes |= obj_fp_rule.with_context(
+                            ctx).product_fcp_map(
+                            kwargs.get('product_id'), partner.state_id)
                 else:
                     ctx['type_tax_use'] = 'purchase'
                     if product.supplier_taxes_id:
@@ -1044,7 +1225,8 @@ class AccountInvoiceLine(models.Model):
 
         if not fiscal_category_id or not product:
             return result
-
+        product_obj = self.env['product.product'].browse(product)
+        result['value']['name'] = product_obj.display_name
         result = self._fiscal_position_map(
             result, partner_id=partner_id, partner_invoice_id=partner_id,
             company_id=company_id, product_id=product,
@@ -1293,12 +1475,12 @@ class AccountInvoiceLine(models.Model):
         vals.update(self._validate_taxes(vals))
         return super(AccountInvoiceLine, self).create(vals)
 
-    # TODO comentado por causa deste bug
-    # https://github.com/odoo/odoo/issues/2197
-    # @api.multi
-    # def write(self, vals):
-    #    vals.update(self._validate_taxes(vals))
-    #    return super(AccountInvoiceLine, self).write(vals)
+    @api.multi
+    def write(self, vals):
+        for this in self:
+            updated_vals = dict(vals, **this._validate_taxes(vals))
+            super(AccountInvoiceLine, this).write(updated_vals)
+        return True
 
 
 class AccountInvoiceTax(models.Model):
@@ -1313,7 +1495,8 @@ class AccountInvoiceTax(models.Model):
         for line in invoice.invoice_line:
             taxes = line.invoice_line_tax_id.compute_all(
                 (line.price_unit * (1 - (line.discount or 0.0) / 100.0)),
-                line.quantity, line.product_id, invoice.partner_id,
+                line.quantity, product=line.product_id,
+                partner=invoice.partner_id,
                 fiscal_position=line.fiscal_position,
                 insurance_value=line.insurance_value,
                 freight_value=line.freight_value,
@@ -1326,8 +1509,9 @@ class AccountInvoiceTax(models.Model):
                     'manual': False,
                     'sequence': tax['sequence'],
                     'base': currency.round(
-                        tax['price_unit'] *
-                        line['quantity']),
+                        tax.get('total_base',
+                                tax.get('price_unit', 0.00) *
+                                line['quantity'])),
                 }
                 if invoice.type in ('out_invoice', 'in_invoice'):
                     val['base_code_id'] = tax['base_code_id']

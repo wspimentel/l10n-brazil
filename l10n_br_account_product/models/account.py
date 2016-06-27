@@ -20,6 +20,7 @@
 from datetime import datetime
 
 from openerp import models, fields, api
+from openerp.exceptions import Warning as UserError
 
 
 class AccountPaymentTerm(models.Model):
@@ -99,6 +100,48 @@ class AccountTax(models.Model):
         result['taxes'] = taxes
         return result
 
+    def _compute_costs(self, cr, uid, insurance_value, freight_value,
+                       other_costs_value, context=False):
+        result = []
+        total_included = 0.0
+
+        company = self.pool.get('res.users').browse(
+            cr, uid, [uid], context=context)[0].company_id
+
+        costs = {
+            company.insurance_tax_id: insurance_value,
+            company.freight_tax_id: freight_value,
+            company.other_costs_tax_id: other_costs_value,
+        }
+
+        for tax in costs:
+            if costs[tax]:
+                result.append({
+                    'domain': tax.domain,
+                    'ref_tax_code_id': tax.ref_tax_code_id,
+                    'sequence': tax.sequence,
+                    'total_base': costs[tax],
+                    'account_paid_id': tax.account_paid_id.id,
+                    'base_sign': tax.base_sign,
+                    'id': tax.id,
+                    'ref_base_code_id': tax.ref_base_code_id.id,
+                    'account_analytic_collected_id':
+                        tax.account_analytic_collected_id.id,
+                    'tax_code_id': tax.tax_code_id.id,
+                    'ref_tax_sign': tax.ref_tax_sign,
+                    'type': tax.type,
+                    'ref_base_sign': tax.ref_base_sign,
+                    'base_code_id': tax.base_code_id.id,
+                    'account_analytic_paid_id':
+                        tax.account_analytic_paid_id.id,
+                    'name': tax.name,
+                    'account_collected_id': tax.account_collected_id.id,
+                    'amount': costs[tax],
+                    'tax_sign':tax.tax_sign,
+                })
+                total_included += costs[tax]
+        return result, total_included
+
     # TODO
     # Refatorar este método, para ficar mais simples e não repetir
     # o que esta sendo feito no método l10n_br_account_product
@@ -159,7 +202,7 @@ class AccountTax(models.Model):
                 tax['icms_st_base_type'] = tax_brw.icms_st_base_type
 
         common_taxes = [tx for tx in result['taxes'] if tx[
-            'domain'] not in ['icms', 'icmsst', 'ipi']]
+            'domain'] not in ['icms', 'icmsst', 'ipi', 'icmsinter']]
         result_tax = self._compute_tax(cr, uid, common_taxes, result['total'],
                                        product, quantity, precision, base_tax)
         totaldc += result_tax['tax_discount']
@@ -169,6 +212,11 @@ class AccountTax(models.Model):
         specific_ipi = [tx for tx in result['taxes'] if tx['domain'] == 'ipi']
         result_ipi = self._compute_tax(cr, uid, specific_ipi, result['total'],
                                        product, quantity, precision, base_tax)
+        # Calcula a FCP
+        specific_fcp = [tx for tx in result['taxes']
+                        if tx['domain'] == 'icmsfcp']
+        result_fcp = self._compute_tax(cr, uid, specific_fcp, result['total'],
+                                       product, quantity, precision, base_tax)
         totaldc += result_ipi['tax_discount']
         calculed_taxes += result_ipi['taxes']
         for ipi in result_ipi['taxes']:
@@ -177,9 +225,67 @@ class AccountTax(models.Model):
         # Calcula ICMS
         specific_icms = [tx for tx in result['taxes']
                          if tx['domain'] == 'icms']
+        difa = {}
         if fiscal_position and fiscal_position.asset_operation:
             total_base = result['total'] + insurance_value + \
                 freight_value + other_costs_value + ipi_value
+
+            # Para operações fora do estado e aquisição de ativo
+            # TODO: Verificar se existem outras condições que
+            # devem passar por este trecho
+            if fiscal_position and fiscal_position.cfop_id.id_dest == '2':
+                specific_icms_inter = [tx for tx in result['taxes']
+                                 if tx['domain'] == 'icmsinter']
+                if specific_icms_inter:
+                    if (specific_icms_inter[0]['amount'] == \
+                            specific_icms[0]['amount']):
+                        pass
+                    elif (specific_icms_inter[0]['amount'] <
+                              specific_icms[0]['amount']):
+                        aux = specific_icms_inter[0]
+                        specific_icms_inter[0] = specific_icms[0]['amount']
+                        specific_icms[0]['amount'] = aux
+                    else:
+                        # BASE UNICA
+                        difa['vBCUFDest'] = total_base
+                        #ICMS origem = [BC x ALQ INTER]
+                        difa['pICMSUFDest'] = specific_icms_inter[0]['percent']
+                        #TODO mapear percentual com l10n_br_tax.icms_partition
+                        difa['pICMSInterPart'] = 0.40
+                        #ICMS interno Destino = [BC x ALQ intra]
+                        difa['pICMSInter'] = specific_icms[0]['percent']
+                        #ICMS destino = [BC x ALQ intra] - ICMS origem
+                        icms_difa = (
+                            (difa['vBCUFDest'] * difa['pICMSUFDest']) -
+                            (difa['vBCUFDest'] * difa['pICMSInter'])
+                        )
+                        if result_fcp['taxes']:
+                            # % Fundo pobreza
+                            difa['pFCPUFDest'] = \
+                                result_fcp['taxes'][0]['percent']
+                            difa['vFCPUFDest'] = \
+                                difa['vBCUFDest'] * difa['pFCPUFDest']
+                            # FIXME: O ICMS deve ter o FCP incluso?
+                            icms_difa -= difa['vFCPUFDest']
+                        difa['vICMSUFDest'] = \
+                            icms_difa * difa['pICMSInterPart']
+                        difa['vICMSUFRemet'] = \
+                            icms_difa * (1-difa['pICMSInterPart'])
+                        specific_icms_inter[0]['percent'] = \
+                            difa['pICMSUFDest'] - difa['pICMSInter']
+                        #FIXME: Criar um lancaçamento para cada % rateado
+                        specific_icms_inter[0]['amount'] = icms_difa
+                        result_icms_inter = self._compute_tax(
+                            cr,
+                            uid,
+                            specific_icms_inter,
+                            total_base,
+                            product,
+                            quantity,
+                            precision,
+                            base_tax)
+                        totaldc += result_icms_inter['tax_discount']
+                        calculed_taxes += result_icms_inter['taxes']
         else:
             total_base = result['total'] + insurance_value + \
                 freight_value + other_costs_value
@@ -193,8 +299,16 @@ class AccountTax(models.Model):
             quantity,
             precision,
             base_tax)
-        totaldc += result_icms['tax_discount']
-        calculed_taxes += result_icms['taxes']
+
+        if result_icms['taxes'] and fiscal_position and \
+                fiscal_position.suframa:
+            result['icms_relief_value'] = result_icms['taxes'][0]['amount']
+        else:
+            if difa:
+                result_icms['taxes'][0].update(difa)
+            totaldc += result_icms['tax_discount']
+            calculed_taxes += result_icms['taxes']
+
         if result_icms['taxes']:
             icms_value = result_icms['taxes'][0]['amount']
 
@@ -226,11 +340,14 @@ class AccountTax(models.Model):
             result_icmsst['taxes'][0][
                 'icms_st_base_other'] = icms_st_base_other
 
-            if result_icmsst['taxes'][0]['percent']:
+            if result_icmsst['taxes'][0]['percent'] and fiscal_position \
+                    and not fiscal_position.icms_st_extract:
                 calculed_taxes += result_icmsst['taxes']
+            elif result_icmsst['taxes'][0]['percent']:
+                result['total_gnre'] = result_icmsst['taxes'][0]['amount']
 
         # Estimate Taxes
-        if fiscal_position and fiscal_position.asset_operation:
+        if fiscal_position and fiscal_position.tax_estimate:
             obj_tax_estimate = self.pool.get('l10n_br_tax.estimate')
             date = datetime.now().strftime('%Y-%m-%d')
             tax_estimate_ids = obj_tax_estimate.search(
@@ -257,12 +374,21 @@ class AccountTax(models.Model):
                                tax_estimate_percent)
                 result['total_taxes'] = round(total_taxes, precision)
 
+
+        costs, costs_values = self._compute_costs(
+            cr, uid, insurance_value, freight_value, other_costs_value)
+        calculed_taxes += costs
+        result['total_included'] += costs_values
+
         return {
             'total': result['total'],
             'total_included': result.get('total_included', 0.00),
             'total_tax_discount': totaldc,
             'taxes': calculed_taxes,
             'total_taxes': result.get('total_taxes', 0.00),
+            'total_gnre': result.get('total_gnre', 0.00),
+            'icms_relief_value': result.get('icms_relief_value',
+                                                0.00),
         }
 
     @api.v8
@@ -272,7 +398,8 @@ class AccountTax(models.Model):
                     other_costs_value=0.0, base_tax=0.00):
         return self._model.compute_all(
             self._cr, self._uid, self, price_unit, quantity,
-            product=product, partner=partner, force_excluded=force_excluded,
+            product=product, partner=partner,
+            force_excluded=force_excluded,
             fiscal_position=fiscal_position, insurance_value=insurance_value,
             freight_value=freight_value, other_costs_value=other_costs_value,
             base_tax=base_tax)

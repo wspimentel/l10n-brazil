@@ -13,9 +13,43 @@
 					<field name="amount_insurance" widget='monetary' options="{'currency_field': 'currency_id'}" />
 					<field name="amount_costs" widget='monetary' options="{'currency_field': 'currency_id'}" />
 				</field>
-                		<field name="invoiced" position="before">
+				<field name="invoiced" position="before">
 					<field name="ind_pres"/>
 				</field>
+				<field name="note" position="after">
+                    <field name="has_gnre" invisible="1"/>
+					<group string="GNRE" attrs="{'invisible': [('has_gnre','!=', True)]}">
+						<label for="gnre_due_days"/>
+						<div>
+							<field name="gnre_due_days"/>
+						</div>
+						<label for="gnre_response"/>
+						<div>
+							<field name="gnre_response"/>
+						</div>
+						<label for="amount_total_gnre"/>
+						<div>
+							<field name="amount_total_gnre"/>
+						</div>
+					</group>
+				</field>
+				<xpath expr="//field[@name='order_line']/form/div[@groups='base.group_no_one']" position="replace">
+					<notebook>
+						<page string="Invoice Lines" groups="base.group_no_one">
+							<field name="invoice_lines"/>
+						</page>
+						<page string="Informações Fiscais">
+							<group string="Informação de interesse do emissor para controle do B2B">
+								<group>
+									<field name="xped"/>
+								</group>
+								<group>
+									<field name="nitemped"/>
+								</group>
+							</group>
+						</page>
+					</notebook>
+				</xpath>
 			</field>
 		</record>
 

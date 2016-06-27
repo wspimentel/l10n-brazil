@@ -18,6 +18,12 @@
 ###############################################################################
 
 from openerp import models, fields, api
+from openerp.addons.l10n_br_account_product.models.product import \
+    PRODUCT_ORIGIN
+from openerp.addons.l10n_br_account_product.models.l10n_br_account_product\
+    import (GNRE_RESPONSE,
+            GNRE_RESPONSE_DEFAULT)
+from operator import attrgetter
 
 
 class AccountFiscalPositionTemplate(models.Model):
@@ -26,17 +32,36 @@ class AccountFiscalPositionTemplate(models.Model):
     cfop_id = fields.Many2one('l10n_br_account_product.cfop', 'CFOP')
     ind_final = fields.Selection([
         ('0', u'Não'),
-        ('1', u'Consumidor final')
+        ('1', u'Sim')
     ], u'Operação com Consumidor final', readonly=True,
         states={'draft': [('readonly', False)]}, required=False,
         help=u'Indica operação com Consumidor final.', default='0')
-
+    icms_st_extract = fields.Boolean(
+        string=u'Remover Substituição Tributária dos totais',
+        states={'draft': [('readonly', False)]},
+        default=False
+    )
+    tax_estimate = fields.Boolean(
+        string=u'Calcular total dos tributos',
+        states={'draft': [('readonly', False)]},
+        default=True
+    )
+    suframa = fields.Boolean(
+        string=u'Suframa',
+        default=False,
+    )
 
 class AccountFiscalPositionTaxTemplate(models.Model):
     _inherit = 'account.fiscal.position.tax.template'
 
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification.template', 'NCM')
+
+    origin = fields.Selection(PRODUCT_ORIGIN, 'Origem',)
+    tax_ipi_guideline_id = fields.Many2one(
+        'l10n_br_account_product.ipi_guideline', string=u'Enquadramento IPI')
+    tax_icms_relief_id = fields.Many2one(
+        'l10n_br_account_product.icms_relief', string=u'Desoneração ICMS')
 
 
 class AccountFiscalPosition(models.Model):
@@ -45,10 +70,24 @@ class AccountFiscalPosition(models.Model):
     cfop_id = fields.Many2one('l10n_br_account_product.cfop', 'CFOP')
     ind_final = fields.Selection([
         ('0', u'Não'),
-        ('1', u'Consumidor final')
+        ('1', u'Sim')
     ], u'Operação com Consumidor final', readonly=True,
         states={'draft': [('readonly', False)]}, required=False,
         help=u'Indica operação com Consumidor final.', default='0')
+    icms_st_extract = fields.Boolean(
+        string=u'Remover Substituição Tributária dos totais',
+        states={'draft': [('readonly', False)]},
+        default=False
+    )
+    tax_estimate = fields.Boolean(
+        string=u'Calcular total dos tributos',
+        states={'draft': [('readonly', False)]},
+        default=True
+    )
+    suframa = fields.Boolean(
+        string=u'Suframa',
+        default=False,
+    )
 
     @api.v7
     def map_tax(self, cr, uid, fposition_id, taxes, context=None):
@@ -97,13 +136,60 @@ class AccountFiscalPosition(models.Model):
             result[map.tax_dest_id.domain] = {
                 'tax': map.tax_dest_id,
                 'tax_code': map.tax_code_dest_id,
+                'icms_relief': map.tax_icms_relief_id,
+                'ipi_guideline':  map.tax_ipi_guideline_id,
             }
+        return result
+
+    def _map_analysis(self, result, product, taxes):
+        temp = result
+        tax_match = self.env['account.fiscal.position.tax'].browse()
+        for domain, value in temp.iteritems():
+            tax_in_domain = self.tax_ids.filtered(
+                lambda r: r.tax_src_domain == domain and r.tax_dest_id)
+
+            tax_ncm_origin = tax_in_domain.filtered(lambda ncm_origin: (
+                ncm_origin.fiscal_classification_id and
+                ncm_origin.fiscal_classification_id.id ==
+                product.fiscal_classification_id.id and
+                ncm_origin.origin and ncm_origin.origin ==
+                product.origin))
+            if tax_ncm_origin:
+                tax_match |= tax_ncm_origin
+            else:
+                tax_ncm = tax_in_domain.filtered(lambda ncm_origin: (
+                    ncm_origin.fiscal_classification_id and
+                    ncm_origin.fiscal_classification_id.id ==
+                    product.fiscal_classification_id.id))
+                if tax_ncm:
+                    tax_match |= tax_ncm
+                else:
+                    tax_origin = tax_in_domain.filtered(lambda ncm_origin: (
+                        ncm_origin.origin and ncm_origin.origin ==
+                        product.origin))
+                    if tax_origin:
+                        tax_match |= tax_origin
+                    else:
+                        tax_only = tax_in_domain.filtered(lambda ncm_origin: (
+                            not ncm_origin.fiscal_classification_id and
+                            not ncm_origin.origin))
+                        tax_match |= tax_only
+
+        tax_to_remove = self.tax_ids - tax_match
+
+        for remove in tax_to_remove:
+            if result.has_key(remove.tax_src_domain):
+                result.pop(remove.tax_src_domain)
+        result.update(self._map_tax_code(tax_match))
         return result
 
     @api.multi
     def _map_tax(self, product_id, taxes):
         result = {}
+        if not product_id:
+            return result
         product = self.env['product.product'].browse(product_id)
+
         product_fc = product.fiscal_classification_id
         if self.company_id and \
                 self.env.context.get('type_tax_use') in ('sale', 'all'):
@@ -115,6 +201,8 @@ class AccountFiscalPosition(models.Model):
                         result[tax_def.tax_id.domain] = {
                             'tax': tax_def.tax_id,
                             'tax_code': tax_def.tax_code_id,
+                            'icms_relief': tax_def.tax_icms_relief_id,
+                            'ipi_guideline':  tax_def.tax_ipi_guideline_id,
                         }
 
             # FIXME se tiver com o admin pegar impostos de outras empresas
@@ -125,32 +213,15 @@ class AccountFiscalPosition(models.Model):
             product_ncm_tax_def = product_fc.purchase_tax_definition_line
 
         for ncm_tax_def in product_ncm_tax_def:
+            # Sobrescreve as taxas da empresa com as da ncm
             if ncm_tax_def.tax_id:
                 result[ncm_tax_def.tax_id.domain] = {
                     'tax': ncm_tax_def.tax_id,
                     'tax_code': ncm_tax_def.tax_code_id,
+                    'icms_relief': ncm_tax_def.tax_icms_relief_id,
+                    'ipi_guideline':  ncm_tax_def.tax_ipi_guideline_id,
                 }
-
-        map_taxes = self.env['account.fiscal.position.tax'].browse()
-        map_taxes_ncm = self.env['account.fiscal.position.tax'].browse()
-        for tax in taxes:
-            for map in self.tax_ids:
-                if map.tax_src_id.id == tax.id or \
-                        map.tax_code_src_id.id == tax.tax_code_id.id:
-                    if map.tax_dest_id.id or tax.tax_code_id.id:
-                        if map.fiscal_classification_id.id == \
-                                product.fiscal_classification_id.id:
-                            map_taxes_ncm |= map
-                        else:
-                            map_taxes |= map
-            else:
-                if result.get(tax.domain):
-                    result[tax.domain].update({'tax': tax})
-                else:
-                    result[tax.domain] = {'tax': tax}
-
-        result.update(self._map_tax_code(map_taxes))
-        result.update(self._map_tax_code(map_taxes_ncm))
+        result = self._map_analysis(result, product, taxes)
         return result
 
     @api.v8
@@ -160,6 +231,14 @@ class AccountFiscalPosition(models.Model):
         for code in taxes_codes:
             if taxes_codes[code].get('tax_code'):
                 result.update({code: taxes_codes[code].get('tax_code').id})
+            if taxes_codes[code].get('ipi_guideline'):
+                result.update({
+                    'ipi_guideline': taxes_codes[code].get('ipi_guideline').id
+                })
+            if taxes_codes[code].get('icms_relief'):
+                result.update({
+                    'icms_relief': taxes_codes[code].get('icms_relief').id
+                })
         return result
 
     @api.v8
@@ -177,3 +256,22 @@ class AccountFiscalPositionTax(models.Model):
 
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification', 'NCM')
+    origin = fields.Selection(PRODUCT_ORIGIN, 'Origem',)
+    tax_ipi_guideline_id = fields.Many2one(
+        'l10n_br_account_product.ipi_guideline', string=u'Enquadramento IPI')
+    tax_icms_relief_id = fields.Many2one(
+        'l10n_br_account_product.icms_relief', string=u'Desoneração ICMS')
+
+
+class ResPartner(models.Model):
+    _inherit = "res.partner"
+
+    has_gnre = fields.Boolean(
+        string=u"Recolhe imposto antecipadamente atraves de GNRE")
+    gnre_due_days = fields.Integer(
+        string=u"Vencimento (em dias)")
+    gnre_response= fields.Selection(
+        selection=GNRE_RESPONSE,
+        default=GNRE_RESPONSE_DEFAULT,
+        string=u'Responsabilidade'
+    )

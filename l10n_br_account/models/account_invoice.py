@@ -76,6 +76,8 @@ class AccountInvoice(models.Model):
         states={'draft': [('readonly', False)]},
         help="""Unique number of the invoice, computed
             automatically when the invoice is created.""")
+    invoice_reserved_number = fields.Char(
+        u'Número reservado da fatura', size=32, copy=False)
     fiscal_type = fields.Selection(
         PRODUCT_FISCAL_TYPE, 'Tipo Fiscal', required=True,
         default=PRODUCT_FISCAL_TYPE_DEFAULT)
@@ -110,6 +112,24 @@ class AccountInvoice(models.Model):
         'l10n_br_account.document_event', 'document_event_ids',
         u'Eventos')
     fiscal_comment = fields.Text(u'Observação Fiscal')
+    cnpj_cpf = fields.Char(
+        string=u'CNPJ/CPF',
+        related='partner_id.cnpj_cpf',
+    )
+    legal_name = fields.Char(
+        string=u'Razão Social',
+        related='partner_id.legal_name',
+    )
+    ie = fields.Char(
+        string=u'Inscrição Estadual',
+        related='partner_id.inscr_est',
+    )
+    revenue_expense = fields.Boolean(
+        related='journal_id.revenue_expense',
+        readonly=True,
+        store=True,
+        string='Gera Financeiro'
+    )
 
     _order = 'internal_number desc'
 
@@ -217,7 +237,11 @@ class AccountInvoice(models.Model):
         self.write({})
 
         for invoice in self:
-            if invoice.issuer == '0':
+            if invoice.invoice_reserved_number:
+                aux_number = invoice.invoice_reserved_number
+                invoice.write({'internal_number': aux_number,
+                               'number': aux_number})
+            elif invoice.issuer == '0':
                 sequence_obj = self.env['ir.sequence']
                 sequence = sequence_obj.browse(
                     invoice.document_serie_id.internal_sequence_id.id)
@@ -225,6 +249,7 @@ class AccountInvoice(models.Model):
                     'l10n_br_account.invoice.invalid.number'].search(
                     [('number_start', '<=', sequence.number_next),
                      ('number_end', '>=', sequence.number_next),
+                     ('document_serie_id', '=', invoice.document_serie_id.id),
                      ('state', '=', 'done')])
 
                 if invalid_number:
@@ -237,7 +262,10 @@ class AccountInvoice(models.Model):
                 seq_number = sequence_obj.get_id(
                     invoice.document_serie_id.internal_sequence_id.id)
                 self.write(
-                    {'internal_number': seq_number, 'number': seq_number})
+                    {'internal_number': seq_number,
+                     'number': seq_number,
+                     'invoice_reserved_number': seq_number,
+                     })
         return True
 
     # TODO Talvez este metodo substitui o metodo action_move_create
@@ -317,13 +345,13 @@ class AccountInvoiceLine(models.Model):
             price, self.quantity, product=self.product_id,
             partner=self.invoice_id.partner_id,
             fiscal_position=self.fiscal_position)
-        self.price_subtotal = taxes['total'] - taxes['total_tax_discount']
-        self.price_total = taxes['total']
+        self.price_subtotal = taxes['total']
+        self.price_tax_discount = taxes['total'] - taxes['total_tax_discount']
         if self.invoice_id:
             self.price_subtotal = self.invoice_id.currency_id.round(
                 self.price_subtotal)
-            self.price_total = self.invoice_id.currency_id.round(
-                self.price_total)
+            self.price_tax_discount = self.invoice_id.currency_id.round(
+                self.price_tax_discount)
 
     invoice_line_tax_id = fields.Many2many(
         'account.tax', 'account_invoice_line_tax', 'invoice_line_id',
@@ -333,8 +361,8 @@ class AccountInvoiceLine(models.Model):
     fiscal_position = fields.Many2one(
         'account.fiscal.position', u'Posição Fiscal',
         domain="[('fiscal_category_id', '=', fiscal_category_id)]")
-    price_total = fields.Float(
-        string='Amount', store=True, digits=dp.get_precision('Account'),
+    price_tax_discount = fields.Float(
+        string='Price Tax discount', store=True, digits=dp.get_precision('Account'),
         readonly=True, compute='_compute_price')
 
     def fields_view_get(self, cr, uid, view_id=None, view_type=False,
@@ -369,3 +397,14 @@ class AccountInvoiceLine(models.Model):
             result['arch'] = etree.tostring(eview)
 
         return result
+
+    @api.model
+    def move_line_get_item(self, line):
+        """
+            Overrrite core to fix invoice total account.move
+        :param line:
+        :return:
+        """
+        res = super(AccountInvoiceLine, self).move_line_get_item(line)
+        res['price'] = line.price_tax_discount
+        return res

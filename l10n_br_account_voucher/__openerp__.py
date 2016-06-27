@@ -21,18 +21,22 @@
     'name': 'Brazilian Localization Account Voucher',
     'category': 'Localisation',
     'license': 'AGPL-3',
-    'author': 'Akretion, OpenERP Brasil',
-    'website': 'http://openerpbrasil.org',
-    'version': '7.0',
+    'author': 'Akretion, KMEE, Odoo Community Association (OCA)',
+    'website': 'http://odoo-brasil.org',
+    'version': '8.0.1.0.1',
     'depends': [
         'l10n_br_base',
         'l10n_br_account',
         'account_payment',
     ],
     'data': [
-        'wizard/account_statement_from_invoice_view.xml',
+        'view/account_journal.xml',
     ],
     'demo': [
+        # 'demo/accounting_demo.xml'
     ],
-    'installable': False,
+    'test': [
+        'test/account_customer_invoice.yml',
+    ],
+    'installable': True,
 }

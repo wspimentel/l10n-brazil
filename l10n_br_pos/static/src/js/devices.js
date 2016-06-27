@@ -38,9 +38,6 @@ function l10n_br_pos_devices(instance, module) {
                                 currentOrder.set_num_sessao_sat(result['numSessao']);
                                 currentOrder.set_chave_cfe(result['chave_cfe']);
                                 self.pos.push_order(currentOrder);
-                                console.log("enviar_cfe_sat");
-                                console.log(self);
-                                self.get_last_orders();
                             }else{
                                 self.pos.pos_widget.screen_selector.show_popup('error-traceback',{
                                     'message': _t('Erro SAT: '),
@@ -72,12 +69,15 @@ function l10n_br_pos_devices(instance, module) {
                     var posOrderModel = new instance.web.Model('pos.order');
                     var posOrder = posOrderModel.call('refund', {'ids': order_id})
                     .then(function (orders) {
-                        self.pos_widget.screen_selector.show_popup('error',{
+                        self.pos.pos_widget.screen_selector.show_popup('error',{
                             message: _t('Venda Cancelada!'),
                             comment: _t('A venda foi cancelada com sucesso.'),
                         });
+                        setTimeout(function () {
+                            self.pos.pos_widget.posorderlist_screen.get_last_orders();
+                            self.pos.pos_widget.screen_selector.back();
+                        }, 5000);
                     });
-//                    self.pos.cancel_pos_order(chave_cfe);
                 }else{
                     self.pos.pos_widget.screen_selector.show_popup('error-traceback',{
                         'message': _t('Erro SAT: '),
