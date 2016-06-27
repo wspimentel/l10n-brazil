@@ -76,7 +76,7 @@ function l10n_br_pos_devices(instance, module) {
                         setTimeout(function () {
                             self.pos.pos_widget.posorderlist_screen.get_last_orders();
                             self.pos.pos_widget.screen_selector.back();
-                        }, 5000);
+                        }, 4000);
                     });
                 }else{
                     self.pos.pos_widget.screen_selector.show_popup('error-traceback',{

@@ -11,7 +11,6 @@ from openerp.addons.l10n_br_pos.models.pos_config import \
 from openerp.tools.translate import _
 
 
-
 class PosOrder(models.Model):
     _inherit = 'pos.order'
 
