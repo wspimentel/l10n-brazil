@@ -111,16 +111,6 @@ class SaleOrder(models.Model):
         readonly=True, states={'draft': [('readonly', False)]})
     invoiced_rate = fields.Float(compute='_invoiced_rate', string='Invoiced')
     copy_note = fields.Boolean(u'Copiar Observação no documentos fiscal')
-    amount_untaxed = fields.Float(
-        compute='_amount_all_wrapper', string='Untaxed Amount',
-        digits=dp.get_precision('Account'), store=True,
-        help="The amount without tax.", track_visibility='always')
-    amount_tax = fields.Float(
-        compute='_amount_all_wrapper', string='Taxes', store=True,
-        digits=dp.get_precision('Account'), help="The tax amount.")
-    amount_total = fields.Float(
-        compute='_amount_all_wrapper', string='Total', store=True,
-        digits=dp.get_precision('Account'), help="The total amount.")
     amount_discount = fields.Float(
         compute='_amount_all_wrapper', string='Desconto (-)',
         digits=dp.get_precision('Account'), store=True,
