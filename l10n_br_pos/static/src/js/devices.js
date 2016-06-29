@@ -22,6 +22,7 @@ function l10n_br_pos_devices(instance, module) {
     module.ProxyDevice = module.ProxyDevice.extend({
         send_order_sat: function(currentOrder, receipt, json){
             var self = this;
+            console.log(json);
             if(receipt){
                 this.receipt_queue.push(receipt);
                 this.receipt_queue.push(json);
@@ -29,9 +30,9 @@ function l10n_br_pos_devices(instance, module) {
             var aborted = false;
             function send_sat_job(){
                 if (self.receipt_queue.length > 0){
-                    var r = self.receipt_queue.shift();
-                    var j = self.receipt_queue.shift();
-                    self.message('enviar_cfe',{ json: j },{ timeout: 5000 })
+                   var r = self.receipt_queue.shift();
+                   var j = self.receipt_queue.shift();
+                   self.message('enviar_cfe_sat',{json: j},{ timeout: 5000 })
                         .then(function(result){
                             if (!result['excessao']){
                                 currentOrder.set_return_cfe(result['xml']);
@@ -60,13 +61,24 @@ function l10n_br_pos_devices(instance, module) {
             }
             send_sat_job();
         },
-        cancel_last_order: function(chave_cfe){
+        cancel_last_order: function(order_id, chave_cfe){
             var self = this;
 
             self.message('cancelar_cfe',{ chave_cfe: chave_cfe },{ timeout: 5000 })
             .then(function(result){
                 if (result){
-                    self.pos.cancel_pos_order(chave_cfe);
+                    var posOrderModel = new instance.web.Model('pos.order');
+                    var posOrder = posOrderModel.call('refund', {'ids': order_id})
+                    .then(function (orders) {
+                        self.pos.pos_widget.screen_selector.show_popup('error',{
+                            message: _t('Venda Cancelada!'),
+                            comment: _t('A venda foi cancelada com sucesso.'),
+                        });
+                        setTimeout(function () {
+                            self.pos.pos_widget.posorderlist_screen.get_last_orders();
+                            self.pos.pos_widget.screen_selector.back();
+                        }, 4000);
+                    });
                 }else{
                     self.pos.pos_widget.screen_selector.show_popup('error-traceback',{
                         'message': _t('Erro SAT: '),
@@ -82,8 +94,6 @@ function l10n_br_pos_devices(instance, module) {
                     });
                     return;
                 }
-                self.receipt_queue.unshift(r)
-                self.receipt_queue.unshift(j)
             });
         }
     });

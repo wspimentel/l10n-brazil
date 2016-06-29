@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # See README.rst file on addon root folder for license details
-import base64
+
+import time
 
 from openerp import models, fields, api
 from openerp.addons import decimal_precision as dp
 from openerp.tools.float_utils import float_compare
 from openerp.addons.l10n_br_pos.models.pos_config import \
     SIMPLIFIED_INVOICE_TYPE
-from openerp import http
+from openerp.tools.translate import _
 
 
 class PosOrder(models.Model):
@@ -16,15 +17,15 @@ class PosOrder(models.Model):
     @api.model
     def _order_fields(self, ui_order):
         return {
-            'name':         ui_order['name'],
-            'user_id':      ui_order['user_id'] or False,
-            'session_id':   ui_order['pos_session_id'],
-            'lines':        ui_order['lines'],
-            'pos_reference':ui_order['name'],
-            'partner_id':   ui_order['partner_id'] or False,
-            'cfe_return':   ui_order['cfe_return'],
+            'name':           ui_order['name'],
+            'user_id':        ui_order['user_id'] or False,
+            'session_id':     ui_order['pos_session_id'],
+            'lines':          ui_order['lines'],
+            'pos_reference':  ui_order['name'],
+            'partner_id':     ui_order['partner_id'] or False,
+            'cfe_return':     ui_order['cfe_return'],
             'num_sessao_sat': ui_order['num_sessao_sat'],
-            'chave_cfe':    ui_order['chave_cfe'],
+            'chave_cfe':      ui_order['chave_cfe'],
         }
 
     @api.model
@@ -43,7 +44,11 @@ class PosOrder(models.Model):
 
     chave_cfe = fields.Char('Chave da Cfe')
 
-    num_sessao_sat = fields.Char(u'Número sessão SAT')
+    num_sessao_sat = fields.Char(u'Número Sessão SAT')
+
+    pos_order_associated = fields.Many2one('pos.order', 'Venda Associada')
+
+    canceled_order = fields.Boolean('Venda Cancelada', readonly=True)
 
     @api.one
     def action_invoice(self):
@@ -87,16 +92,21 @@ class PosOrder(models.Model):
     def return_orders_from_session(self, **kwargs):
         orders_session = {'Orders': []}
         orders = self.search(
-            [('session_id', '=', kwargs['session_id'])], limit=5, order="id"
+            [
+                ('session_id', '=', kwargs['session_id']),
+                ('state', '=', 'paid'),
+                ('chave_cfe', '!=', '')
+            ], limit=5, order="id DESC"
         )
-        orders = reversed(orders)
         for order in orders:
             order_vals = {
+                'id': order.id,
                 'name': order.name,
                 'pos_reference': order.pos_reference,
                 'partner_id': order.partner_id.id,
                 'date': order.date_order,
                 'chave_cfe': order.chave_cfe,
+                'canceled_order': order.canceled_order,
                 'can_cancel': False,
             }
             orders_session['Orders'].append(order_vals)
@@ -104,9 +114,48 @@ class PosOrder(models.Model):
         return orders_session
 
     @api.model
-    def cancel_last_order(self, **kwargs):
-        order = self.search(
-            [('chave_cfe', '=', kwargs['chave_cfe'])]
-        )
+    def refund(self, ids):
+        """Create a copy of order  for refund order"""
+        clone_list = []
 
-        return self.cancel_order(order)
+        for order in self.browse(ids):
+            current_session_ids = self.env['pos.session'].search([
+                ('state', '!=', 'closed'),
+                ('user_id', '=', self.env.uid)]
+            )
+
+            # if not current_session_ids:
+            #     raise osv.except_osv(_('Error!'), _('To return product(s),
+            # you need to open a session that will be used to register
+            # the refund.'))
+
+            clone_id = order.copy()
+
+            clone_id.write({
+                'name': order.name + ' REFUND',
+                'pos_reference': order.pos_reference + ' REFUND',
+                'session_id': current_session_ids.id,
+                'date_order': time.strftime('%Y-%m-%d %H:%M:%S'),
+                'pos_order_associated': order.id,
+                'canceled_order': True,
+                'chave_cfe': '',
+                'cfe_return': '',
+                'num_sessao_sat': ''
+            })
+
+            clone_list.append(clone_id.id)
+
+        for clone in self.browse(clone_list):
+            for order_line in clone.lines:
+                order_line.write({
+                    'qty': -order_line.qty
+                })
+
+            clone.action_paid()
+            parent_order = self.browse(clone.pos_order_associated.id)
+            parent_order.write({
+                'canceled_order': True,
+                'pos_order_associated': clone.id,
+            })
+
+        return True

@@ -356,9 +356,15 @@ function l10n_br_pos_screens(instance, module) {
             });
 
             this.render_list(self.orders.Orders);
-
             this.$('.client-list-contents').delegate('.cancel_order','click',function(event){
-                self.cancel_pos_order(parseInt($(this).data('id')));
+                chave_cfe = null;
+                for (var i = 0; i < self.orders.Orders.length; i++){
+                    if($(this).parent().parent().data('id') == self.orders.Orders[i].id){
+                        chave_cfe = self.orders.Orders[i].chave_cfe;
+                    }
+
+                }
+                self.cancel_last_order_sat($(this).parent().parent().data('id'), chave_cfe);
             });
         },
         get_last_orders: function(){
@@ -373,7 +379,7 @@ function l10n_br_pos_screens(instance, module) {
         },
         render_list: function(orders){
             var orders_vals = orders;
-            console.log(orders_vals);
+
             var contents = this.$el[0].querySelector('.client-list-contents');
             contents.innerHTML = "";
             for(var i = 0; i < orders_vals.length; i++){
@@ -386,26 +392,28 @@ function l10n_br_pos_screens(instance, module) {
                 contents.appendChild(clientline);
             }
         },
-        cancel_pos_order: function(order_id){
+        cancel_last_order_sat: function(order_id, chave_cfe){
             var self = this;
-            chave_cfe = null;
-            for (var i = 0; i < self.orders; i++){
-                if(order_id == self.orders[i].id){
-                    chave_cfe = self.orders[i].chave_cfe;
-                }
 
+            var status = this.pos.proxy.get('status');
+            var sat_status = status.drivers.satcfe ? status.drivers.satcfe.status : false;
+            if( sat_status == 'connected'){
+                if(this.pos.config.iface_sat_via_proxy){
+                    this.pos.proxy.cancel_last_order(order_id, chave_cfe);
+                }
             }
-            var posOrderModel = new instance.web.Model('pos.order');
-            var posOrder = posOrderModel.call('cancel_last_order', {'chave_cfe': chave_cfe})
-            .then(function (orders) {
-                self.pos_widget.screen_selector.show_popup('error',{
-                    message: _t('Venda Cancelada!'),
-                    comment: _t('A venda foi cancelada com sucesso.'),
-                });
-            });
         },
         close: function(){
             this._super();
         },
+    });
+
+    module.ReceiptScreenWidget = module.ReceiptScreenWidget.extend({
+        template: 'ReceiptScreenWidget',
+
+        finishOrder: function() {
+            this.pos_widget.posorderlist_screen.get_last_orders();
+            this.pos.get('selectedOrder').destroy();
+        }
     });
 }
