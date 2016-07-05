@@ -13,6 +13,7 @@
             <field name="chave_cfe" />
             <field name="num_sessao_sat" />
             <field name="canceled_order" />
+            <field name="devolvido" />
             <field name="pos_order_associated" />
             <field name="cfe_cancelamento_return" />
             <field name="chave_cfe_cancelamento" />
@@ -21,6 +22,13 @@
         <button name="action_invoice" position="attributes">
             <attribute name="invisible">1</attribute>
             <attribute name="states" />
+        </button>
+        <button name="refund" position="attributes">
+            <attribute name="invisible">1</attribute>
+            <attribute name="states" />
+        </button>
+        <button name="refund" position="after">
+            <button name="devolution" type="object" string="Devolution" states="paid, invoiced" attrs="{'invisible': ['devolvido', '=', True]}"/>
         </button>
     </field>
 </record>

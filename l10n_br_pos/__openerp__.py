@@ -12,7 +12,8 @@
     "depends": [
         'l10n_br_base',
         'point_of_sale',
-        'pos_pricelist'
+        'pos_pricelist',
+        'stock_account'
     ],
     'data': [
         "views/pos_template.xml",

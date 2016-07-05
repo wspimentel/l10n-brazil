@@ -56,6 +56,8 @@ class PosOrder(models.Model):
 
     num_sessao_sat_cancelamento = fields.Char(u'Número Sessão SAT Cancelamento')
 
+    devolvido = fields.Boolean('Venda Devolvida', readonly=True, default=False)
+
     @api.one
     def action_invoice(self):
         self.simplified = False
@@ -181,3 +183,29 @@ class PosOrder(models.Model):
         }
 
         return dados_reimpressao
+
+    @api.multi
+    def devolution(self):
+        for order in self:
+            if order.picking_id:
+                view_rec = self.env['ir.model.data'].get_object_reference(
+                    'stock_account',
+                    'view_stock_return_picking_form_inherit')
+                view_id = view_rec and view_rec[1] or False
+                ctx = dict(self._context)
+                ctx.update({'pos_devolution': True,
+                            'active_model': 'stock.picking',
+                            'active_id': order.picking_id.id,
+                            })
+
+                # TODO calcular o campo devolvido
+                order.devolvido = True
+
+                return {
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'stock.return.picking',
+                    'type': 'ir.actions.act_window',
+                    'target': 'new',
+                    'context': ctx,
+                }
