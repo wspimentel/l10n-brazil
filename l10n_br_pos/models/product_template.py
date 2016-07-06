@@ -23,5 +23,3 @@ class ProductTemplate(models.Model):
         digits_compute=dp.get_precision('Account'),
         store=True,
     )
-
-
