@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 
+from datetime import datetime
+from dateutil import relativedelta
 from openerp import models, fields, api
 from openerp.addons import decimal_precision as dp
 
@@ -158,9 +160,8 @@ class L10n_brTaxEstimateModel(models.AbstractModel):
         'Impostos Municipais Nacional', default=0.00,
         digits_compute=dp.get_precision('Account'))
 
-    date_start = fields.Date('Data Inicial')
-
-    date_end = fields.Date('Data Final')
+    create_date = fields.Datetime(
+        u'Data de Criação', readonly=True)
 
     key = fields.Char('Chave', size=32)
 
@@ -231,7 +232,7 @@ class AccountProductFiscalClassification(models.Model):
     tax_estimate_ids = fields.One2many(
         comodel_name='l10n_br_tax.estimate',
         inverse_name='fiscal_classification_id',
-        string=u'Impostos Estimados')
+        string=u'Impostos Estimados', readonly=True)
 
     tax_fcp_ids = fields.One2many(
         comodel_name='l10n_br_tax.fcp',
@@ -261,36 +262,35 @@ class AccountProductFiscalClassification(models.Model):
 
     @api.multi
     def get_ibpt(self):
-        for item in self:
-            brazil = item.env['res.country'].search([('code', '=', 'BR')])
-            states = item.env['res.country.state'].search([('country_id', '=',
-                                                            brazil.id)])
-            company = item.company_id or item.env.user.company_id
-            config = DeOlhoNoImposto(company.ipbt_token,
-                                     punctuation_rm(company.cnpj_cpf),
-                                     company.state_id.code)
-            tax_estimate = item.env['l10n_br_tax.estimate']
-            for state in states:
-                result = get_ibpt_product(
-                    config,
-                    punctuation_rm(item.code or ''),
-                    ex='0')
-                update = tax_estimate.search([('state_id', '=', state.id),
-                                              ('origin', '=', 'IBPT-WS'),
-                                              ('fiscal_classification_id',
-                                               '=', item.id)])
-                vals = {
-                    'fiscal_classification_id': item.id,
-                    'origin': 'IBPT-WS',
-                    'state_id': state.id,
-                    'state_taxes': result.estadual,
-                    'federal_taxes_national': result.nacional,
-                    'federal_taxes_import': result.importado,
-                    }
-                if update:
-                    update.write(vals)
-                else:
-                    tax_estimate.create(vals)
+
+        for fiscal_classification in self:
+
+            company = (
+                fiscal_classification.env.user.company_id or
+                fiscal_classification.company_id)
+
+            config = DeOlhoNoImposto(
+                company.ipbt_token, punctuation_rm(company.cnpj_cpf),
+                company.state_id.code)
+
+            result = get_ibpt_product(
+                config,
+                punctuation_rm(fiscal_classification.code or ''), ex='0')
+
+            vals = {
+                'fiscal_classification_id': fiscal_classification.id,
+                'origin': 'IBPT-WS',
+                'state_id': company.state_id.id,
+                'state_taxes': result.estadual,
+                'federal_taxes_national': result.nacional,
+                'federal_taxes_import': result.importado,
+                }
+
+            tax_estimate = fiscal_classification.env[
+                'l10n_br_tax.estimate']
+
+            tax_estimate.create(vals)
+
         return True
 
 
@@ -327,6 +327,55 @@ class L10n_brTaxEstimate(models.Model):
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification',
         'Fiscal Classification', select=True)
+
+    @api.model
+    def compute_tax_estimate(self, product):
+        if product.fiscal_classification_id.id:
+
+            if not product.fiscal_classification_id.tax_estimate_ids:
+                product.fiscal_classification_id.get_ibpt()
+
+            self.env.cr.execute(
+                '''SELECT id FROM l10n_br_tax_estimate
+                   WHERE fiscal_classification_id = %s
+                   ORDER BY create_date DESC''', (
+                    product.fiscal_classification_id.id,))
+            tax_estimate_ids = self.env.cr.fetchall()
+
+            obj_tax_estimate = self.env['l10n_br_tax.estimate'].browse(
+                tax_estimate_ids[0][0])
+
+            tax_create_date = datetime.strptime(
+                obj_tax_estimate.create_date, '%Y-%m-%d %H:%M:%S')
+
+            date_limit_to_update = \
+                tax_create_date + relativedelta.relativedelta(
+                    days=self.env.user.company_id.ibpt_update_days or 0)
+
+            if datetime.now().date() > date_limit_to_update.date():
+                product.fiscal_classification_id.get_ibpt()
+
+                self.env.cr.execute(
+                    '''SELECT id FROM l10n_br_tax_estimate
+                       WHERE fiscal_classification_id = %s
+                       ORDER BY create_date DESC''', (
+                        product.fiscal_classification_id.id,))
+                tax_estimate_ids = self.env.cr.fetchall()
+
+                obj_tax_estimate = self.env['l10n_br_tax.estimate'].browse(
+                    tax_estimate_ids[0][0])
+
+            tax_estimate_percent = 0.00
+            if product.origin in ('1', '2', '6', '7'):
+                tax_estimate_percent += \
+                    obj_tax_estimate.federal_taxes_import
+            else:
+                tax_estimate_percent += \
+                    obj_tax_estimate.federal_taxes_national
+
+            tax_estimate_percent += obj_tax_estimate.state_taxes
+            tax_estimate_percent /= 100
+            return tax_estimate_percent
 
 
 class WizardAccountProductFiscalClassification(models.TransientModel):
