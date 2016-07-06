@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# See README.rst file on addon root folder for license details
+# © 2016 KMEE INFORMATICA LTDA (https://kmee.com.br)
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
     "name": "Ponto de venda adaptado a legislação Brasileira",
@@ -16,6 +17,7 @@
         'pos_payment_term',
     ],
     'data': [
+        "wizard/l10n_br_pos_order_return.xml",
         "views/pos_template.xml",
         "views/point_of_sale_view.xml",
         "views/point_of_sale_report.xml",

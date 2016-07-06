@@ -2,5 +2,4 @@
 # © 2016 KMEE INFORMATICA LTDA (https://kmee.com.br)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from . import wizard
-from . import models
+from . import l10n_br_pos_order_return
