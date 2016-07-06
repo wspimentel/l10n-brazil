@@ -269,6 +269,10 @@ class AccountProductFiscalClassification(models.Model):
                 fiscal_classification.env.user.company_id or
                 fiscal_classification.company_id)
 
+            if not (company.ipbt_token and company.cnpj_cpf and
+                    company.state_id.code):
+                return False
+
             config = DeOlhoNoImposto(
                 company.ipbt_token, punctuation_rm(company.cnpj_cpf),
                 company.state_id.code)
