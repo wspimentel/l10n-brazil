@@ -345,14 +345,12 @@ class L10n_brTaxEstimate(models.Model):
             obj_tax_estimate = self.env['l10n_br_tax.estimate'].browse(
                 tax_estimate_ids[0][0])
 
-            obj_account_config = self.env['account.config.settings'].browse(1)
-
             tax_create_date = datetime.strptime(
                 obj_tax_estimate.create_date, '%Y-%m-%d %H:%M:%S')
 
             date_limit_to_update = \
                 tax_create_date + relativedelta.relativedelta(
-                    days=obj_account_config.number_days_update)
+                    days=self.env.user.company_id.ibpt_update_days or 0)
 
             if datetime.now().date() > date_limit_to_update.date():
                 product.fiscal_classification_id.get_ibpt()
