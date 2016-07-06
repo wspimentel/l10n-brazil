@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 
+from datetime import datetime
+from dateutil import relativedelta
 from openerp import models, fields, api
 from openerp.addons import decimal_precision as dp
 
@@ -325,6 +327,57 @@ class L10n_brTaxEstimate(models.Model):
     fiscal_classification_id = fields.Many2one(
         'account.product.fiscal.classification',
         'Fiscal Classification', select=True)
+
+    @api.model
+    def compute_tax_estimate(self, product):
+        if product.fiscal_classification_id.id:
+
+            if not product.fiscal_classification_id.tax_estimate_ids:
+                product.fiscal_classification_id.get_ibpt()
+
+            self.env.cr.execute(
+                '''SELECT id FROM l10n_br_tax_estimate
+                   WHERE fiscal_classification_id = %s
+                   ORDER BY create_date DESC''', (
+                    product.fiscal_classification_id.id,))
+            tax_estimate_ids = self.env.cr.fetchall()
+
+            obj_tax_estimate = self.env['l10n_br_tax.estimate'].browse(
+                tax_estimate_ids[0][0])
+
+            obj_account_config = self.env['account.config.settings'].browse(1)
+
+            tax_create_date = datetime.strptime(
+                obj_tax_estimate.create_date, '%Y-%m-%d %H:%M:%S')
+
+            date_limit_to_update = \
+                tax_create_date + relativedelta.relativedelta(
+                    days=obj_account_config.number_days_update)
+
+            if datetime.now().date() > date_limit_to_update.date():
+                product.fiscal_classification_id.get_ibpt()
+
+                self.env.cr.execute(
+                    '''SELECT id FROM l10n_br_tax_estimate
+                       WHERE fiscal_classification_id = %s
+                       ORDER BY create_date DESC''', (
+                        product.fiscal_classification_id.id,))
+                tax_estimate_ids = self.env.cr.fetchall()
+
+                obj_tax_estimate = self.env['l10n_br_tax.estimate'].browse(
+                    tax_estimate_ids[0][0])
+
+            tax_estimate_percent = 0.00
+            if product.origin in ('1', '2', '6', '7'):
+                tax_estimate_percent += \
+                    obj_tax_estimate.federal_taxes_import
+            else:
+                tax_estimate_percent += \
+                    obj_tax_estimate.federal_taxes_national
+
+            tax_estimate_percent += obj_tax_estimate.state_taxes
+            tax_estimate_percent /= 100
+            return tax_estimate_percent
 
 
 class WizardAccountProductFiscalClassification(models.TransientModel):
