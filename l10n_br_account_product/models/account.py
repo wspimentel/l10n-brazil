@@ -346,23 +346,10 @@ class AccountTax(models.Model):
                 result['total_gnre'] = result_icmsst['taxes'][0]['amount']
 
         # Estimate Taxes
-        if fiscal_position:
-            if fiscal_position.asset_operation \
-                    or fiscal_position.ind_final == '1':
-
-                    tax_estimate_percent = self.env[
-                        'l10n_br_tax.estimate'].compute_tax_estimate(product)
-
-                    total_taxes = (
-                        (result['total_included'] - totaldc) *
-                        tax_estimate_percent)
-                    result['total_taxes'] = round(total_taxes, precision)
-
-
-        costs, costs_values = self._compute_costs(
-            cr, uid, insurance_value, freight_value, other_costs_value)
-        calculed_taxes += costs
-        result['total_included'] += costs_values
+        if fiscal_position and fiscal_position.asset_operation:
+                total_taxes = ((result['total_included'] - totaldc) *
+                               product.product_estimated_taxes_percent)
+                result['total_taxes'] = round(total_taxes, precision)
 
         return {
             'total': result['total'],
