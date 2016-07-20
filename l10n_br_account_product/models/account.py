@@ -22,7 +22,6 @@ from datetime import datetime
 
 from openerp import models, fields, api
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
-from openerp.exceptions import Warning as UserError
 
 
 class AccountPaymentTerm(models.Model):
