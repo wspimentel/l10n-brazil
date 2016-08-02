@@ -123,7 +123,22 @@ function l10n_br_pos_models(instance, module) {
                     self.company = companies[0];
                 },
             });
-
+            for (var i = 0; i < this.models.length; i++){
+                if (this.models[i].model == 'product.product') {
+                    this.models.splice(i, 1);
+                }
+            }
+            this.models.push({
+                model:  'product.product',
+                fields: ['name', 'display_name', 'list_price','price','pos_categ_id', 'taxes_id', 'ean13', 'default_code',
+                         'to_weight', 'uom_id', 'uos_id', 'uos_coeff', 'mes_type', 'description_sale', 'description',
+                         'product_tmpl_id', 'estimated_taxes'],
+                domain: [['sale_ok','=',true],['available_in_pos','=',true], ['qty_available', '>', 0], ['ean13', '!=', false]],
+                context: function(self){ return { pricelist: self.pricelist.id, display_default_code: false }; },
+                loaded: function(self, products){
+                    self.db.add_products(products);
+                },
+            });
         },
 
         /**
