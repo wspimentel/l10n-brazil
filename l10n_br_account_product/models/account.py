@@ -333,9 +333,9 @@ class AccountTax(models.Model):
 
         # Estimate Taxes
         if fiscal_position and fiscal_position.asset_operation:
-                total_taxes = ((result['total_included'] - totaldc) *
-                               product.product_estimated_taxes_percent/100)
-                result['total_taxes'] = round(total_taxes, precision)
+            total_taxes = ((result['total_included'] - totaldc) *
+                           product.product_estimated_taxes_percent/100)
+            result['total_taxes'] = round(total_taxes, precision)
 
         return {
             'total': result['total'],
