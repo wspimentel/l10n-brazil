@@ -30,6 +30,7 @@
         'account_fiscal_position_rule_stock',
         'report_xls',
         'stock_account',
+        'stock_picking_invoice_link'
     ],
     'data': [
         'data/l10n_br_stock_account_data.xml',

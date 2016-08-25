@@ -10,8 +10,13 @@
 				<field name="fiscal_type" position="attributes">
 					<attribute name="invisible">0</attribute>
 				</field>
+				<field name="fiscal_type" position="after">
+					<field name="purpose" />
+				</field>
 			</field>
 		</record>
+
+
 
 	</data>
 </openerp>

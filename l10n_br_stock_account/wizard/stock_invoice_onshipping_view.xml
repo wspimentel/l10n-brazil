@@ -11,6 +11,7 @@
 					<field name="fiscal_category_journal" />
 					<newline/>
 					<field name="journal_id" attrs="{'required': [('fiscal_category_journal', '=', False)], 'invisible': [('fiscal_category_journal', '=', True)]}" />
+					<field name="fiscal_doc_ref" />
 				</field>
 			</field>
 		</record>
