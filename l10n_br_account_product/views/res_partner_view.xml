@@ -1,67 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data>
+    <data>
 
-		<record id="l10n_br_account_product_position_template_form" model="ir.ui.view">
-			<field name="name">l10n_br_account_product.fiscal.position.template.form</field>
-			<field name="model">account.fiscal.position.template</field>
-			<field name="inherit_id" ref="l10n_br_account.l10n_br_account_position_template_form"/>
-			<field name="arch" type="xml">
-				<field name="fiscal_category_fiscal_type" position="after">
-					<field name="cfop_id" colspan="4" domain="[('type', '=', type)]"/>
-					<field name="ind_final"/>
-					<field name="icms_st_extract"/>
-					<field name="tax_estimate"/>
-					<field name="suframa"/>
-				</field>
-				<xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_src_id']" position="before">
-					<field name="fiscal_classification_id" />
-					<field name="origin" />
-				</xpath>
-				<xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_dest_id']" position="before">
-					<field name="tax_ipi_guideline_id" />
-					<field name="tax_icms_relief_id" />
-				</xpath>
-			</field>
-		</record>
-
-		<record id="l10n_br_account_product_position_form" model="ir.ui.view">
-			<field name="name">l10n_br_account_product.fiscal.position.form</field>
-			<field name="model">account.fiscal.position</field>
-			<field name="inherit_id" ref="l10n_br_account.l10n_br_account_position_form"/>
-			<field name="arch" type="xml">
-				<field name="fiscal_category_fiscal_type" position="after">
-					<field name="cfop_id" colspan="4" domain="[('type', '=', type), ('internal_type', '=', 'normal')]"/>
-					<field name="ind_final"/>
-					<field name="icms_st_extract"/>
-					<field name="tax_estimate"/>
-					<field name="suframa"/>
-				</field>
-				<xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_src_id']" position="before">
-					<field name="fiscal_classification_id" />
-					<field name="origin" />
-				</xpath>
-				<xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_dest_id']" position="after">
-					<field name="tax_ipi_guideline_id" />
-					<field name="tax_icms_relief_id" />
-				</xpath>
-
-			</field>
-		</record>
-
-		 <record id="l10n_br_account_product_res_partner_form" model="ir.ui.view">
-			<field name="name">l10n_br_account_product.res_partner.form</field>
-			<field name="model">res.partner</field>
-			<field name="inherit_id" ref="l10n_br_base.view_l10n_br_base_partner_form"/>
-			 <field name="arch" type="xml">
-					<group string="Dados Fiscais"  position="after">
-						<group string="Recolhimento GNRE">
-							<field name="has_gnre"/>
-							<field name="gnre_response"  attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-							<field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
-                        </group>
-					</group>
-			</field>
+        <record id="l10n_br_account_product_position_template_form" model="ir.ui.view">
+            <field name="name">l10n_br_account_product.fiscal.position.template.form</field>
+            <field name="model">account.fiscal.position.template</field>
+            <field name="inherit_id" ref="l10n_br_account.l10n_br_account_position_template_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_category_fiscal_type" position="after">
+                    <field name="cfop_id" colspan="4" domain="[('type', '=', type)]"/>
+                    <field name="ind_final"/>
+                    <field name="icms_st_extract"/>
+                    <field name="tax_estimate"/>
+                    <field name="suframa"/>
+                </field>
+                <xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_src_id']" position="before">
+                    <field name="fiscal_classification_id" />
+                    <field name="origin" />
+                </xpath>
+                <xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_dest_id']" position="before">
+                    <field name="tax_ipi_guideline_id" />
+                    <field name="tax_icms_relief_id" />
+                </xpath>
+            </field>
         </record>
-	</data>
+
+        <record id="l10n_br_account_product_position_form" model="ir.ui.view">
+            <field name="name">l10n_br_account_product.fiscal.position.form</field>
+            <field name="model">account.fiscal.position</field>
+            <field name="inherit_id" ref="l10n_br_account.l10n_br_account_position_form"/>
+            <field name="arch" type="xml">
+                <field name="fiscal_category_fiscal_type" position="after">
+                    <field name="cfop_id" colspan="4" domain="[('type', '=', type), ('internal_type', '=', 'normal')]"/>
+                    <field name="ind_final"/>
+                    <field name="icms_st_extract"/>
+                    <field name="tax_estimate"/>
+                    <field name="suframa"/>
+                </field>
+                <xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_src_id']" position="before">
+                    <field name="fiscal_classification_id" />
+                    <field name="origin" />
+                </xpath>
+                <xpath expr="/form/notebook/page/field[@name='tax_ids']/tree/field[@name='tax_code_dest_id']" position="after">
+                    <field name="tax_ipi_guideline_id" />
+                    <field name="tax_icms_relief_id" />
+                </xpath>
+
+            </field>
+        </record>
+
+         <record id="l10n_br_account_product_res_partner_form" model="ir.ui.view">
+            <field name="name">l10n_br_account_product.res_partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="l10n_br_base.view_l10n_br_base_partner_form"/>
+             <field name="arch" type="xml">
+                    <group string="Dados Fiscais"  position="after">
+                        <group string="Recolhimento GNRE">
+                            <field name="has_gnre"/>
+                            <field name="gnre_response"  attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+                            <field name="gnre_due_days" attrs="{'invisible': [('has_gnre','!=', True)]}"/>
+                        </group>
+                    </group>
+            </field>
+        </record>
+    </data>
 </openerp>
