@@ -1083,6 +1083,9 @@ class AccountInvoiceLine(models.Model):
                 result['fiscal_classification_id'] = \
                     product.fiscal_classification_id.id
 
+            if product.cest_id:
+                result['cest_id'] = product.cest_id.id
+
             if product.fci:
                 result['fci'] = product.fci
                 result['fiscal_comment'] = u'Res. Senado Fed. ' \
