@@ -18,6 +18,7 @@ class ResourceCalendar(models.Model):
         'resource.calendar', 'parent_id',
         string='Child Calendar')
     _parent_store = True
+
     parent_left = fields.Integer(index=True)
     parent_right = fields.Integer(index=True)
 
