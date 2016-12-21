@@ -14,6 +14,12 @@
                             <field name="stock_in_fiscal_category_id"/>
                             <field name="stock_out_fiscal_category_id"/>
                         </group>
+                        <group string="Configurações Transferencia entre filiais">
+                            <field name="stock_out_resupply_fiscal_category_id" />
+                            <field name="stock_out_resupply_invoice_state"/>
+                            <field name="stock_in_resupply_fiscal_category_id" />
+                            <field name="stock_in_resupply_invoice_state"/>
+                        </group>
                     </page>
                 </page>
             </field>
