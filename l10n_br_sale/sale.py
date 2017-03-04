@@ -66,7 +66,7 @@ class SaleOrder(orm.Model):
         price = line_obj._calc_line_base_price(cr, uid, line, context=context)
         qty = line_obj._calc_line_quantity(cr, uid, line, context=context)
 
-        for c in self.pool.get['account.tax'].compute_all(
+        for c in self.pool.get('account.tax').compute_all(
                 cr,
                 uid,
                 line.tax_id,
