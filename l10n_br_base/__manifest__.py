@@ -92,9 +92,9 @@
         'security/ir.model.access.csv',
 
         #
-        # Dados dos clientes 
+        # Dados dos participantes
         #
-        #'data/sped_cliente_data.xml',
+        'data/sped_participante_data.xml',
     ],
     'demo': [
         #'demo/sped_empresa_demo.xml',
