@@ -90,10 +90,15 @@
         #
         'security/inherited_res_groups_data.xml',
         'security/ir.model.access.csv',
+
+        #
+        # Dados dos clientes 
+        #
+        #'data/sped_cliente_data.xml',
     ],
     'demo': [
-        'demo/sped_empresa_demo.xml',
-        'demo/l10n_br_base_demo.xml',
+        #'demo/sped_empresa_demo.xml',
+        #'demo/l10n_br_base_demo.xml',
     ],
     'test': [
         'test/sped_participante_test.yml',
