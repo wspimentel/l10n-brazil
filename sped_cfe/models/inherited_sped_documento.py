@@ -156,8 +156,9 @@ class SpedDocumento(models.Model):
             from mfecfe.clientelocal import ClienteSATLocal
             from mfecfe import BibliotecaSAT
             cliente = ClienteSATLocal(
-                BibliotecaSAT(self.configuracoes_pdv.caminho_integrador),  # FIXME: Caminho do integrador nas configurações
-                codigo_ativacao=self.configuracoes_pdv.codigo_ativacao
+                BibliotecaSAT(self.configuracoes_pdv.caminho_integrador),
+                codigo_ativacao=self.configuracoes_pdv.codigo_ativacao,
+                numerador_sessao=self.numero_identificador,
             )
         elif self.configuracoes_pdv.tipo_sat == 'rede_interna':
             from mfecfe.clientesathub import ClienteSATHub
@@ -390,6 +391,7 @@ class SpedDocumento(models.Model):
 
     def cancela_nfe(self):
         self.ensure_one()
+        # FIXME trocar o metodo a ser chamado
         result = super(SpedDocumento, self).envia_nfe()
         if not self.modelo == MODELO_FISCAL_CFE:
             return result
@@ -463,7 +465,7 @@ class SpedDocumento(models.Model):
             self.envia_pagamento()
             if not self.pagamento_autorizado_cfe:
                 raise Warning('Pagamento(s) não autorizado(s)!')
-
+        self.numero_identificador = None
         cliente = self.processador_cfe()
 
         cfe = self.monta_cfe()
@@ -480,9 +482,8 @@ class SpedDocumento(models.Model):
                 self.situacao_nfe = SITUACAO_NFE_AUTORIZADA
                 self.executa_depois_autorizar()
                 self.data_hora_autorizacao = fields.Datetime.now()
-
                 chave = ChaveCFeSAT(resposta.chaveConsulta)
-
+                self.numero_identificador = resposta.resposta.numeroSessao
                 self.numero = chave.numero_cupom_fiscal
                 self.serie = chave.numero_serie
                 self.chave = resposta.chaveConsulta[3:]
@@ -501,11 +502,13 @@ class SpedDocumento(models.Model):
             elif resposta.EEEEE in ('06001', '06002', '06003', '06004', '06005',
                                     '06006', '06007', '06008', '06009', '06010',
                                     '06098', '06099'):
+                self.numero_identificador = resposta.resposta.numeroSessao
                 self.executa_antes_denegar()
                 self.situacao_fiscal = SITUACAO_FISCAL_DENEGADO
                 self.situacao_nfe = SITUACAO_NFE_DENEGADA
                 self.executa_depois_denegar()
         except (ErroRespostaSATInvalida, ExcecaoRespostaSAT) as resposta:
+            self.numero_identificador = resposta.resposta.numeroSessao
             mensagem = 'Código de retorno: ' + \
                        resposta.EEEEE
             mensagem += '\nMensagem: ' + \
@@ -513,6 +516,7 @@ class SpedDocumento(models.Model):
             self.mensagem_nfe = mensagem
             self.situacao_nfe = SITUACAO_NFE_REJEITADA
         except Exception as resposta:
+            self.numero_identificador = resposta.resposta.numeroSessao
             mensagem = 'Código de retorno: ' + \
                        resposta.resposta.EEEEE
             mensagem += '\nMensagem: ' + \
@@ -542,7 +546,7 @@ class SpedDocumento(models.Model):
             from mfecfe import ClienteVfpeLocal
             cliente = ClienteVfpeLocal(
                 BibliotecaSAT(self.configuracoes_pdv.caminho_integrador),
-                chave_acesso_validador=config.chave_acesso_validador
+                chave_acesso_validador=config.chave_acesso_validador,
             )
 
             for duplicata in pagamentos_cartoes:
