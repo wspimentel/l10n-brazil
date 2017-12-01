@@ -43,13 +43,19 @@ class SpedDocumento(models.Model):
     configuracoes_pdv = fields.Many2one(
         string=u"Configurações para a venda",
         comodel_name="pdv.config",
-        compute=_buscar_configuracoes_pdv
+        compute=_buscar_configuracoes_pdv,
     )
 
     pagamento_autorizado_cfe = fields.Boolean(
         string=u"Pagamento Autorizado",
         readonly=True,
-        default=False
+        default=False,
+    )
+
+    numero_identificador = fields.Char(
+        string='Numero do Identificador',
+        readonly=True,
+        invisible=False,
     )
 
     def _check_permite_alteracao(self, operacao='create', dados={},
@@ -127,9 +133,6 @@ class SpedDocumento(models.Model):
 
             documento.permite_cancelamento = False
 
-            # FIXME retirar apost teste
-            documento.permite_cancelamento = True
-
             if documento.data_hora_autorizacao:
                 tempo_autorizado = UTC.normalize(agora())
                 tempo_autorizado -= \
@@ -151,7 +154,6 @@ class SpedDocumento(models.Model):
         :return:
         """
         self.ensure_one()
-
         if self.configuracoes_pdv.tipo_sat == 'local':
             from mfecfe.clientelocal import ClienteSATLocal
             from mfecfe import BibliotecaSAT
@@ -392,7 +394,7 @@ class SpedDocumento(models.Model):
     def cancela_nfe(self):
         self.ensure_one()
         # FIXME trocar o metodo a ser chamado
-        result = super(SpedDocumento, self).envia_nfe()
+        result = super(SpedDocumento, self).cancela_nfe()
         if not self.modelo == MODELO_FISCAL_CFE:
             return result
 
@@ -461,6 +463,8 @@ class SpedDocumento(models.Model):
         if not self.modelo == MODELO_FISCAL_CFE:
             return result
 
+        if self.mensagem_nfe:
+            self.numero_identificador = self.mensagem_nfe[self.mensagem_nfe.find(': ')+2:self.mensagem_nfe.find('\n')]
         if not self.pagamento_autorizado_cfe:
             self.envia_pagamento()
             if not self.pagamento_autorizado_cfe:
@@ -482,9 +486,9 @@ class SpedDocumento(models.Model):
                 self.situacao_nfe = SITUACAO_NFE_AUTORIZADA
                 self.executa_depois_autorizar()
                 self.data_hora_autorizacao = fields.Datetime.now()
+                self.numero_identificador = resposta.numeroSessao
                 chave = ChaveCFeSAT(resposta.chaveConsulta)
-                self.numero_identificador = resposta.resposta.numeroSessao
-                self.numero = chave.numero_cupom_fiscal
+                self.numero = str(chave.numero_cupom_fiscal)
                 self.serie = chave.numero_serie
                 self.chave = resposta.chaveConsulta[3:]
 
@@ -502,7 +506,7 @@ class SpedDocumento(models.Model):
             elif resposta.EEEEE in ('06001', '06002', '06003', '06004', '06005',
                                     '06006', '06007', '06008', '06009', '06010',
                                     '06098', '06099'):
-                self.numero_identificador = resposta.resposta.numeroSessao
+                self.numero_identificador = resposta.numeroSessao
                 self.executa_antes_denegar()
                 self.situacao_fiscal = SITUACAO_FISCAL_DENEGADO
                 self.situacao_nfe = SITUACAO_NFE_DENEGADA
@@ -537,6 +541,7 @@ class SpedDocumento(models.Model):
     def envia_pagamento(self):
         self.ensure_one()
         pagamentos_cartoes = self._verificar_formas_pagamento()
+
         if not pagamentos_cartoes:
             self.pagamento_autorizado_cfe = True
         else:
@@ -547,27 +552,34 @@ class SpedDocumento(models.Model):
             cliente = ClienteVfpeLocal(
                 BibliotecaSAT(self.configuracoes_pdv.caminho_integrador),
                 chave_acesso_validador=config.chave_acesso_validador,
+                numerador_sessao=self.numero_identificador,
             )
-
-            for duplicata in pagamentos_cartoes:
-                if not duplicata.id_fila_status:
-                    resposta = cliente.enviar_pagamento(
-                        config.chave_requisicao, config.estabelecimento,
-                        config.serial_pos, config.cnpjsh, self.bc_icms_proprio,
-                        duplicata.valor, config.id_fila_validador,config.multiplos_pag,
-                        config.anti_fraude, 'BRL', config.numero_caixa
+            try:
+                for duplicata in pagamentos_cartoes:
+                    if not duplicata.id_fila_status:
+                        resposta = cliente.enviar_pagamento(
+                            config.chave_requisicao, config.estabelecimento,
+                            config.serial_pos, config.cnpjsh, self.bc_icms_proprio,
+                            duplicata.valor, config.id_fila_validador,config.multiplos_pag,
+                            config.anti_fraude, 'BRL', config.numero_caixa
+                        )
+                        duplicata.id_fila_status = resposta
+                    # FIXME status sempre vai ser negativo na homologacao
+                    resposta_status_pagamento = cliente.verificar_status_validador(
+                        config.cnpjsh, duplicata.id_fila_status
                     )
-                    duplicata.id_fila_status = resposta
-                # FIXME status sempre vai ser negativo na homologacao
-                resposta_status_pagamento = cliente.verificar_status_validador(
-                    config.cnpjsh, duplicata.id_fila_status
-                )
-                #
-                # resposta_status_pagamento = cliente.verificar_status_validador(
-                #     config.cnpjsh, '214452'
-                # )
-                if resposta_status_pagamento.ValorPagamento == '0' and resposta_status_pagamento.IdFila == '0':
-                    pagamentos_autorizados = False
-                    break
 
-            self.pagamento_autorizado_cfe = pagamentos_autorizados
+                    # resposta_status_pagamento = cliente.verificar_status_validador(
+                    #     config.cnpjsh, '214452'
+                    # )
+                    if resposta_status_pagamento.ValorPagamento == '0' and resposta_status_pagamento.IdFila == '0':
+                        pagamentos_autorizados = False
+                        break
+
+                self.pagamento_autorizado_cfe = pagamentos_autorizados
+            except Exception as resposta:
+                self.numero_identificador = resposta.resposta.numeroSessao
+                mensagem = 'Código de retorno: ' + \
+                           resposta.resposta.EEEEE
+                mensagem += '\nMensagem: ' + \
+                            resposta.resposta.mensagem

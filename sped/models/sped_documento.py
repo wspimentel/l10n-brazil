@@ -34,9 +34,6 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
     _order = 'emissao, modelo, data_emissao desc, serie, numero desc'
     _rec_name = 'descricao'
 
-    numero_identificador = fields.Char(
-        string='Numero do Identificador',
-    )
     descricao = fields.Char(
         string='Documento Fiscal',
         compute='_compute_descricao',
