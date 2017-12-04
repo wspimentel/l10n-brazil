@@ -463,13 +463,10 @@ class SpedDocumento(models.Model):
         if not self.modelo == MODELO_FISCAL_CFE:
             return result
 
-        if self.mensagem_nfe:
-            self.numero_identificador = self.mensagem_nfe[self.mensagem_nfe.find(': ')+2:self.mensagem_nfe.find('\n')]
         if not self.pagamento_autorizado_cfe:
             self.envia_pagamento()
             if not self.pagamento_autorizado_cfe:
                 raise Warning('Pagamento(s) não autorizado(s)!')
-        self.numero_identificador = None
         cliente = self.processador_cfe()
 
         cfe = self.monta_cfe()
@@ -550,7 +547,7 @@ class SpedDocumento(models.Model):
             from mfecfe import BibliotecaSAT
             from mfecfe import ClienteVfpeLocal
             cliente = ClienteVfpeLocal(
-                BibliotecaSAT(self.configuracoes_pdv.caminho_integrador),
+                BibliotecaSAT(config.caminho_integrador),
                 chave_acesso_validador=config.chave_acesso_validador,
                 numerador_sessao=self.numero_identificador,
             )
