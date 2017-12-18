@@ -51,6 +51,8 @@ class SpedDocumento(models.Model):
         if xml is None:
             return
 
+        xml = xml.decode('UTF-8')
+
         if ' Id="NFe' not in xml:
             return
 
