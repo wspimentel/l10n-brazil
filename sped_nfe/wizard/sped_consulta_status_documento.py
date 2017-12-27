@@ -103,6 +103,8 @@ class SpedConsultaStatusDocumento(models.TransientModel):
     def busca_status_documento(self):
         self.ensure_one()
 
+        dados = {}
+
         if self.forma_consulta == 'XML':
             xml = base64.b64decode(self.arquivo)
 
@@ -110,49 +112,33 @@ class SpedConsultaStatusDocumento(models.TransientModel):
             documento = self.env['sped.documento'].new()
             documento.modelo = nfe.NFe.infNFe.ide.mod.text
             dados = documento.le_nfe(xml=xml)
-            return {
-                'name': _("Associar Pedido de Compras"),
-                'view_mode': 'form',
-                'view_type': 'form',
-                'view_id': self.env.ref('sped_nfe.sped_documento_ajuste_recebimento_form').id,
-                'res_id': dados.id,
-                'res_model': 'sped.documento',
-                'type': 'ir.actions.act_window',
-                'target': 'current',
-                'context': {'default_purchase_order_ids': [(4, self.purchase_order_id.id)]},
-                'flags': {'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
-            }
 
-        consulta = self.env['sped.consulta.dfe']
-        consulta.validate_nfe_configuration(self.empresa_id)
+        else:
+            consulta = self.env['sped.consulta.dfe']
+            consulta.validate_nfe_configuration(self.empresa_id)
 
-        try:
+            try:
 
-            nfe_result = consulta.download_nfe(self.empresa_id,self.chave)
+                nfe_result = consulta.download_nfe(self.empresa_id,self.chave)
 
-            if nfe_result['code'] == '138':
+                if nfe_result['code'] == '138':
 
-                nfe = objectify.fromstring(nfe_result['nfe'])
-                documento = self.env['sped.documento'].new()
-                documento.modelo = nfe.NFe.infNFe.ide.mod.text
-                nfe = documento.le_nfe(xml=nfe_result['nfe'])
+                    nfe = objectify.fromstring(nfe_result['nfe'])
+                    documento = self.env['sped.documento'].new()
+                    documento.modelo = nfe.NFe.infNFe.ide.mod.text
+                    dados = documento.le_nfe(xml=nfe_result['nfe'])
 
-                # dados = {
-                #     'versao': processo.resposta.versao.valor,
-                #     'motivo': processo.resposta.cStat.txt + ' - ' +
-                #                processo.resposta.xMotivo.txt,
-                #     'codigo_uf': processo.resposta.cUF.txt,
-                #     'chave': processo.resposta.chNFe.txt,
-                #     'ambiente_nfe': processo.resposta.tpAmb.txt,
-                #     'protocolo_autorizacao':
-                #         '' if processo.resposta.protNFe is None else
-                #         processo.resposta.protNFe.infProt.nProt.txt,
-                #     'protocolo_cancelamento': '',
-                #     'processamento_evento_nfe': '',
-                #     'state': 'done',
-                # }
-                # self.write(dados)
+            except Exception as e:
+                raise UserError(
+                    _(u'Erro na consulta da chave!'), e)
 
-        except Exception as e:
-            raise UserError(
-                _(u'Erro na consulta da chave!'), e)
+        return {
+            'view_mode': 'form',
+            'view_type': 'form',
+            'view_id': self.env.ref(
+                'sped.sped_documento_recebimento_nfe_form').id,
+            'res_id': dados.id,
+            'res_model': 'sped.documento',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+        }
