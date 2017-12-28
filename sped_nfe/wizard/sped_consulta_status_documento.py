@@ -110,7 +110,12 @@ class SpedConsultaStatusDocumento(models.TransientModel):
 
             nfe = objectify.fromstring(xml)
             documento = self.env['sped.documento'].new()
-            documento.modelo = nfe.NFe.infNFe.ide.mod.text
+
+            try:
+                documento.modelo = nfe.NFe.infNFe.ide.mod.text
+            except AttributeError:
+                documento.modelo = nfe.infNFe.ide.mod.text
+
             dados = documento.le_nfe(xml=xml)
 
         else:
