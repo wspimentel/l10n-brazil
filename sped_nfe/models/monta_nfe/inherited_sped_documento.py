@@ -404,7 +404,7 @@ class SpedDocumento(models.Model):
         # Volumes
         #
         transp.vol = []
-        if len(self.volume_ids) == 0:
+        if not self.volume_ids:
             vol = ClasseVol()
 
             vol.qVol.valor = str(D(1))
