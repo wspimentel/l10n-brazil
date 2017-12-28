@@ -598,7 +598,7 @@ class SpedDocumento(models.Model):
             transp.transporta.xEnder.valor = ender.strip()
             transp.transporta.xMun.valor = self.transportadora_id.cidade or ''
             transp.transporta.UF.valor = self.transportadora_id.estado or ''
-
+'''
         if self.veiculo_id:
             transp.veicTransp.placa.valor = self.veiculo_id.placa or ''
             transp.veicTransp.UF.valor = self.veiculo_id.estado_id.uf or ''
@@ -642,7 +642,7 @@ class SpedDocumento(models.Model):
         transp.vol = []
         for volume in self.volume_ids:
             transp.vol.append(volume.monta_nfe())
-        '''
+
 
     def _le_nfe_cobranca(self, cobr, dados):
         if self.modelo != MODELO_FISCAL_NFE:
