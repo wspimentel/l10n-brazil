@@ -28,6 +28,7 @@
         'views/sped_consulta_dfe_view.xml',
         'security/ir.model.access.csv',
         'wizard/sped_consulta_status_documento.xml',
+        'data/cron_envia_nfe_email.xml',
     ],
     'external_dependencies': {
         'python': ['pybrasil', 'pysped', 'mako'],

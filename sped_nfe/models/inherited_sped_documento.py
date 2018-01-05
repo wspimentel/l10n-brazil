@@ -145,6 +145,8 @@ class SpedDocumento(models.Model):
         size=60,
     )
 
+
+
     @api.depends('data_hora_emissao', 'data_hora_entrada_saida',
                  'data_hora_autorizacao', 'data_hora_cancelamento')
     def _compute_data_hora_separadas(self):
@@ -834,6 +836,24 @@ class SpedDocumento(models.Model):
 
         self.ensure_one()
         mail_template.send_mail(self.id)
+
+    @api.multi
+    def cron_envia_email_nfe(self):
+
+        mail_ids = self.env['mail.mail'].search([
+            ('model', '=','sped.documento'),
+            ('state','in',['sent','cancel']),
+        ])
+
+        nfe_ids = self.env['sped.documento'].search([])
+
+        nfe_enviadas_ids = mail_ids.mapped('res_id')
+
+        nfe_nao_enviadas_ids = [nfe for nfe in nfe_ids if nfe not in
+                                nfe_enviadas_ids]
+
+        for nfe_id in nfe_nao_enviadas_ids:
+                nfe_id.envia_email_nfe()
 
     def envia_email_nfe(self):
         self.ensure_one()
