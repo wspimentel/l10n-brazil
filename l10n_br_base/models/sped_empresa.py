@@ -62,6 +62,25 @@ class SpedEmpresa(SpedBase, models.Model):
     eh_empresa = fields.Boolean(
         default=True,
     )
+    usuario_ids = fields.Many2many(
+        string="Usuários com Permissão nesta Empresa",
+        comodel_name='res.users',
+        reverse_name='empresa_ids',
+    )
+    eh_autorizado = fields.Boolean(
+        default=True,
+    )
+
+    @api.depends('usuario_ids')
+    def autorizado(self):
+        for empresa in self:
+            if not empresa.usuario_ids:
+                empresa.eh_autorizado = True
+            else:
+                if self.env.user.id in empresa.usuario_ids:
+                    empresa.eh_autorizado = True
+                else:
+                    empresa.eh_autorizado = False
 
     @api.multi
     def name_get(self):
