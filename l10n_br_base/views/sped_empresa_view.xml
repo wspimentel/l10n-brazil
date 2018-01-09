@@ -118,6 +118,7 @@
                             </page>
                         </notebook>
                     </page>
+<<<<<<< Updated upstream
                     <page name="multiempresas" group="l10n_br_base.GRUPO_CADASTRO_GERENTE" string="Multi-Empresas">
                         <group name="usuarios" string="Usuários com acesso a esta Empresa">
                             <field name="usuario_ids" nolabel="1" widget="many2many_tags" options="{'no_create': True}">
@@ -129,6 +130,14 @@
                                 </tree>
                             </field>
                         </group>
+=======
+                    <page name="usuarios" string="Usuários Permitidos">
+                        <notebook colspan="4">
+                            <group col="4" colspan="4">
+                                <field name="usuario_ids" colspan="4" nolabel="1" />
+                            </group>
+                        </notebook>
+>>>>>>> Stashed changes
                     </page>
                 </notebook>
             </sheet>
