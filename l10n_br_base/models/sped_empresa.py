@@ -124,20 +124,19 @@ class SpedEmpresa(SpedBase, models.Model):
 
     def _compute_eh_autorizado(self):
         for empresa in self:
-            if not user.empresa_ids:
+            if not self.env.user.empresa_ids:
                 empresa.eh_autorizado = True
             else:
-                if empresa.id in user.empresa_ids:
+                if empresa.id in self.env.user.empresa_ids.ids:
                     empresa.eh_autorizado = True
                 else:
                     empresa.eh_autorizado = False
 
-    def _search_eh_autorizado(self):
-        ret = [
-            '|',
-            ('user.empresa_ids', '=', False),
-            ('id', 'in', ['user.empresa_ids', ])
-        ]
+    def _search_eh_autorizado(self, operator, value):
+        if self.env.user.empresa_ids:
+            ret = [('id', 'in', self.env.user.empresa_ids.ids)]
+        else:
+            ret = [(1, '=', 1)]
         return ret
 
     def _valida_cnpj_cpf(self):
