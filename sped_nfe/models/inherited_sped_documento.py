@@ -449,7 +449,7 @@ class SpedDocumento(models.Model):
         conteudo = canc.xml.encode('utf-8')
         self.arquivo_xml_autorizacao_cancelamento_id = False
         self.arquivo_xml_autorizacao_cancelamento_id = \
-            self._grava_anexo(nome_arquivo, conteudo)
+            self._grava_anexo(nome_arquivo, conteudo).id
 
         return {
             'type': 'ir.actions.act_url',
