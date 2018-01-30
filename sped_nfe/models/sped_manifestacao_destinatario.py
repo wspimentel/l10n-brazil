@@ -198,7 +198,6 @@ class SpedManifestacaoDestinatario(models.Model):
             'target': 'current',
         }
 
-
     @api.multi
     def action_salva_xml(self):
 
