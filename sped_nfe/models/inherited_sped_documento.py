@@ -147,6 +147,7 @@ class SpedDocumento(models.Model):
 
     @api.multi
     def action_fluxo_compras(self):
+        self.ensure_one();
 
         return {
             'name': "Associar Pedido de Compras",
