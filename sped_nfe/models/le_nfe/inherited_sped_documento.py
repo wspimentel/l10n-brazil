@@ -34,7 +34,7 @@ except (ImportError, IOError) as err:
 class SpedDocumento(models.Model):
     _inherit = 'sped.documento'
 
-    def le_nfe(self, processador=None, xml=None):
+    def le_nfe(self, processador=None, xml=None, operacao_id=None):
         _logger.info(u'Lendo xml')
         self.ensure_one()
 
@@ -93,7 +93,7 @@ class SpedDocumento(models.Model):
         self._le_nfe_destinatario(nfe.infNFe.dest, dados_destinatario)
 
         if not self._pode_importar_nfe(nfe.infNFe.ide, dados, dados_emitente,
-                                       dados_destinatario):
+                                       dados_destinatario, operacao_id):
             _logger.info(u'Não foi possível importar a nfe')
             return
 
@@ -191,7 +191,7 @@ class SpedDocumento(models.Model):
         return self
 
     def _pode_importar_nfe(self, ide, dados,
-                           dados_emitente, dados_destinatario):
+                           dados_emitente, dados_destinatario, operacao_id=None):
         self.ensure_one()
 
         pode_importar = False
@@ -324,7 +324,7 @@ class SpedDocumento(models.Model):
                 })
 
             dados['natureza_operacao_id'] = natureza.id
-            dados['operacao_id'] = self._busca_operacao(natureza)
+            dados['operacao_id'] = operacao_id.id or self._busca_operacao(natureza)
 
         return True
 
