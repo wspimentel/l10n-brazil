@@ -144,6 +144,10 @@ class SpedDocumento(models.Model):
         string='Consulta-DFe',
         ondelete='cascade',
     )
+    manitestacao_id = fields.Many2one(
+        comodel_name='sped.manifestacao.destinatario',
+        string='Manifestação do Destinatário',
+    )
 
     xmls_exportados = fields.Boolean(
         string='XMLs exportados para a pasta da contabilidade',
@@ -1153,3 +1157,11 @@ class SpedDocumento(models.Model):
             res['value']['numero'] = faixa_inutilizada.fim_numeracao + 1
 
         return res
+
+    def action_confirmar_operacacao(self):
+        for record in self:
+            if record.manitestacao_id:
+                record.manitestacao_id.action_confirmar_operacacao()
+                _logger.info(
+                    "Confirmada a operação e manifestação do documento fiscal"
+                )
