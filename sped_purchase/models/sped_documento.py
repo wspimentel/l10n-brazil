@@ -96,8 +96,8 @@ class SpedDocumento(models.Model):
         if not self.purchase_order_ids:
             super(SpedDocumento, self)._criar_picking_entrada()
 
-    def executa_depois_create(self, result, dados):
-        for documento in result:
-            for item in documento.item_ids:
-                item.calcula_impostos()
-        return result
+    # def executa_depois_create(self, result, dados):
+    #     for documento in result:
+    #         for item in documento.item_ids:
+    #             item.calcula_impostos()
+    #     return result
