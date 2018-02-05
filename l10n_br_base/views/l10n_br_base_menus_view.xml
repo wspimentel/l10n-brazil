@@ -9,7 +9,6 @@
         name="Cadastro"
         sequence="3"
         web_icon="sped,static/description/icon.png"
-        groups="l10n_br_base.GRUPO_SUPORTE"
         />
 
     <menuitem id="menu_cadastro_participante"
