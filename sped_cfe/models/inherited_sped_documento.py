@@ -7,12 +7,26 @@
 
 from __future__ import division, print_function, unicode_literals
 
-import os
 import logging
 
 from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models
-from odoo.addons.l10n_br_base.constante_tributaria import *
+from odoo.addons.l10n_br_base.constante_tributaria import (
+    AMBIENTE_NFE_HOMOLOGACAO,
+    TIPO_EMISSAO_PROPRIA,
+    MODELO_FISCAL_NFCE,
+    MODELO_FISCAL_NFE,
+    MODELO_FISCAL_CFE,
+    SITUACAO_NFE_AUTORIZADA,
+    SITUACAO_NFE_CANCELADA,
+    SITUACAO_NFE_DENEGADA,
+    SITUACAO_NFE_REJEITADA,
+    SITUACAO_NFE_EM_DIGITACAO,
+    SITUACAO_FISCAL_DENEGADO,
+    SITUACAO_FISCAL_REGULAR,
+    SITUACAO_FISCAL_CANCELADO,
+    SITUACAO_FISCAL_CANCELADO_EXTEMPORANEO,
+)
 from odoo.exceptions import UserError, Warning
 
 
@@ -20,15 +34,19 @@ _logger = logging.getLogger(__name__)
 
 try:
     from pybrasil.inscricao import limpa_formatacao
-    from pybrasil.data import (parse_datetime, UTC, data_hora_horario_brasilia,
-                               agora)
-    from pybrasil.valor import formata_valor
     from pybrasil.valor.decimal import Decimal as D
-    from pybrasil.template import TemplateBrasil
 
     from satcomum.ersat import ChaveCFeSAT
-    from satcfe.entidades import *
+    from satcfe.entidades import (
+        CFeVenda,
+        Emitente,
+        Destinatario,
+        LocalEntrega,
+        InformacoesAdicionais,
+        CFeCancelamento,
+    )
     from satcfe.excecoes import ExcecaoRespostaSAT, ErroRespostaSATInvalida
+    from pybrasil.template import TemplateBrasil
 
 except (ImportError, IOError) as err:
     _logger.debug(err)
@@ -51,13 +69,15 @@ class SpedDocumento(models.Model):
             configuracoes_pdv = self.env['pdv.config'].search(
                 [
                     ('vendedor', '=', self.env.user.id),
-                    ('loja', '=', self.env.user.company_id.sped_empresa_id.id)
+                    ('loja', '=',
+                     self.env.user.company_id.sped_empresa_id.id)
                 ]
             )
             if not configuracoes_pdv:
                 configuracoes_pdv = self.env['pdv.config'].search(
                     [
-                        ('loja', '=', self.env.user.company_id.sped_empresa_id.id)
+                        ('loja', '=',
+                         self.env.user.company_id.sped_empresa_id.id)
                     ]
                 )
             record.configuracoes_pdv = configuracoes_pdv
@@ -75,9 +95,9 @@ class SpedDocumento(models.Model):
             record.pagamento_autorizado_cfe = pagamentos_validados
 
     configuracoes_pdv = fields.Many2one(
-        string=u"Configurações para a venda",
+        string=u"Configurações PDV",
         comodel_name="pdv.config",
-        compute=_buscar_configuracoes_pdv
+        compute='_buscar_configuracoes_pdv',
     )
 
     pagamento_autorizado_cfe = fields.Boolean(
@@ -102,6 +122,10 @@ class SpedDocumento(models.Model):
     )
 
     id_fila_validador = fields.Char(string=u'ID Fila Validador')
+
+    numero_identificador_sessao = fields.Char(
+        string=u'Numero identificador sessao'
+    )
 
     def executa_depois_autorizar(self):
         #
@@ -204,12 +228,14 @@ class SpedDocumento(models.Model):
 
     def processador_cfe(self):
         """
-        Busca classe do processador do cadastro da empresa, onde podemos ter três tipos de processamento dependendo
+        Busca classe do processador do cadastro da empresa, onde podemos ter
+        três tipos de processamento dependendo
         de onde o equipamento esta instalado:
 
         - Instalado no mesmo servidor que o Odoo;
         - Instalado na mesma rede local do servidor do Odoo;
-        - Instalado em um local remoto onde o browser vai ser responsável por se comunicar com o equipamento
+        - Instalado em um local remoto onde o browser vai ser responsável
+         por se comunicar com o equipamento
 
         :return:
         """
@@ -239,12 +265,14 @@ class SpedDocumento(models.Model):
 
     def processador_vfpe(self):
         """
-        Busca classe do processador do cadastro da empresa, onde podemos ter três tipos de processamento dependendo
+        Busca classe do processador do cadastro da empresa, onde podemos
+        ter três tipos de processamento dependendo
         de onde o equipamento esta instalado:
 
         - Instalado no mesmo servidor que o Odoo;
         - Instalado na mesma rede local do servidor do Odoo;
-        - Instalado em um local remoto onde o browser vai ser responsável por se comunicar com o equipamento
+        - Instalado em um local remoto onde o browser vai ser responsável
+        por se comunicar com o equipamento
 
         :return:
         """
@@ -255,9 +283,12 @@ class SpedDocumento(models.Model):
         if self.configuracoes_pdv.tipo_sat == 'local':
             from mfecfe import BibliotecaSAT
             from mfecfe import ClienteVfpeLocal
+
+            chave = self.configuracoes_pdv.chave_acesso_validador
             cliente = ClienteVfpeLocal(
-                BibliotecaSAT(self.configuracoes_pdv.path_integrador),
-                chave_acesso_validador=self.configuracoes_pdv.chave_acesso_validador
+                BibliotecaSAT(
+                    self.configuracoes_pdv.path_integrador),
+                chave_acesso_validador=chave,
             )
         elif self.configuracoes_pdv.tipo_sat == 'rede_interna':
             from mfecfe.clientesathub import ClienteVfpeHub
@@ -351,10 +382,28 @@ class SpedDocumento(models.Model):
             detalhamentos=detalhamentos,
             pagamentos=pagamentos,
             vCFeLei12741=D(self.vr_ibpt).quantize('0.01'),
+            informacoes_adicionais=self._monta_cfe_informacoes_adicionais(),
             **kwargs
         )
         cfe_venda.validar()
         return cfe_venda
+
+    def _monta_cfe_informacoes_adicionais(self):
+        infcomplementar = self.infcomplementar or ''
+
+        dados_informacoes_venda = InformacoesAdicionais()
+
+        dados_infcomplementar = {
+            'nf': self,
+        }
+
+        if infcomplementar:
+            template = TemplateBrasil(infcomplementar.encode('utf-8'))
+            info_complementar = template.render(**dados_infcomplementar)
+            dados_informacoes_venda.infCpl = info_complementar
+            dados_informacoes_venda.validar()
+
+        return dados_informacoes_venda
 
     def _monta_cfe_identificacao(self):
         # FIXME: Buscar dados do cadastro da empresa / cadastro do caixa
@@ -364,9 +413,18 @@ class SpedDocumento(models.Model):
         return cnpj_software_house, assinatura, numero_caixa
 
     def _monta_cfe_emitente(self):
+        ambiente = int(self.ambiente_nfe or AMBIENTE_NFE_HOMOLOGACAO)
+
+        if ambiente == AMBIENTE_NFE_HOMOLOGACAO:
+            cnpj = self.configuracoes_pdv.cnpjsh
+            ie = self.configuracoes_pdv.ie
+        else:
+            cnpj = self.empresa_id.cnpj_cpf
+            ie = self.empresa_id.ie
+
         emitente = Emitente(
-            CNPJ=limpa_formatacao(self.configuracoes_pdv.cnpjsh),
-            IE=limpa_formatacao(self.configuracoes_pdv.ie),
+            CNPJ=limpa_formatacao(cnpj),
+            IE=limpa_formatacao(ie),
             indRatISSQN='N'
         )
         emitente.validar()
@@ -467,9 +525,9 @@ class SpedDocumento(models.Model):
             self.situacao_nfe = SITUACAO_NFE_AUTORIZADA
             self.executa_depois_autorizar()
             # self.data_hora_autorizacao = fields.Datetime.now()
-        elif resposta_sefaz.EEEEE in ('06001', '06002', '06003', '06004', '06005',
-                                      '06006', '06007', '06008', '06009', '06010',
-                                      '06098', '06099'):
+        elif resposta_sefaz.EEEEE in ('06001', '06002', '06003', '06004',
+                                      '06005', '06006', '06007', '06008',
+                                      '06009', '06010', '06098', '06099'):
             self.executa_antes_denegar()
             self.situacao_fiscal = SITUACAO_FISCAL_DENEGADO
             self.situacao_nfe = SITUACAO_NFE_DENEGADA
@@ -489,9 +547,6 @@ class SpedDocumento(models.Model):
     def _monta_cancelamento(self):
         cnpj_software_house, assinatura, numero_caixa = \
             self._monta_cfe_identificacao()
-
-        destinatario = self._monta_cfe_destinatario()
-
         return CFeCancelamento(
             chCanc=u'CFe' + self.chave,
             CNPJ=limpa_formatacao(cnpj_software_house),
@@ -565,7 +620,8 @@ class SpedDocumento(models.Model):
 
                 if processo.EEEEE != '07000':
                     # FIXME: Verificar se da para cancelar fora do prazo
-                    self.situacao_fiscal = SITUACAO_FISCAL_CANCELADO_EXTEMPORANEO
+                    self.situacao_fiscal = \
+                        SITUACAO_FISCAL_CANCELADO_EXTEMPORANEO
                     self.situacao_nfe = SITUACAO_NFE_CANCELADA
                 elif processo.EEEEE == '07000':
                     self.situacao_fiscal = SITUACAO_FISCAL_CANCELADO
@@ -612,7 +668,8 @@ class SpedDocumento(models.Model):
             elif self.configuracoes_pdv.tipo_sat == 'rede_interna':
                 resposta = cliente.enviar_dados_venda(
                     cfe, self.configuracoes_pdv.codigo_ativacao,
-                    self.configuracoes_pdv.path_integrador
+                    self.configuracoes_pdv.path_integrador,
+                    self.numero_identificador_sessao
                 )
             else:
                 resposta = None
@@ -631,6 +688,7 @@ class SpedDocumento(models.Model):
                 self.situacao_nfe = SITUACAO_NFE_AUTORIZADA
                 if impressao:
                     self.imprimir_documento()
+
                 # # self.grava_pdf(nfe, procNFe.danfe_pdf)
 
                 # data_autorizacao = protNFe.infProt.dhRecbto.valor
@@ -640,9 +698,9 @@ class SpedDocumento(models.Model):
                 # self.protocolo_autorizacao = protNFe.infProt.nProt.valor
                 #
 
-            elif resposta.EEEEE in ('06001', '06002', '06003', '06004', '06005',
-                                    '06006', '06007', '06008', '06009', '06010',
-                                    '06098', '06099'):
+            elif resposta.EEEEE in ('06001', '06002', '06003', '06004',
+                                    '06005', '06006', '06007', '06008',
+                                    '06009', '06010', '06098', '06099'):
                 self.codigo_rejeicao_cfe = resposta.EEEEE
                 self.executa_antes_denegar()
                 self.situacao_fiscal = SITUACAO_FISCAL_DENEGADO
@@ -654,31 +712,43 @@ class SpedDocumento(models.Model):
                        resposta.EEEEE
             mensagem += '\nMensagem: ' + \
                         resposta.mensagem
+            if resposta.resposta.mensagem == u'Erro interno' and \
+                    resposta.resposta.mensagemSEFAZ == u'ERRO' and not \
+                    self.numero_identificador_sessao:
+                self.numero_identificador_sessao = \
+                    resposta.resposta.numeroSessao
             self.mensagem_nfe = mensagem
             self.situacao_nfe = SITUACAO_NFE_REJEITADA
         except Exception as resposta:
-            if resposta.resposta.EEEEE:
+            if hasattr(resposta, 'resposta'):
                 self.codigo_rejeicao_cfe = resposta.resposta.EEEEE
-            mensagem = '\nMensagem: ' + resposta.message
-            self.mensagem_nfe = mensagem
+            if resposta.resposta.mensagem == u'Erro interno' and \
+                    resposta.resposta.mensagemSEFAZ == u'ERRO' and not \
+                    self.numero_identificador_sessao:
+                self.numero_identificador_sessao = \
+                    resposta.resposta.numeroSessao
+            self.mensagem_nfe = "Falha na conexão com SATHUB"
             self.situacao_nfe = SITUACAO_NFE_REJEITADA
 
     @api.multi
     def imprimir_documento(self):
+        self.ensure_one()
         # TODO: Reimprimir cupom de cancelamento caso houver com o normal.
         if not self.modelo == MODELO_FISCAL_CFE:
-            return super(SpedDocumento, self).imprime_documento()
-        self.ensure_one()
+            return super(SpedDocumento, self).imprimir_documento()
         impressao = self.configuracoes_pdv.impressora
         if impressao:
-            cliente = self.processador_cfe()
-            resposta = self.arquivo_xml_autorizacao_id.datas
-            cliente.imprimir_cupom_venda(
-                resposta,
-                impressao.modelo,
-                impressao.conexao,
-                self.configuracoes_pdv.site_consulta_qrcode.encode("utf-8")
-            )
+            try:
+                cliente = self.processador_cfe()
+                resposta = self.arquivo_xml_autorizacao_id.datas
+                cliente.imprimir_cupom_venda(
+                    resposta,
+                    impressao.modelo,
+                    impressao.conexao,
+                    self.configuracoes_pdv.site_consulta_qrcode.encode("utf-8")
+                )
+            except Exception as e:
+                _logger.error("Erro ao imprimir o cupom")
         else:
             raise Warning("Não existem configurações para impressão no PDV!")
 
@@ -710,7 +780,9 @@ class SpedDocumento(models.Model):
                             self.bc_icms_proprio,
                             duplicata.valor,
                             config.multiplos_pag,
-                            config.anti_fraude, 'BRL', config.numero_caixa
+                            config.anti_fraude,
+                            'BRL',
+                            int(config.numero_caixa),
                         )
                     elif self.configuracoes_pdv.tipo_sat == 'rede_interna':
                         resposta = cliente.enviar_pagamento(
@@ -723,9 +795,10 @@ class SpedDocumento(models.Model):
                             config.multiplos_pag,
                             config.anti_fraude,
                             'BRL',
-                            config.numero_caixa,
+                            int(config.numero_caixa),
                             config.chave_acesso_validador,
-                            config.path_integrador
+                            config.path_integrador,
+                            self.numero_identificador_sessao
                         )
                     resposta_pagamento = resposta.split('|')
                     if len(resposta_pagamento[0]) >= 7:
@@ -734,14 +807,17 @@ class SpedDocumento(models.Model):
                     else:
                         pagamentos_autorizados = False
                 # FIXME status sempre vai ser negativo na homologacao
-                # resposta_status_pagamento = cliente.verificar_status_validador(
+                # resposta_status_pagamento =
+                        # cliente.verificar_status_validador(
                 #     config.cnpjsh, duplicata.id_fila_status
                 # )
                 #
-                # resposta_status_pagamento = cliente.verificar_status_validador(
+                # resposta_status_pagamento =
+                        # cliente.verificar_status_validador(
                 #     config.cnpjsh, '214452'
                 # )
-                # if resposta_status_pagamento.ValorPagamento == '0' and resposta_status_pagamento.IdFila == '0':
+                # if resposta_status_pagamento.ValorPagamento
+                        # == '0' and resposta_status_pagamento.IdFila == '0':
                 #     pagamentos_autorizados = False
                 #     break
 

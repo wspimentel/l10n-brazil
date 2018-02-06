@@ -11,7 +11,7 @@ from __future__ import division, print_function, unicode_literals
 
 import logging
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, tools,  _
 from odoo.exceptions import ValidationError
 from odoo.addons.sped_imposto.models.sped_calculo_imposto import SpedCalculoImposto
 
@@ -894,12 +894,34 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
     documento_subsequente_ids = fields.One2many(
         comodel_name='sped.documento.subsequente',
         inverse_name='documento_origem_id',
-        compute='_compute_documento_subsequente_ids',
     )
     documento_impresso = fields.Boolean(
         string='Impresso',
         readonly=True,
     )
+
+    documento_origem_id = fields.Reference(
+        selection="_selection_documento_origem_id",
+        string='Documento de Origem',
+        help='Documento que originou o sped.documento.',
+    )
+
+    @api.model
+    @tools.ormcache("self")
+    def _selection_documento_origem_id(self):
+        """
+        Documento de origem deve ser de um dos seguintes
+        modelos: finan.lancamento, sale.order ou purchase.order
+
+        """
+        documentos = []
+
+        for doc in self.env["ir.model"].\
+                search([('model', 'in', ('finan.lancamento',
+                                         'sale.order', 'purchase.order'))]):
+            documentos.append([doc.model, doc.name])
+
+        return documentos
 
     @api.multi
     def name_get(self):
@@ -1090,6 +1112,21 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
 
         return serie
 
+    def _serie_padrao_cfe(self, empresa, ambiente_nfe, tipo_emissao_nfe):
+        if tipo_emissao_nfe == TIPO_EMISSAO_CFE_NORMAL:
+            if ambiente_nfe == AMBIENTE_CFE_PRODUCAO:
+                serie = empresa.serie_cfe_producao
+            else:
+                serie = empresa.serie_cfe_homologacao
+
+        else:
+            if ambiente_nfe == AMBIENTE_CFE_PRODUCAO:
+                serie = empresa.serie_cfe_contingencia_producao
+            else:
+                serie = empresa.serie_cfe_contingencia_homologacao
+
+        return serie
+
     @api.onchange('empresa_id', 'modelo', 'emissao')
     def _onchange_empresa_id(self):
         res = {}
@@ -1163,6 +1200,15 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
                 valores['serie_rps'] = self.empresa_id.serie_rps_producao
             else:
                 valores['serie_rps'] = self.empresa_id.serie_rps_homologacao
+
+        elif self.modelo == MODELO_FISCAL_CFE:
+            valores['ambiente_nfe'] = self.empresa_id.ambiente_cfe
+            valores['tipo_emissao_nfe'] = self.empresa_id.tipo_emissao_cfe
+            valores['serie'] = self._serie_padrao_cfe(
+                self.empresa_id,
+                self.empresa_id.ambiente_cfe,
+                self.empresa_id.tipo_emissao_cfe
+            )
 
         return res
 
@@ -1267,6 +1313,18 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
             valores['servico_id'] = self.operacao_id.servico_id.id
 
         valores['cst_iss'] = self.operacao_id.cst_iss
+
+        sub = []
+        for subsequente_id in self.operacao_id.mapped(
+                'operacao_subsequente_ids'):
+            sub.append({
+                'documento_origem_id': self.id,
+                'operacao_subsequente_id': subsequente_id.id,
+                'sped_operacao_id':
+                    subsequente_id.operacao_subsequente_id.id,
+            })
+        valores['documento_subsequente_ids'] = [(0, 0, x) for x in sub]
+
 
         return res
 
@@ -1501,7 +1559,7 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
         self.ensure_one()
 
     def gera_pdf(self):
-        self.write({'documento_impresso': True})
+        self.sudo().write({'documento_impresso': True})
 
     @api.multi
     def imprimir_documento(self):
@@ -1624,34 +1682,6 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
                 # documento.envia_documento()
 
         # TODO: Retornar usuário para os documentos criados
-    
-    @api.depends('operacao_id')
-    def _compute_documento_subsequente_ids(self):
-        for documento in self:
-            documento.documento_subsequente_ids = \
-                self.env['sped.documento.subsequente'].search([
-                    ('documento_origem_id', '=', self.id)
-                ])
-            if not self.operacao_id:
-                continue
-            if documento.operacao_id.mapped('operacao_subsequente_ids') == \
-                    documento.documento_subsequente_ids.mapped(
-                        'operacao_subsequente_id'):
-                continue
-            self.env['sped.documento.subsequente'].search([
-                ('documento_origem_id', '=', documento.id)
-            ]).unlink()
-            for subsequente_id in documento.operacao_subsequente_ids:
-                self.env['sped.documento.subsequente'].create({
-                    'documento_origem_id': documento.id,
-                    'operacao_subsequente_id': subsequente_id.id,
-                    'sped_operacao_id':
-                        subsequente_id.operacao_subsequente_id.id,
-                })
-                documento.documento_subsequente_ids = \
-                    self.env['sped.documento.subsequente'].search([
-                        ('documento_origem_id', '=', self.id)
-                    ])
 
     @api.depends('documento_subsequente_ids.documento_subsequente_id')
     def _compute_documentos_subsequentes_gerados(self):

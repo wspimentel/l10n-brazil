@@ -54,6 +54,8 @@ class SpedDocumento(models.Model):
             _logger.info(u'XML vazio')
             return
 
+        xml = xml.decode('UTF-8')
+
         if ' Id="NFe' not in xml:
             _logger.info(u'Documento não é uma nf-e')
             return
@@ -152,7 +154,6 @@ class SpedDocumento(models.Model):
 
         if not self.id:
             self = self.create(dados)
-            _logger.info(u'Documento importado')
         else:
             self.update(dados)
             _logger.info(u'Documento atualizado')
@@ -280,7 +281,9 @@ class SpedDocumento(models.Model):
             # É nota própria
             #
             else:
-                dados['empresa_id'] = emitente.empresa_ids[0].id
+
+                dados['empresa_id'] = self.env['sped.empresa'].search([
+                    ('cnpj_cpf_numero', '=', emitente.cnpj_cpf_numero)]).id
                 dados['participante_id'] = destinatario.id
                 dados['regime_tributario'] = emitente.regime_tributario
 
@@ -293,7 +296,8 @@ class SpedDocumento(models.Model):
         # É nota de terceiros
         #
         else:
-            dados['empresa_id'] = destinatario.empresa_ids[0].id
+            dados['empresa_id'] = self.env['sped.empresa'].search([
+                ('cnpj_cpf_numero', '=', destinatario.cnpj_cpf_numero)]).id
             dados['participante_id'] = emitente.id
             dados['emissao'] = TIPO_EMISSAO_TERCEIROS
 

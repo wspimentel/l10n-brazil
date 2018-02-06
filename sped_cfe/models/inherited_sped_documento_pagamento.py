@@ -33,9 +33,7 @@ FORMA_PAGAMENTO = (
 )
 
 try:
-    from satcfe import *
     from pybrasil.valor.decimal import Decimal as D
-    from pybrasil.inscricao import limpa_formatacao
     from satcfe.entidades import MeioPagamento
 
 except (ImportError, IOError) as err:
@@ -119,7 +117,9 @@ class SpedDocumentoPagamento(models.Model):
                     self.documento_id.bc_icms_proprio,
                     self.valor,
                     config.multiplos_pag,
-                    config.anti_fraude, 'BRL', config.numero_caixa
+                    config.anti_fraude,
+                    'BRL',
+                    int(config.numero_caixa),
                 )
             elif config.tipo_sat == 'rede_interna':
                 resposta = cliente.enviar_pagamento(
@@ -132,7 +132,7 @@ class SpedDocumentoPagamento(models.Model):
                     config.multiplos_pag,
                     config.anti_fraude,
                     'BRL',
-                    config.numero_caixa,
+                    int(config.numero_caixa),
                     config.chave_acesso_validador,
                     config.path_integrador
                 )
@@ -141,13 +141,17 @@ class SpedDocumentoPagamento(models.Model):
                 self.id_pagamento = resposta_pagamento[0]
                 self.id_fila = resposta_pagamento[1]
 
+                # Retorno do status do pagamento só é necessário em uma venda
+                # efetuada por TEF.
+
                 if config.tipo_sat == 'local':
-                    retorno = cliente.enviar_status_pagamento(
+                    cliente.enviar_status_pagamento(
                         config.cnpjsh, self.id_fila
                     )
                 elif config.tipo_sat == 'rede_interna':
-                    retorno = cliente.enviar_status_pagamento(
-                        config.cnpjsh, self.id_fila, config.numero_caixa,
+                    cliente.enviar_status_pagamento(
+                        config.cnpjsh, self.id_fila,
+                        int(config.numero_caixa),
                         config.chave_acesso_validador,
                         config.path_integrador
                     )
