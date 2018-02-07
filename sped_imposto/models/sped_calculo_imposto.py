@@ -603,7 +603,6 @@ class SpedCalculoImposto(SpedBase):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self.ensure_one()
-        self.partner_id = self.partner_id.partner_id
 
         if self.partner_id.condicao_pagamento_id:
             self.condicao_pagamento_id = \
