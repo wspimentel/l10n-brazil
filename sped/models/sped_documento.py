@@ -26,6 +26,7 @@ try:
         formata_data
     from pybrasil.valor.decimal import Decimal as D
     from pybrasil.valor import formata_valor
+    from pybrasil.template import TemplateBrasil
 
 except (ImportError, IOError) as err:
     _logger.debug(err)
@@ -1693,3 +1694,11 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
                 subsequente_id.operacao_realizada
                 for subsequente_id in documento.documento_subsequente_ids
             )
+
+    def _renderizar_informacoes_template(
+            self, dados_infcomplementar, infcomplementar):
+
+        template = TemplateBrasil(infcomplementar.encode('utf-8'))
+        infcomplementar = template.render(**dados_infcomplementar)
+
+        return infcomplementar

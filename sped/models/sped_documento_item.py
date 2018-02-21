@@ -28,6 +28,7 @@ _logger = logging.getLogger(__name__)
 
 try:
     from pybrasil.valor.decimal import Decimal as D
+    from pybrasil.template import TemplateBrasil
 
 except (ImportError, IOError) as err:
     _logger.debug(err)
@@ -245,3 +246,11 @@ class SpedDocumentoItem(SpedCalculoImpostoItem, models.Model):
 
     def _set_additional_fields(self, sped_documento_id):
         pass
+
+    def _renderizar_informacoes_template(
+            self, dados_infcomplementar, infcomplementar):
+
+        template = TemplateBrasil(infcomplementar.encode('utf-8'))
+        informacao_complementar = template.render(**dados_infcomplementar)
+
+        return informacao_complementar
