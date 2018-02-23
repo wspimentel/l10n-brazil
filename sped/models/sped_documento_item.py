@@ -11,7 +11,7 @@ import logging
 
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from odoo.addons.l10n_br_base.constante_tributaria import (
     REGIME_TRIBUTARIO,
     MODELO_FISCAL,
@@ -249,8 +249,11 @@ class SpedDocumentoItem(SpedCalculoImpostoItem, models.Model):
 
     def _renderizar_informacoes_template(
             self, dados_infcomplementar, infcomplementar):
+        try:
+            template = TemplateBrasil(infcomplementar.encode('utf-8'))
+            informacao_complementar = template.render(**dados_infcomplementar)
 
-        template = TemplateBrasil(infcomplementar.encode('utf-8'))
-        informacao_complementar = template.render(**dados_infcomplementar)
-
-        return informacao_complementar
+            return informacao_complementar
+        except Exception as e:
+            raise UserError(
+                _(""" Erro ao gerar informação adicional do item"""))
