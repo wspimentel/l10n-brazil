@@ -93,9 +93,7 @@ class SpedCalculoImposto(SpedBase):
         string='Empresa',
         default=lambda self: self.env['sped.empresa']._empresa_ativa('sped.empresa')
     )
-    partner_id = fields.Many2one(
-        comodel_name='res.partner',
-    )
+
     partner_id = fields.Many2one(
         comodel_name='res.partner',
         string='Destinatário/Remetente'
@@ -605,7 +603,6 @@ class SpedCalculoImposto(SpedBase):
             'modelo': operacao.modelo,
             'emissao': operacao.emissao,
             'partner_id': self.partner_id.id,
-            'partner_id': self.partner_id.id,
             'condicao_pagamento_id': self.condicao_pagamento_id.id if \
                 self.condicao_pagamento_id else False,
             'transportadora_id': self.transportadora_id.id if \
@@ -649,6 +646,7 @@ class SpedCalculoImposto(SpedBase):
                 dados = {
                     'documento_id': documento.id,
                     'produto_id': item.produto_id.id,
+                    'product_id': item.product_id.id,
                     'quantidade': item.quantidade,
                     'vr_unitario': item.vr_unitario,
                     'vr_frete': item.vr_frete,
@@ -732,6 +730,15 @@ class SpedCalculoImposto(SpedBase):
 
     @api.multi
     def action_view_documento(self):
+        """
+        Rotina para retornar uma view contendo os documentos fiscais
+        :return: action 
+        """
+        # Caso seja um model que tem herança da classe base, pegar os
+        # sed.documentos que estao relacionados
+        if not self._name == 'sped.documento':
+            self = self.documento_ids
+
         action = self.env.ref('sped.sped_documento_emissao_nfe_acao').read()[0]
 
         if len(self) > 1:

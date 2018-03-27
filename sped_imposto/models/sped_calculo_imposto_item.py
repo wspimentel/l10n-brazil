@@ -147,16 +147,25 @@ class SpedCalculoImpostoItem(SpedBase):
         ondelete='restrict',
         index=True,
     )
+    
+    # campo para remoção do sped.produto
+    product_id = fields.Many2one(
+        comodel_name='product.product',
+        string='Produto/Serviço',
+        ondelete='restrict',
+        index=True,
+    )
+
     ncm_id = fields.Many2one(
         comodel_name='sped.ncm',
         string='NCM',
-        related='produto_id.ncm_id',
+        related='product_id.ncm_id',
         readonly=True,
     )
     cest_id = fields.Many2one(
         comodel_name='sped.cest',
         string='CEST',
-        related='produto_id.cest_id',
+        related='product_id.cest_id',
         readonly=True,
     )
     protocolo_id = fields.Many2one(
@@ -1033,31 +1042,36 @@ class SpedCalculoImpostoItem(SpedBase):
 
         return (estado_origem, estado_destino, destinatario)
 
-    @api.onchange('produto_id')
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        """
+        :return:
+        """
+        for record in self:
+            record.produto_id = record.product_id.sped_produto_id
+
+    @api.onchange('product_id')
     def _onchange_produto_id(self):
         self.ensure_one()
 
         if self.emissao == TIPO_EMISSAO_PROPRIA:
             res = self._onchange_produto_id_emissao_propria()
 
-            if hasattr(self, 'product_id'):
-                self.product_id = self.produto_id.product_id.id
             if hasattr(self, 'product_uom'):
-                self.product_uom = self.produto_id.unidade_id.uom_id
+                self.product_uom = self.product_id.unidade_id.uom_id
             if hasattr(self, 'uom_id'):
-                self.uom_id = self.produto_id.unidade_id.uom_id
+                self.uom_id = self.product_id.unidade_id.uom_id
             return res
         elif self.emissao == TIPO_EMISSAO_TERCEIROS:
             if self.env.context.get('manual'):
                 res = self._onchange_produto_id_emissao_propria()
             else:
                 res = self._onchange_produto_id_recebimento()
-            if hasattr(self, 'product_id'):
-                self.product_id = self.produto_id.product_id.id
+
             if hasattr(self, 'product_uom'):
-                self.product_uom = self.produto_id.unidade_id.uom_id
+                self.product_uom = self.product_id.unidade_id.uom_id
             if hasattr(self, 'uom_id'):
-                self.uom_id = self.produto_id.unidade_id.uom_id
+                self.uom_id = self.product_id.unidade_id.uom_id
             return res
 
     def busca_operacao_item(self, domain_base):
@@ -1112,7 +1126,7 @@ class SpedCalculoImpostoItem(SpedBase):
         #
         res = {}
 
-        if not self.produto_id:
+        if not self.product_id:
             return res
 
         #
@@ -1135,48 +1149,48 @@ class SpedCalculoImpostoItem(SpedBase):
         # Se já ocorreu o preenchimento da descrição, não sobrepõe
         #
         if not self.produto_nome:
-            self.produto_nome = self.produto_id.nome
+            self.produto_nome = self.product_id.nome
 
-        self.org_icms = (self.produto_id.org_icms or
-                         ORIGEM_MERCADORIA_NACIONAL)
-        self.unidade_id = self.produto_id.unidade_id.id
+        self.org_icms = \
+            (self.product_id.org_icms or ORIGEM_MERCADORIA_NACIONAL)
+        self.unidade_id = self.product_id.unidade_id.id
 
 
-        if self.produto_id.unidade_tributacao_id:
+        if self.product_id.unidade_tributacao_id:
             self.unidade_tributacao_id = \
-                self.produto_id.unidade_tributacao_id.id
+                self.product_id.unidade_tributacao_id.id
             self.fator_conversao_unidade_tributacao = \
-                self.produto_id.fator_conversao_unidade_tributacao
+                self.product_id.fator_conversao_unidade_tributacao
 
-        elif self.produto_id.unidade_tributacao_ncm_id:
+        elif self.product_id.unidade_tributacao_ncm_id:
             self.unidade_tributacao_id = \
-                self.produto_id.unidade_tributacao_ncm_id.id
+                self.product_id.unidade_tributacao_ncm_id.id
             self.fator_conversao_unidade_tributacao = \
-                self.produto_id.fator_conversao_unidade_tributacao_ncm
+                self.product_id.fator_conversao_unidade_tributacao_ncm
 
         else:
-            self.unidade_tributacao_id = self.produto_id.unidade_id.id
+            self.unidade_tributacao_id = self.product_id.unidade_id.id
             self.fator_conversao_unidade_tributacao = 1
 
         if 'forca_vr_unitario' in self.env.context:
             self.vr_unitario = self.env.context['forca_vr_unitario']
 
         elif self.operacao_id.preco_automatico == 'V':
-            self.vr_unitario = self.produto_id.preco_venda
+            self.vr_unitario = self.product_id.preco_venda
 
         elif self.operacao_id.preco_automatico == 'C':
-            self.vr_unitario = self.produto_id.preco_custo
+            self.vr_unitario = self.product_id.preco_custo
 
         elif self.operacao_id.preco_automatico == 'T':
-            self.vr_unitario = self.produto_id.preco_transferencia
+            self.vr_unitario = self.product_id.preco_transferencia
 
         self.vr_unitario_readonly = self.vr_unitario
 
-        self.peso_bruto_unitario = self.produto_id.peso_bruto
-        self.peso_liquido_unitario = self.produto_id.peso_liquido
-        self.especie = self.produto_id.especie
+        self.peso_bruto_unitario = self.product_id.peso_bruto
+        self.peso_liquido_unitario = self.product_id.peso_liquido
+        self.especie = self.product_id.especie
         self.fator_quantidade_especie = \
-            self.produto_id.fator_quantidade_especie
+            self.product_id.fator_quantidade_especie
 
         estado_origem, estado_destino, destinatario = \
             self._estado_origem_estado_destino_destinatario()
@@ -1193,13 +1207,13 @@ class SpedCalculoImpostoItem(SpedBase):
         #
         protocolo = None
 
-        if self.produto_id.protocolo_id:
-            protocolo = self.produto_id.protocolo_id
+        if self.product_id.protocolo_id:
+            protocolo = self.product_id.protocolo_id
 
-        if (protocolo is None and self.produto_id.ncm_id and
-                self.produto_id.ncm_id.protocolo_ids):
+        if (protocolo is None and self.product_id.ncm_id and
+                self.product_id.ncm_id.protocolo_ids):
             busca_protocolo = [
-                ('ncm_ids.ncm_id', '=', self.produto_id.ncm_id.id),
+                ('ncm_ids.ncm_id', '=', self.product_id.ncm_id.id),
                 '|',
                 ('estado_ids', '=', False),
                 ('estado_ids.uf', '=', estado_destino)
@@ -1236,7 +1250,7 @@ class SpedCalculoImpostoItem(SpedBase):
                     protocolo = self.empresa_id.protocolo_id
 
                 else:
-                    if self.produto_id.ncm_id:
+                    if self.product_id.ncm_id:
                         mensagem_erro = \
                             'Não há protocolo padrão para a empresa, ' \
                             'e o protocolo “{protocolo}” não pode ' \
@@ -1245,8 +1259,8 @@ class SpedCalculoImpostoItem(SpedBase):
                             .format(
                                 protocolo=protocolo.descricao,
                                 estado=estado_destino,
-                                produto=self.produto_id.nome,
-                                ncm=self.produto_id.ncm_id.codigo_formatado
+                                produto=self.product_id.nome,
+                                ncm=self.product_id.ncm_id.codigo_formatado
                             )
                     else:
                         mensagem_erro = \
@@ -1256,7 +1270,7 @@ class SpedCalculoImpostoItem(SpedBase):
                             '(produto “{produto}”)!'\
                             .format(protocolo=protocolo.descricao,
                                     estado=estado_destino,
-                                    produto=self.produto_id.nome)
+                                    produto=self.product_id.nome)
 
                     raise ValidationError(_(mensagem_erro))
 
@@ -1276,7 +1290,7 @@ class SpedCalculoImpostoItem(SpedBase):
             #
             'contribuinte': self.partner_id.contribuinte,
             'protocolo_id': protocolo.id,
-            'tipo_produto_servico': self.produto_id.tipo,
+            'tipo_produto_servico': self.product_id.tipo,
         }
         operacao_item_ids = self.busca_operacao_item(domain_base)
 
@@ -1339,7 +1353,7 @@ class SpedCalculoImpostoItem(SpedBase):
         #
         res = {}
 
-        if not self.produto_id:
+        if not self.product_id:
             return res
 
         #
@@ -1362,48 +1376,48 @@ class SpedCalculoImpostoItem(SpedBase):
         # Se já ocorreu o preenchimento da descrição, não sobrepõe
         #
         if not self.produto_nome:
-            self.produto_nome = self.produto_id.nome
+            self.produto_nome = self.product_id.nome
 
-        self.org_icms = (self.produto_id.org_icms or
+        self.org_icms = (self.product_id.org_icms or
                          ORIGEM_MERCADORIA_NACIONAL)
-        self.unidade_id = self.produto_id.unidade_id.id
+        self.unidade_id = self.product_id.unidade_id.id
 
 
-        if self.produto_id.unidade_tributacao_id:
+        if self.product_id.unidade_tributacao_id:
             self.unidade_tributacao_id = \
-                self.produto_id.unidade_tributacao_id.id
+                self.product_id.unidade_tributacao_id.id
             self.fator_conversao_unidade_tributacao = \
-                self.produto_id.fator_conversao_unidade_tributacao
+                self.product_id.fator_conversao_unidade_tributacao
 
-        elif self.produto_id.unidade_tributacao_ncm_id:
+        elif self.product_id.unidade_tributacao_ncm_id:
             self.unidade_tributacao_id = \
-                self.produto_id.unidade_tributacao_ncm_id.id
+                self.product_id.unidade_tributacao_ncm_id.id
             self.fator_conversao_unidade_tributacao = \
-                self.produto_id.fator_conversao_unidade_tributacao_ncm
+                self.product_id.fator_conversao_unidade_tributacao_ncm
 
         else:
-            self.unidade_tributacao_id = self.produto_id.unidade_id.id
+            self.unidade_tributacao_id = self.product_id.unidade_id.id
             self.fator_conversao_unidade_tributacao = 1
 
         if 'forca_vr_unitario' in self.env.context:
             self.vr_unitario = self.env.context['forca_vr_unitario']
 
         elif self.operacao_id.preco_automatico == 'V':
-            self.vr_unitario = self.produto_id.preco_venda
+            self.vr_unitario = self.product_id.preco_venda
 
         elif self.operacao_id.preco_automatico == 'C':
-            self.vr_unitario = self.produto_id.preco_custo
+            self.vr_unitario = self.product_id.preco_custo
 
         elif self.operacao_id.preco_automatico == 'T':
-            self.vr_unitario = self.produto_id.preco_transferencia
+            self.vr_unitario = self.product_id.preco_transferencia
 
         self.vr_unitario_readonly = self.vr_unitario
 
-        self.peso_bruto_unitario = self.produto_id.peso_bruto
-        self.peso_liquido_unitario = self.produto_id.peso_liquido
-        self.especie = self.produto_id.especie
+        self.peso_bruto_unitario = self.product_id.peso_bruto
+        self.peso_liquido_unitario = self.product_id.peso_liquido
+        self.especie = self.product_id.especie
         self.fator_quantidade_especie = \
-            self.produto_id.fator_quantidade_especie
+            self.product_id.fator_quantidade_especie
 
         estado_origem, estado_destino, destinatario = \
             self._estado_origem_estado_destino_destinatario()
@@ -1423,15 +1437,15 @@ class SpedCalculoImpostoItem(SpedBase):
         #
         protocolo = None
 
-        if self.produto_id.protocolo_id:
-            protocolo = self.produto_id.protocolo_id
+        if self.product_id.protocolo_id:
+            protocolo = self.product_id.protocolo_id
 
         if not protocolo and (
-                self.produto_id.categ_id and
-                self.produto_id.categ_id.protocolo_ids
+                self.product_id.categ_id and
+                self.product_id.categ_id.protocolo_ids
         ):
             busca_protocolo = [
-                ('categ_ids.id', '=', self.produto_id.categ_id.id),
+                ('categ_ids.id', '=', self.product_id.categ_id.id),
                 '|',
                 ('estado_ids', '=', False),
                 ('estado_ids.uf', '=', estado_destino)
@@ -1441,11 +1455,11 @@ class SpedCalculoImpostoItem(SpedBase):
             )
 
         if not protocolo and (
-                self.produto_id.ncm_id and
-                self.produto_id.ncm_id.protocolo_ids
+                self.product_id.ncm_id and
+                self.product_id.ncm_id.protocolo_ids
         ):
             busca_protocolo = [
-                ('ncm_ids.ncm_id', '=', self.produto_id.ncm_id.id),
+                ('ncm_ids.ncm_id', '=', self.product_id.ncm_id.id),
                 '|',
                 ('estado_ids', '=', False),
                 ('estado_ids.uf', '=', estado_destino)
@@ -1480,7 +1494,7 @@ class SpedCalculoImpostoItem(SpedBase):
                     protocolo = self.empresa_id.protocolo_id
 
                 else:
-                    if self.produto_id.ncm_id:
+                    if self.product_id.ncm_id:
                         mensagem_erro = \
                             'Não há protocolo padrão para a empresa, ' \
                             'e o protocolo “{protocolo}” não pode ' \
@@ -1489,8 +1503,8 @@ class SpedCalculoImpostoItem(SpedBase):
                             .format(
                                 protocolo=protocolo.descricao,
                                 estado=estado_destino,
-                                produto=self.produto_id.nome,
-                                ncm=self.produto_id.ncm_id.codigo_formatado
+                                produto=self.product_id.nome,
+                                ncm=self.product_id.ncm_id.codigo_formatado
                             )
                     else:
                         mensagem_erro = \
@@ -1500,7 +1514,7 @@ class SpedCalculoImpostoItem(SpedBase):
                             '(produto “{produto}”)!'\
                             .format(protocolo=protocolo.descricao,
                                     estado=estado_destino,
-                                    produto=self.produto_id.nome)
+                                    produto=self.product_id.nome)
 
                     raise ValidationError(_(mensagem_erro))
 
@@ -1520,7 +1534,7 @@ class SpedCalculoImpostoItem(SpedBase):
             #
             'contribuinte': self.partner_id.contribuinte,
             'protocolo_id': protocolo.id,
-            'tipo_produto_servico': self.produto_id.tipo,
+            'tipo_produto_servico': self.product_id.tipo,
         }
         operacao_item_ids = self.busca_operacao_item(domain_base)
 
@@ -1635,10 +1649,10 @@ class SpedCalculoImpostoItem(SpedBase):
             # 2º - se o NCM tem uma específica
             # 3º - a geral da empresa
             #
-            if self.produto_id.al_pis_cofins_id:
-                al_pis_cofins = self.produto_id.al_pis_cofins_id
-            elif self.produto_id.ncm_id.al_pis_cofins_id:
-                al_pis_cofins = self.produto_id.ncm_id.al_pis_cofins_id
+            if self.product_id.al_pis_cofins_id:
+                al_pis_cofins = self.product_id.al_pis_cofins_id
+            elif self.product_id.ncm_id.al_pis_cofins_id:
+                al_pis_cofins = self.product_id.ncm_id.al_pis_cofins_id
             else:
                 al_pis_cofins = self.empresa_id.al_pis_cofins_id
 
@@ -1660,13 +1674,13 @@ class SpedCalculoImpostoItem(SpedBase):
             # Agora, pega a natureza da receita do PIS-COFINS, necessária
             # para o SPED Contribuições
             #
-            if self.produto_id.codigo_natureza_receita_pis_cofins:
+            if self.product_id.codigo_natureza_receita_pis_cofins:
                 self.codigo_natureza_receita_pis_cofins = \
-                self.produto_id.codigo_natureza_receita_pis_cofins
-            elif self.produto_id.ncm_id.al_pis_cofins_id and \
-                self.produto_id.ncm_id.codigo_natureza_receita_pis_cofins:
+                self.product_id.codigo_natureza_receita_pis_cofins
+            elif self.product_id.ncm_id.al_pis_cofins_id and \
+                self.product_id.ncm_id.codigo_natureza_receita_pis_cofins:
                 self.codigo_natureza_receita_pis_cofins = \
-                    self.produto_id.ncm_id.codigo_natureza_receita_pis_cofins
+                    self.product_id.ncm_id.codigo_natureza_receita_pis_cofins
             elif self.operacao_item_id.codigo_natureza_receita_pis_cofins:
                 self.codigo_natureza_receita_pis_cofins = \
                     self.operacao_item_id.codigo_natureza_receita_pis_cofins
@@ -1723,13 +1737,13 @@ class SpedCalculoImpostoItem(SpedBase):
         # Busca a alíquota do IBPT quando venda
         #
         if self.cfop_id.eh_venda:
-            if self.produto_id.ncm_id:
+            if self.product_id.ncm_id:
                 ibpt = self.env['sped.ibptax.ncm']
 
                 ibpt_ids = ibpt.search([
                     ('estado_id', '=',
                         self.empresa_id.municipio_id.estado_id.id),
-                    ('ncm_id', '=', self.produto_id.ncm_id.id),
+                    ('ncm_id', '=', self.product_id.ncm_id.id),
                 ])
 
                 if len(ibpt_ids) > 0:
@@ -1744,13 +1758,13 @@ class SpedCalculoImpostoItem(SpedBase):
             # NBS por ser mais detalhado tem prioridade sobre o código do
             # serviço
             #
-            elif self.produto_id.nbs_id:
+            elif self.product_id.nbs_id:
                 ibpt = self.env['sped.ibptax.nbs']
 
                 ibpt_ids = ibpt.search([
                     ('estado_id', '=',
                         self.empresa_id.municipio_id.estado_id.id),
-                    ('nbs_id', '=', self.produto_id.nbs_id.id),
+                    ('nbs_id', '=', self.product_id.nbs_id.id),
                 ])
 
                 if len(ibpt_ids) > 0:
@@ -1761,13 +1775,13 @@ class SpedCalculoImpostoItem(SpedBase):
                             POSICAO_CFOP_ESTRANGEIRO):
                         self.al_ibpt += ibpt_ids[0].al_ibpt_internacional
 
-            elif self.produto_id.servico_id:
+            elif self.product_id.servico_id:
                 ibpt = self.env['sped.ibptax.servico']
 
                 ibpt_ids = ibpt.search([
                     ('estado_id', '=',
                         self.empresa_id.municipio_id.estado_id.id),
-                    ('servico_id', '=', self.produto_id.servico_id.id),
+                    ('servico_id', '=', self.product_id.servico_id.id),
                 ])
 
                 if len(ibpt_ids) > 0:
@@ -1851,10 +1865,10 @@ class SpedCalculoImpostoItem(SpedBase):
         # 1º - se o produto tem uma específica
         # 2º - se o NCM tem uma específica
         #
-        if self.produto_id.al_ipi_id:
-            al_ipi = self.produto_id.al_ipi_id
-        elif self.produto_id.ncm_id.al_ipi_id:
-            al_ipi = self.produto_id.ncm_id.al_ipi_id
+        if self.product_id.al_ipi_id:
+            al_ipi = self.product_id.al_ipi_id
+        elif self.product_id.ncm_id.al_ipi_id:
+            al_ipi = self.product_id.ncm_id.al_ipi_id
         else:
             al_ipi = None
 
@@ -1872,7 +1886,7 @@ class SpedCalculoImpostoItem(SpedBase):
         return res
 
     @api.onchange('protocolo_id', 'cfop_id', 'calcula_difal',
-                  'org_icms', 'cst_icms', 'cst_icms_sn', 'produto_id')
+                  'org_icms', 'cst_icms', 'cst_icms_sn', 'product_id')
     def _onchange_cst_icms_cst_icms_sn(self):
         self.ensure_one()
 
@@ -1981,7 +1995,7 @@ class SpedCalculoImpostoItem(SpedBase):
         #
         if ((self.cst_icms in ST_ICMS_CALCULA_ST or
                 self.cst_icms_sn in ST_ICMS_SN_CALCULA_ST) and
-                self.produto_id.tipo != TIPO_PRODUTO_SERVICO_SERVICOS):
+                self.product_id.tipo != TIPO_PRODUTO_SERVICO_SERVICOS):
             al_icms_st = aliquota_origem_destino.al_icms_st_id
 
             self.md_icms_st = al_icms_st.md_icms
@@ -1995,7 +2009,7 @@ class SpedCalculoImpostoItem(SpedBase):
             if (al_icms_st.md_icms ==
                     MODALIDADE_BASE_ICMS_ST_MARGEM_VALOR_AGREGADO and
                     (not al_icms_st.pr_icms)):
-                protocolo_ncm = self.produto_id.ncm_id.busca_mva(
+                protocolo_ncm = self.product_id.ncm_id.busca_mva(
                     self.protocolo_id)
 
                 if (protocolo_ncm is not None) and protocolo_ncm:
