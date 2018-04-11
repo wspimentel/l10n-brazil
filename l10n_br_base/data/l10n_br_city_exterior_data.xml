@@ -19,7 +19,7 @@
         <field name="fuso_horario">UTC</field>
         <field name="name">Afeganistão</field>
         <field name="country_id" ref="base.af" />
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="cep_unico">99999-999</field>
     </record>
 
@@ -30,7 +30,7 @@
         <field name="code">ZA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">África do Sul</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.za" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -42,7 +42,7 @@
         <field name="code">AL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Albânia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.al" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -54,7 +54,7 @@
         <field name="code">DE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Alemanha</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.de" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -66,7 +66,7 @@
         <field name="code">AD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Andorra</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ad" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -78,7 +78,7 @@
         <field name="code">AO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Angola</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ao" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -90,7 +90,7 @@
         <field name="code">AI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Anguila</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ai" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -102,7 +102,7 @@
         <field name="code">AG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Antígua e Barbuda</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ag" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -114,7 +114,7 @@
         <field name="code">SA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Arábia Saudita</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sa" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -126,7 +126,7 @@
         <field name="code">DZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Argélia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.dz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -138,7 +138,7 @@
         <field name="code">AR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Argentina</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ar" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -150,7 +150,7 @@
         <field name="code">AM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Armênia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.am" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -162,7 +162,7 @@
         <field name="code">AW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Aruba</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.aw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -174,7 +174,7 @@
         <field name="code">AU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Austrália</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.au" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -186,7 +186,7 @@
         <field name="code">AT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Áustria</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.at" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -198,7 +198,7 @@
         <field name="code">AZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Azerbaijão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.az" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -210,7 +210,7 @@
         <field name="code">BS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bahamas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bs" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -222,7 +222,7 @@
         <field name="code">BD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bangladeche</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bd" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -234,7 +234,7 @@
         <field name="code">BB</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Barbados</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bb" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -246,7 +246,7 @@
         <field name="code">BH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Barêin</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bh" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -258,7 +258,7 @@
         <field name="code">BE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bélgica</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.be" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -270,7 +270,7 @@
         <field name="code">BZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Belize</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -282,7 +282,7 @@
         <field name="code">BJ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Benin</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bj" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -294,7 +294,7 @@
         <field name="code">BM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bermudas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -306,7 +306,7 @@
         <field name="code">BY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bielorrússia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.by" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -318,7 +318,7 @@
         <field name="code">BO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bolívia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bo" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -330,7 +330,7 @@
         <field name="code">BA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bósnia Herzegóvina</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ba" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -342,7 +342,7 @@
         <field name="code">BW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Botsuana</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -354,7 +354,7 @@
         <field name="code">BN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Brunei</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -366,7 +366,7 @@
         <field name="code">BG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bulgária</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -378,7 +378,7 @@
         <field name="code">BF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Burquina Fasso</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -390,7 +390,7 @@
         <field name="code">BI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Burúndi</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bi" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -402,7 +402,7 @@
         <field name="code">BT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Butão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -414,7 +414,7 @@
         <field name="code">CV</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Cabo Verde</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cv" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -426,7 +426,7 @@
         <field name="code">KY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Caimã, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ky" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -438,7 +438,7 @@
         <field name="code">CM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Camarões</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -450,7 +450,7 @@
         <field name="code">KH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Camboja</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kh" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -462,7 +462,7 @@
         <field name="code">CA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Canadá</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ca" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -474,7 +474,7 @@
         <field name="code">ES</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Canárias, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.es" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -486,7 +486,7 @@
         <field name="code">QA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Catar</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.qa" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -498,7 +498,7 @@
         <field name="code">KZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Cazaquistão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -510,7 +510,7 @@
         <field name="code">TD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Chade</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.td" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -522,7 +522,7 @@
         <field name="code">CL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Chile</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cl" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -534,7 +534,7 @@
         <field name="code">CN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">China</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -546,7 +546,7 @@
         <field name="code">CY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Chipre</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cy" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -558,7 +558,7 @@
         <field name="code">CX</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Christmas, Ilha</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cx" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -570,7 +570,7 @@
         <field name="code">CC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Cocos (Keeling), Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -582,7 +582,7 @@
         <field name="code">CO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Colômbia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.co" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -594,7 +594,7 @@
         <field name="code">KM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Comores</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.km" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -606,7 +606,7 @@
         <field name="code">CG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Congo Brazavile</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -618,7 +618,7 @@
         <field name="code">CD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Congo Quinxassa</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cd" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -630,7 +630,7 @@
         <field name="code">CK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Cook, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ck" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -642,7 +642,7 @@
         <field name="code">KR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Coreia do Norte</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -654,7 +654,7 @@
         <field name="code">KP</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Coreia do Sul</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kp" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -666,7 +666,7 @@
         <field name="code">CI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Costa do Marfim</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ci" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -678,7 +678,7 @@
         <field name="code">CR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Costa Rica</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -690,7 +690,7 @@
         <field name="code">HR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Croácia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.hr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -702,7 +702,7 @@
         <field name="code">CU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Cuba</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -714,7 +714,7 @@
         <field name="code">CW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Curaçao</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -726,7 +726,7 @@
         <field name="code">BQ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Bonaire, Santo Eustáquio e Saba</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bq" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -738,7 +738,7 @@
         <field name="code">SX</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Martinho (parte neerlandesa)</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sx" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -750,7 +750,7 @@
         <field name="code">DK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Dinamarca</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.dk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -762,7 +762,7 @@
         <field name="code">DJ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Djibúti</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.dj" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -774,7 +774,7 @@
         <field name="code">DM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Dominica</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.dm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -786,7 +786,7 @@
         <field name="code">EG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Egito</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.eg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -798,7 +798,7 @@
         <field name="code">SV</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">El Salvador</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sv" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -810,7 +810,7 @@
         <field name="code">AE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Emirados Árabes Unidos</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ae" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -822,7 +822,7 @@
         <field name="code">EC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Equador</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ec" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -834,7 +834,7 @@
         <field name="code">ER</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Eritreia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
        <field name="country_id" ref="base.er" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -846,7 +846,7 @@
         <field name="code">SK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Eslováquia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -858,7 +858,7 @@
         <field name="code">SI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Eslovênia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.si" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -870,7 +870,7 @@
         <field name="code">US</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Estados Unidos</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.us" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -882,7 +882,7 @@
         <field name="code">EE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Estônia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ee" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -894,7 +894,7 @@
         <field name="code">ET</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Etiópia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.et" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -906,7 +906,7 @@
         <field name="code">FK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Falkland, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.fk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -918,7 +918,7 @@
         <field name="code">FO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Faroe, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.fo" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -930,7 +930,7 @@
         <field name="code">FJ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Fiji</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.fj" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -942,7 +942,7 @@
         <field name="code">PH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Filipinas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ph" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -954,7 +954,7 @@
         <field name="code">FI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Finlândia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.fi" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -966,7 +966,7 @@
         <field name="code">FR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">França</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.fr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -978,7 +978,7 @@
         <field name="code">BL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Bartolomeu</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.bl" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -990,7 +990,7 @@
         <field name="code">MF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Martinho (parte francesa)</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1002,7 +1002,7 @@
         <field name="code">WF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Wallis e Futuna</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.wf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1014,7 +1014,7 @@
         <field name="code">GA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Gabão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ga" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1026,7 +1026,7 @@
         <field name="code">GM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Gâmbia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1038,7 +1038,7 @@
         <field name="code">GH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Gana</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gh" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1050,7 +1050,7 @@
         <field name="code">GE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Geórgia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ge" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1062,7 +1062,7 @@
         <field name="code">GI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Gibraltar</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gi" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1074,7 +1074,7 @@
         <field name="code">GD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Granada</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gd" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1086,7 +1086,7 @@
         <field name="code">GR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Grécia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1098,7 +1098,7 @@
         <field name="code">GL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Groenlândia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gl" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1110,7 +1110,7 @@
         <field name="code">GP</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guadalupe</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gp" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1122,7 +1122,7 @@
         <field name="code">GU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guam</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1134,7 +1134,7 @@
         <field name="code">GT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guatemala</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1146,7 +1146,7 @@
         <field name="code">GG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guérnesei</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1158,7 +1158,7 @@
         <field name="code">GY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guiana</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gy" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1170,7 +1170,7 @@
         <field name="code">GF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guiana Francesa</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1182,7 +1182,7 @@
         <field name="code">GN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guiné</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1194,7 +1194,7 @@
         <field name="code">GQ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guiné Equatorial</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gq" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1206,7 +1206,7 @@
         <field name="code">GW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Guiné-Bissau</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.gw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1218,7 +1218,7 @@
         <field name="code">HT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Haiti</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ht" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1230,7 +1230,7 @@
         <field name="code">HN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Honduras</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.hn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1242,7 +1242,7 @@
         <field name="code">HK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Hong Kong</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.hk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1254,7 +1254,7 @@
         <field name="code">HU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Hungria</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.hu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1266,7 +1266,7 @@
         <field name="code">YE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Iêmen</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ye" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1278,7 +1278,7 @@
         <field name="code">IN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Índia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.in" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1290,7 +1290,7 @@
         <field name="code">ID</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Indonésia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.id" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1302,7 +1302,7 @@
         <field name="code">IR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Irã</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ir" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1314,7 +1314,7 @@
         <field name="code">IQ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Iraque</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.iq" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1326,7 +1326,7 @@
         <field name="code">IE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Irlanda</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ie" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1338,7 +1338,7 @@
         <field name="code">IS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Islândia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.is" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1350,7 +1350,7 @@
         <field name="code">IL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Israel</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.il" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1362,7 +1362,7 @@
         <field name="code">IT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Itália</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.it" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1374,7 +1374,7 @@
         <field name="code">JM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Jamaica</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.jm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1386,7 +1386,7 @@
         <field name="code">JP</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Japão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.jp" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1398,7 +1398,7 @@
         <field name="code">JE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Jérsei</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.je" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1410,7 +1410,7 @@
         <field name="code">UM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Johnston, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.um" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1422,7 +1422,7 @@
         <field name="code">JO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Jordânia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.jo" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1434,7 +1434,7 @@
         <field name="code">KW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Kuwait</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1446,7 +1446,7 @@
         <field name="code">LA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Laos</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.la" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1458,7 +1458,7 @@
         <field name="code">LS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Lesoto</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ls" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1470,7 +1470,7 @@
         <field name="code">LV</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Letônia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lv" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1482,7 +1482,7 @@
         <field name="code">LB</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Líbano</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lb" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1494,7 +1494,7 @@
         <field name="code">LR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Libéria</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1506,7 +1506,7 @@
         <field name="code">LY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Líbia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ly" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1518,7 +1518,7 @@
         <field name="code">LI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Liechtenstein</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.li" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1530,7 +1530,7 @@
         <field name="code">LT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Lituânia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1542,7 +1542,7 @@
         <field name="code">LU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Luxemburgo</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1554,7 +1554,7 @@
         <field name="code">MO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Macau</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mo" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1566,7 +1566,7 @@
         <field name="code">MK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Macedônia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1578,7 +1578,7 @@
         <field name="code">MG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Madagascar</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1590,7 +1590,7 @@
         <field name="code">PT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Madeira, Ilha da</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1602,7 +1602,7 @@
         <field name="code">MY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Malásia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.my" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1614,7 +1614,7 @@
         <field name="code">MW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Malawi</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1626,7 +1626,7 @@
         <field name="code">MV</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Maldivas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mv" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1638,7 +1638,7 @@
         <field name="code">ML</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Máli</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ml" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1650,7 +1650,7 @@
         <field name="code">MT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Malta</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1662,7 +1662,7 @@
         <field name="code">IM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Man, Ilha de</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.im" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1674,7 +1674,7 @@
         <field name="code">MP</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Marianas do Norte, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mp" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1686,7 +1686,7 @@
         <field name="code">MA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Marrocos</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ma" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1698,7 +1698,7 @@
         <field name="code">MH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Marshall, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mh" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1710,7 +1710,7 @@
         <field name="code">MQ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Martinica</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mq" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1722,7 +1722,7 @@
         <field name="code">MU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Maurício</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1734,7 +1734,7 @@
         <field name="code">MR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Mauritânia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1746,7 +1746,7 @@
         <field name="code">YT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Mayotte</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.yt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1758,7 +1758,7 @@
         <field name="code">MX</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">México</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mx" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1770,7 +1770,7 @@
         <field name="code">MM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Mianmar</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1782,7 +1782,7 @@
         <field name="code">FM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Micronésia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.fm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1794,7 +1794,7 @@
         <field name="code">MZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Moçambique</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1806,7 +1806,7 @@
         <field name="code">MD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Moldávia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.md" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1818,7 +1818,7 @@
         <field name="code">MC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Mônaco</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1830,7 +1830,7 @@
         <field name="code">MN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Mongólia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.mn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1842,7 +1842,7 @@
         <field name="code">ME</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Montenegro</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.me" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1854,7 +1854,7 @@
         <field name="code">MS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Montserrat</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ms" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1866,7 +1866,7 @@
         <field name="code">NA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Namíbia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.na" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1878,7 +1878,7 @@
         <field name="code">NR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Nauru</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.nr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1890,7 +1890,7 @@
         <field name="code">NP</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Nepal</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.np" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1902,7 +1902,7 @@
         <field name="code">NI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Nicarágua</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ni" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1914,7 +1914,7 @@
         <field name="code">NE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Níger</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ne" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1926,7 +1926,7 @@
         <field name="code">NG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Nigéria</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ng" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1938,7 +1938,7 @@
         <field name="code">NU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Niue</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.nu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1950,7 +1950,7 @@
         <field name="code">NF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Norfolk, Ilha</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.nf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1962,7 +1962,7 @@
         <field name="code">NO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Noruega</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.no" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1974,7 +1974,7 @@
         <field name="code">NC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Nova Caledônia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.nc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1986,7 +1986,7 @@
         <field name="code">NZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Nova Zelândia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.nz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -1998,7 +1998,7 @@
         <field name="code">OM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Omã</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.om" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2010,7 +2010,7 @@
         <field name="code">NL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Países Baixos (Holanda)</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.nl" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2022,7 +2022,7 @@
         <field name="code">PW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Palau</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2034,7 +2034,7 @@
         <field name="code">PS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Palestina</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ps" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2046,7 +2046,7 @@
         <field name="code">PA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Panamá</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pa" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2058,7 +2058,7 @@
         <field name="code">PG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Papua Nova Guiné</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2070,7 +2070,7 @@
         <field name="code">PK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Paquistão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2082,7 +2082,7 @@
         <field name="code">PY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Paraguai</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.py" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2094,7 +2094,7 @@
         <field name="code">PE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Peru</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pe" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2106,7 +2106,7 @@
         <field name="code">PN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Pitcairn</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2118,7 +2118,7 @@
         <field name="code">PF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Polinésia Francesa</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2130,7 +2130,7 @@
         <field name="code">PL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Polônia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pl" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2142,7 +2142,7 @@
         <field name="code">PR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Porto Rico</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2154,7 +2154,7 @@
         <field name="code">KE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Quênia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ke" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2166,7 +2166,7 @@
         <field name="code">KG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Quirguistão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2178,7 +2178,7 @@
         <field name="code">KI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Quiribati</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ki" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2190,7 +2190,7 @@
         <field name="code">GB</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Reino Unido</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.GBP" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2202,7 +2202,7 @@
         <field name="code">CF</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">República Centro-Africana</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cf" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2214,7 +2214,7 @@
         <field name="code">DO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">República Dominicana</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.do" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2226,7 +2226,7 @@
         <field name="code">CZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">República Tcheca</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.cz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2238,7 +2238,7 @@
         <field name="code">RE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Reunião</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.re" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2250,7 +2250,7 @@
         <field name="code">RO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Romênia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ro" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2262,7 +2262,7 @@
         <field name="code">RW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Ruanda</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.rw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2274,7 +2274,7 @@
         <field name="code">RU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Rússia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ru" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2286,7 +2286,7 @@
         <field name="code">EH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Saara Ocidental</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.eh" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2298,7 +2298,7 @@
         <field name="code">SB</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Salomão, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sb" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2310,7 +2310,7 @@
         <field name="code">WS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Samoa</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ws" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2322,7 +2322,7 @@
         <field name="code">AS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Samoa Americana</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.as" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2334,7 +2334,7 @@
         <field name="code">SM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">San Marino</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2346,7 +2346,7 @@
         <field name="code">SH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Santa Helena, Ascensão e Tristão da Cunha</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sh" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2358,7 +2358,7 @@
         <field name="code">LC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Santa Lúcia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2370,7 +2370,7 @@
         <field name="code">VA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Santa Sé (Estado da Cidade do Vaticano)</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.va" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2382,7 +2382,7 @@
         <field name="code">KN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Cristóvão e Neves, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.kn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2394,7 +2394,7 @@
         <field name="code">PM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Pedro e Miquelon</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.pm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2406,7 +2406,7 @@
         <field name="code">ST</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Tomé e Príncipe, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.st" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2418,7 +2418,7 @@
         <field name="code">VC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">São Vicente e Granadinas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.vc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2430,7 +2430,7 @@
         <field name="code">SN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Senegal</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2442,7 +2442,7 @@
         <field name="code">SL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Serra Leoa</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sl" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2454,7 +2454,7 @@
         <field name="code">RS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Sérvia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.rs" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2466,7 +2466,7 @@
         <field name="code">SC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Seychelles</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2478,7 +2478,7 @@
         <field name="code">SG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Singapura</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2490,7 +2490,7 @@
         <field name="code">SY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Síria</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sy" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2502,7 +2502,7 @@
         <field name="code">SO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Somália</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.so" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2514,7 +2514,7 @@
         <field name="code">LK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Sri Lanka</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.lk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2526,7 +2526,7 @@
         <field name="code">EX</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Suazilândia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2538,7 +2538,7 @@
         <field name="code">SD</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Sudão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sd" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2550,7 +2550,7 @@
         <field name="code">SS</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Sudão do Sul</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ss" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2562,7 +2562,7 @@
         <field name="code">SE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Suécia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.se" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2574,7 +2574,7 @@
         <field name="code">SH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Suíça</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ch" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2586,7 +2586,7 @@
         <field name="code">SR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Suriname</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.sr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2598,7 +2598,7 @@
         <field name="code">TH</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Tailândia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.th" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2610,7 +2610,7 @@
         <field name="code">TW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Taiwan</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tw" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2622,7 +2622,7 @@
         <field name="code">TJ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Tajiquistão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tj" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2634,7 +2634,7 @@
         <field name="code">TZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Tanzânia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2646,7 +2646,7 @@
         <field name="code">IO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Território Britânico no Oceano Índico</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.io" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2658,7 +2658,7 @@
         <field name="code">TL</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Timor Leste</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tp" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2670,7 +2670,7 @@
         <field name="code">TG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Togo</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2682,7 +2682,7 @@
         <field name="code">TO</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Tonga</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.to" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2694,7 +2694,7 @@
         <field name="code">TK</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Toquelau</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tk" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2706,7 +2706,7 @@
         <field name="code">TT</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Trinidade e Tobago</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tt" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2718,7 +2718,7 @@
         <field name="code">TN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Tunísia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2730,7 +2730,7 @@
         <field name="code">TC</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Turcas e Caicos, Ilhas</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tc" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2742,7 +2742,7 @@
         <field name="code">TM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Turcomenistão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2754,7 +2754,7 @@
         <field name="code">TR</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Turquia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tr" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2766,7 +2766,7 @@
         <field name="code">TV</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Tuvalu</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.tv" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2778,7 +2778,7 @@
         <field name="code">UA</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Ucrânia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ua" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2790,7 +2790,7 @@
         <field name="code">UG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Uganda</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ug" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2802,7 +2802,7 @@
         <field name="code">UY</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Uruguai</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.uy" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2814,7 +2814,7 @@
         <field name="code">UZ</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Usbequistão</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.uz" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2826,7 +2826,7 @@
         <field name="code">VU</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Vanuatu</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.vu" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2838,7 +2838,7 @@
         <field name="code">VE</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Venezuela</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.ve" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2850,7 +2850,7 @@
         <field name="code">VN</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Vietnã</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.vn" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2862,7 +2862,7 @@
         <field name="code">VG</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Virgens, Ilhas (Britânicas)</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.vg" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2874,7 +2874,7 @@
         <field name="code">VI</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Virgens, Ilhas (EUA)</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.vi" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2886,7 +2886,7 @@
         <field name="code">ZM</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Zâmbia</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.zm" />
         <field name="cep_unico">99999-999</field>
     </record>
@@ -2898,7 +2898,7 @@
         <field name="code">ZW</field>
         <field name="fuso_horario">UTC</field>
         <field name="name">Zimbábue</field>
-        <field name="state_id" ref="base.state_br_ex" />
+        <field name="state_id" ref="l10n_br_base.state_br_ex" />
         <field name="country_id" ref="base.zw" />
         <field name="cep_unico">99999-999</field>
     </record>
