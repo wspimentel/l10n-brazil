@@ -1634,7 +1634,7 @@ class SpedDocumento(SpedCalculoImposto, models.Model):
         return self.executa_depois_create(result, dados)
 
     def executa_antes_write(self, dados):
-        self._check_permite_alteracao(operacao='write', dados=dados)
+        #self._check_permite_alteracao(operacao='write', dados=dados)
         return dados
 
     def write(self, dados):
